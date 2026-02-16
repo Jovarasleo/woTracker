@@ -14,7 +14,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg"],
+      includeAssets: ["vite.svg"],
       manifest: {
         name: "Workout Tracker",
         short_name: "Workout",
