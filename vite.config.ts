@@ -7,23 +7,13 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    tanstackRouter({
-      target: "react",
-      autoCodeSplitting: false,
-    }),
-    tailwindcss(),
-    react({
-      babel: {
-        plugins: [["babel-plugin-react-compiler"]],
-      },
-    }),
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
         clientsClaim: true,
         skipWaiting: true,
+        cleanupOutdatedCaches: true,
       },
-      includeAssets: [],
       manifest: {
         name: "Workout Tracker",
         short_name: "Workout",
@@ -44,6 +34,16 @@ export default defineConfig({
             type: "image/png",
           },
         ],
+      },
+    }),
+    tanstackRouter({
+      target: "react",
+      autoCodeSplitting: false,
+    }),
+    tailwindcss(),
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler"]],
       },
     }),
   ],
