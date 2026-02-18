@@ -13,6 +13,12 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true,
         cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: /.*/,
+            handler: "NetworkFirst",
+          },
+        ],
       },
       manifest: {
         name: "Workout Tracker",
