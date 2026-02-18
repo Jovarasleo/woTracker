@@ -19,6 +19,10 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: "autoUpdate",
+      workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
+      },
       includeAssets: [],
       manifest: {
         name: "Workout Tracker",
