@@ -44,7 +44,7 @@ interface WorkoutDB extends Dexie {
 
 export const db = new Dexie("WorkoutDB") as WorkoutDB;
 
-db.version(1).stores({
+db.version(2).stores({
   workoutTemplates: "++id, name, createdAt",
 
   // index templateId so we can fetch exercises per template
@@ -54,7 +54,8 @@ db.version(1).stores({
   workoutSessions: "++id, workoutTemplateId, date",
 
   // index sessionId for fetching session exercises
-  exerciseLogs: "++id, sessionId, exerciseTemplateId",
+  exerciseLogs:
+    "++id, sessionId, exerciseTemplateId, [sessionId+exerciseTemplateId]",
 
   // index exerciseLogId for fetching sets
   setLogs: "++id, exerciseLogId, setNumber",

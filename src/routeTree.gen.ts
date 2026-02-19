@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkoutTemplateIdRouteImport } from './routes/workout/$templateId'
+import { Route as SessionSessionIdRouteImport } from './routes/session/$sessionId'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -22,31 +24,54 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkoutTemplateIdRoute = WorkoutTemplateIdRouteImport.update({
+  id: '/workout/$templateId',
+  path: '/workout/$templateId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionSessionIdRoute = SessionSessionIdRouteImport.update({
+  id: '/session/$sessionId',
+  path: '/session/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/session/$sessionId': typeof SessionSessionIdRoute
+  '/workout/$templateId': typeof WorkoutTemplateIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/session/$sessionId': typeof SessionSessionIdRoute
+  '/workout/$templateId': typeof WorkoutTemplateIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/session/$sessionId': typeof SessionSessionIdRoute
+  '/workout/$templateId': typeof WorkoutTemplateIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/about' | '/session/$sessionId' | '/workout/$templateId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/about' | '/session/$sessionId' | '/workout/$templateId'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/session/$sessionId'
+    | '/workout/$templateId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  SessionSessionIdRoute: typeof SessionSessionIdRoute
+  WorkoutTemplateIdRoute: typeof WorkoutTemplateIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +90,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workout/$templateId': {
+      id: '/workout/$templateId'
+      path: '/workout/$templateId'
+      fullPath: '/workout/$templateId'
+      preLoaderRoute: typeof WorkoutTemplateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/session/$sessionId': {
+      id: '/session/$sessionId'
+      path: '/session/$sessionId'
+      fullPath: '/session/$sessionId'
+      preLoaderRoute: typeof SessionSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  SessionSessionIdRoute: SessionSessionIdRoute,
+  WorkoutTemplateIdRoute: WorkoutTemplateIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
