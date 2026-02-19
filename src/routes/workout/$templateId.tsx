@@ -30,10 +30,28 @@ function WorkoutPage() {
   );
 
   const startSession = async () => {
+    if (!exercises) return;
+
     const newSessionId = await db.workoutSessions.add({
       workoutTemplateId: numericTemplateId,
       date: new Date().toISOString(),
     });
+
+    await Promise.all(
+      exercises.map(async (exercise) => {
+        const logId = await db.exerciseLogs.add({
+          sessionId: newSessionId,
+          exerciseTemplateId: exercise.id!,
+        });
+
+        await db.setLogs.add({
+          exerciseLogId: logId,
+          weight: 0,
+          reps: 0,
+          setNumber: 1,
+        });
+      }),
+    );
 
     setSessionId(newSessionId);
   };
@@ -45,25 +63,29 @@ function WorkoutPage() {
   return (
     <Stack>
       <Title order={2}>{template.name}</Title>
+      {!sessionId && (
+        <>
+          {exercises.map((exercise) => (
+            <Title key={exercise.id} order={4}>
+              {exercise.name}
+            </Title>
+          ))}
+          <Button onClick={startSession}>Start Session</Button>
+        </>
+      )}
 
-      {exercises.map((exercise) => (
-        <Title key={exercise.id} order={4}>
-          {exercise.name}
-        </Title>
-      ))}
-
-      {!sessionId && <Button onClick={startSession}>Start Session</Button>}
-
-      {sessionId && <Title order={4}>Session started (ID: {sessionId})</Title>}
-
-      {sessionId &&
-        exercises.map((exercise) => (
-          <ExerciseEditor
-            key={exercise.id}
-            exercise={exercise}
-            sessionId={sessionId}
-          />
-        ))}
+      {sessionId && (
+        <>
+          <Title order={4}>Session started (ID: {sessionId})</Title>
+          {exercises.map((exercise) => (
+            <ExerciseEditor
+              key={exercise.id}
+              exercise={exercise}
+              sessionId={sessionId}
+            />
+          ))}
+        </>
+      )}
     </Stack>
   );
 }

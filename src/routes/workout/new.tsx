@@ -1,8 +1,14 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { db } from "../../store/db";
+import { Button, Card, Group, Stack, TextInput } from "@mantine/core";
 import { useState } from "react";
-import { Button, TextInput, Stack, Group, Card } from "@mantine/core";
-import { db } from "../store/db";
 
-export function CreateTemplateForm() {
+export const Route = createFileRoute("/workout/new")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [exercises, setExercises] = useState<string[]>([""]);
 
@@ -45,6 +51,7 @@ export function CreateTemplateForm() {
 
     setName("");
     setExercises([""]);
+    navigate({ to: "/" });
   };
 
   return (

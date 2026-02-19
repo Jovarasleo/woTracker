@@ -1,8 +1,8 @@
+import { Button, Card, ScrollArea, Stack, Title } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CreateTemplateForm } from "../components/CreateTemplateForm";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type WorkoutTemplate } from "../store/db";
-import { Button, Card, Stack, Title } from "@mantine/core";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -36,9 +36,13 @@ function Index() {
   }, []);
 
   return (
-    <div className="p-2">
-      <CreateTemplateForm />
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 flex-wrap">
+    <div>
+      <Link to="/workout/new">
+        <Button size="md" leftSection={<IconPlus />}>
+          Workout Template
+        </Button>
+      </Link>
+      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap">
         {workoutTemplates?.map((template) => {
           return (
             <li key={template.id}>
@@ -57,24 +61,38 @@ function Index() {
           );
         })}
       </ul>
-      <Title order={2}>Past Sessions</Title>
-      <Stack>
-        {sessionsWithTemplate?.map(({ session, template }) => (
-          <Card key={session.id} shadow="sm" padding="lg">
-            <Stack>
-              <Title
-                order={4}
-              >{`${template.name} — ${new Date(session.date).toLocaleString()}`}</Title>
 
-              <Link
-                to="/session/$sessionId"
-                params={{ sessionId: session.id!.toString() }}
-              >
-                <Button>Continue / View</Button>
-              </Link>
-            </Stack>
-          </Card>
-        ))}
+      <Stack className="bottom-0 fixed left-0 right-0 ">
+        <Title order={2}>Past Sessions</Title>
+        <ScrollArea
+          style={{
+            height: "50vh",
+          }}
+          type="auto"
+        >
+          {sessionsWithTemplate?.map(({ session, template }) => (
+            <Card key={session.id} shadow="sm" padding="sm">
+              <Stack>
+                <Title order={4}>{`${template.name} — ${new Date(
+                  session.date,
+                ).toLocaleString("lt-LT", {
+                  year: "numeric",
+                  month: "short", // abbreviated month (e.g., vas for vasaris)
+                  day: "2-digit",
+                  hour: "2-digit",
+                  hour12: false, // 24-hour format
+                })}`}</Title>
+
+                <Link
+                  to="/session/$sessionId"
+                  params={{ sessionId: session.id!.toString() }}
+                >
+                  <Button>Continue / View</Button>
+                </Link>
+              </Stack>
+            </Card>
+          ))}
+        </ScrollArea>
       </Stack>
     </div>
   );
