@@ -1,55 +1,116 @@
-import { Button, Card, Group, Input, NumberInput, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Card,
+  Input,
+  NumberInput,
+  Title,
+} from "@mantine/core";
+import { IconCheck, IconEdit } from "@tabler/icons-react";
+import { useState } from "react";
 import { useExerciseEdtior } from "../hooks/useExerciseEditor";
 import { type ExerciseTemplate } from "../store/db";
 
 interface Props {
   exercise: ExerciseTemplate;
   sessionId: number;
+  editable: boolean;
+  onEditExercise: (exerciseId: number) => void;
 }
 
-export function ExerciseEditor({ exercise, sessionId }: Props) {
+export function ExerciseEditor({
+  exercise,
+  sessionId,
+  editable,
+  onEditExercise,
+}: Props) {
+  const [activeSetId, setActiveSetId] = useState<number | null>(null);
   const { exerciseLog, sets, addSet, updateSetWeight, updateSetReps } =
     useExerciseEdtior(exercise, sessionId);
+
+  const onSetEditable = (exerciseId: number, setId: number) => {
+    if (setId === activeSetId) {
+      setActiveSetId(null);
+      return;
+    }
+
+    onEditExercise(exerciseId);
+    setActiveSetId(setId);
+  };
+
+  const addActiveSet = async () => {
+    const setId = await addSet();
+    onSetEditable(exercise.id, setId);
+  };
 
   if (!exerciseLog && !sets) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-1">
       <Title order={4}>{exercise.name}</Title>
-      <div className="flex flex-nowrap flex-col gap-4 max-w-96">
-        {(sets ?? []).map((set) => (
-          <div className="flex flex-col">
-            <Card key={set.id}>
-              <Group>
-                <Input.Wrapper label="Weight" className="text-left">
+      <div className="flex flex-col gap-4 ">
+        {(sets ?? []).map((set) => {
+          const disabled = activeSetId !== set.id || !editable;
+          return (
+            <Card key={set.id} className="flex">
+              <div className="flex gap-4">
+                <Input.Wrapper
+                  label="Weight"
+                  className="text-left max-w-32 sm:max-w-max"
+                >
                   <NumberInput
                     size="xs"
                     value={set.weight}
-                    onChange={async (weight) =>
+                    disabled={disabled}
+                    onChange={(weight) =>
                       updateSetWeight(Number(weight), set.id)
                     }
                     placeholder="Weight"
                   />
                 </Input.Wrapper>
 
-                <Input.Wrapper label="Reps" className="text-left">
+                <Input.Wrapper
+                  label="Reps"
+                  className="text-left max-w-32 sm:max-w-max"
+                >
                   <NumberInput
                     size="xs"
                     value={set.reps}
-                    onChange={async (reps) =>
-                      updateSetReps(Number(reps), set.id)
-                    }
+                    min={0}
+                    disabled={disabled}
+                    onChange={(reps) => updateSetReps(Number(reps), set.id)}
                     placeholder="Reps"
                   />
                 </Input.Wrapper>
-              </Group>
+                <ActionIcon
+                  className="self-end"
+                  variant="subtle"
+                  onClick={() => onSetEditable(exercise.id, set.id)}
+                >
+                  {disabled ? (
+                    <IconEdit
+                      style={{ width: "70%", height: "70%" }}
+                      stroke={1.75}
+                    />
+                  ) : (
+                    <IconCheck
+                      style={{ width: "70%", height: "70%" }}
+                      stroke={1.75}
+                    />
+                  )}
+                </ActionIcon>
+              </div>
             </Card>
-          </div>
-        ))}
+          );
+        })}
 
-        <Button onClick={addSet} className="self-end">
+        <Button
+          variant="light"
+          onClick={() => addActiveSet()}
+          className="self-end"
+        >
           Add Set
         </Button>
       </div>

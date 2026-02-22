@@ -3,6 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, type ExerciseLog, type ExerciseTemplate } from "../../store/db";
 import { Stack, Title, Loader } from "@mantine/core";
 import { ExerciseEditor } from "../../components/ExerciseEditor";
+import { useState } from "react";
 
 export const Route = createFileRoute("/session/$sessionId")({
   component: SessionPage,
@@ -10,25 +11,26 @@ export const Route = createFileRoute("/session/$sessionId")({
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
+  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
   const numericSessionId = Number(sessionId);
 
-  // 1️⃣ Load session
+  const onEditExercise = (id: number) => {
+    setActiveExerciseId(id);
+  };
+
   const session = useLiveQuery(
     () => db.workoutSessions.get(numericSessionId),
     [numericSessionId],
   );
 
-  // 2️⃣ Load exercises for this session
   const exerciseLogsWithTemplate = useLiveQuery(async () => {
     if (!numericSessionId) return [];
 
-    // 1️⃣ Get all logs for the session
     const logs = await db.exerciseLogs
       .where("sessionId")
       .equals(numericSessionId)
       .toArray();
 
-    // 2️⃣ Map logs to full templates
     const results = await Promise.all(
       logs.map(async (log) => {
         const template = await db.exerciseTemplates.get(log.exerciseTemplateId);
@@ -40,7 +42,6 @@ function SessionPage() {
       }),
     );
 
-    // 3️⃣ Filter out nulls and assert type
     return results.filter(
       (item): item is { log: ExerciseLog; template: ExerciseTemplate } =>
         item !== null,
@@ -66,8 +67,10 @@ function SessionPage() {
       {exerciseLogsWithTemplate.map(({ log, template }) => (
         <ExerciseEditor
           key={log.id}
-          exercise={template} // full ExerciseTemplate now
+          exercise={template}
           sessionId={numericSessionId}
+          editable={activeExerciseId === template.id}
+          onEditExercise={onEditExercise}
         />
       ))}
     </Stack>

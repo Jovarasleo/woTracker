@@ -73,13 +73,15 @@ function Index() {
           }}
           type="auto"
         >
-          {sessionsWithTemplate?.map(({ session, template }) => (
-            <SessionCard
-              key={session.id}
-              session={session}
-              template={template}
-            />
-          ))}
+          <Stack gap="sm" p="sm">
+            {sessionsWithTemplate?.map(({ session, template }) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                template={template}
+              />
+            ))}
+          </Stack>
         </ScrollArea>
       </Stack>
     </div>

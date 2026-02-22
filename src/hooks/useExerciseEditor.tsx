@@ -31,20 +31,24 @@ export function useExerciseEdtior(
         exerciseTemplateId: exercise.id!,
       });
 
-      await db.setLogs.add({
+      const setId = await db.setLogs.add({
         exerciseLogId: id,
         weight: 0,
         reps: 0,
         setNumber: 1,
       });
+
+      return setId;
     } else {
       const setNumber = (sets?.length ?? 0) + 1;
-      await db.setLogs.add({
+      const setId = await db.setLogs.add({
         exerciseLogId: exerciseLog.id!,
         weight: 0,
         reps: 0,
         setNumber,
       });
+
+      return setId;
     }
   };
 

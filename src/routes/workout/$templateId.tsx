@@ -12,6 +12,11 @@ export const Route = createFileRoute("/workout/$templateId")({
 function WorkoutPage() {
   const { templateId } = Route.useParams();
   const numericTemplateId = Number(templateId);
+  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
+
+  const onEditExercise = (id: number) => {
+    setActiveExerciseId(id);
+  };
 
   const [sessionId, setSessionId] = useState<number | null>(null);
 
@@ -82,6 +87,8 @@ function WorkoutPage() {
               key={exercise.id}
               exercise={exercise}
               sessionId={sessionId}
+              editable={activeExerciseId === exercise.id}
+              onEditExercise={onEditExercise}
             />
           ))}
         </>
