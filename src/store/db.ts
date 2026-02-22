@@ -8,7 +8,7 @@ export interface WorkoutTemplate {
 
 export interface WorkoutSession {
   id: number;
-  workoutTemplateId: number;
+  name: string; // independent name
   date: string;
   notes?: string;
 }
@@ -16,14 +16,14 @@ export interface WorkoutSession {
 export interface ExerciseTemplate {
   id: number;
   workoutTemplateId: number;
-  name: string;
-  order: number;
+  name: string; // independent exercise library
+  order?: number; // optional, for sorting if needed
 }
 
 export interface ExerciseLog {
   id: number;
-  sessionId: number;
-  exerciseTemplateId: number;
+  sessionId: number; // links exercise to a session
+  exerciseTemplateId: number; // reference to exercise template
 }
 
 export interface SetLog {
@@ -44,19 +44,34 @@ interface WorkoutDB extends Dexie {
 
 export const db = new Dexie("WorkoutDB") as WorkoutDB;
 
-db.version(2).stores({
-  workoutTemplates: "++id, name, createdAt",
+db.version(3)
+  .stores({
+    workoutTemplates: "++id, name, createdAt",
+    exerciseTemplates: "++id, workoutTemplateId, order",
+    workoutSessions: "++id, name, date", // updated schema
+    exerciseLogs:
+      "++id, sessionId, exerciseTemplateId, [sessionId+exerciseTemplateId]",
+    setLogs: "++id, exerciseLogId, setNumber",
+  })
+  .upgrade(async (tx) => {
+    // Fetch all existing workout sessions
+    const sessions = await tx.table("workoutSessions").toArray();
 
-  // index templateId so we can fetch exercises per template
-  exerciseTemplates: "++id, workoutTemplateId, order",
+    console.log("onUpgrade");
 
-  // index templateId + date for history queries
-  workoutSessions: "++id, workoutTemplateId, date",
+    for (const session of sessions) {
+      // For old sessions, copy the template name into session.name
+      if ("workoutTemplateId" in session) {
+        const template = await tx
+          .table("workoutTemplates")
+          .get(session.workoutTemplateId);
+        // fallback name if template was deleted
+        session.name = template?.name ?? "Untitled Session";
+        // remove the old workoutTemplateId field
+        delete session.workoutTemplateId;
 
-  // index sessionId for fetching session exercises
-  exerciseLogs:
-    "++id, sessionId, exerciseTemplateId, [sessionId+exerciseTemplateId]",
-
-  // index exerciseLogId for fetching sets
-  setLogs: "++id, exerciseLogId, setNumber",
-});
+        // update the session in the database
+        await tx.table("workoutSessions").put(session);
+      }
+    }
+  });

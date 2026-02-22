@@ -1,27 +1,23 @@
 import { Button, Card, Stack, Title } from "@mantine/core";
-import type { WorkoutSession, WorkoutTemplate } from "../store/db";
 import { Link } from "@tanstack/react-router";
+import type { WorkoutSession } from "../store/db";
 
 interface Props {
   session: WorkoutSession;
-  template: WorkoutTemplate;
 }
 
-export function SessionCard({ session, template }: Props) {
+export function SessionCard({ session }: Props) {
   return (
     <Card shadow="sm" padding="sm">
       <Stack>
         <Title order={4}>
-          {`${template.name} — ${new Date(session.date).toLocaleString(
-            "lt-LT",
-            {
-              year: "numeric",
-              month: "short", // abbreviated month (e.g., vas for vasaris)
-              day: "2-digit",
-              hour: "2-digit",
-              hour12: false, // 24-hour format
-            },
-          )}`}
+          {`${session.name} — ${new Date(session.date).toLocaleString("lt-LT", {
+            year: "numeric",
+            month: "short", // abbreviated month (e.g., vas for vasaris)
+            day: "2-digit",
+            hour: "2-digit",
+            hour12: false, // 24-hour format
+          })}`}
           h
         </Title>
 

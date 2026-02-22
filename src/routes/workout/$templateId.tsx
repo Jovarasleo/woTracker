@@ -38,7 +38,7 @@ function WorkoutPage() {
     if (!exercises) return;
 
     const newSessionId = await db.workoutSessions.add({
-      workoutTemplateId: numericTemplateId,
+      name: template?.name ?? "Unnamed",
       date: new Date().toISOString(),
     });
 
