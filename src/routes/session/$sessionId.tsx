@@ -50,8 +50,18 @@ function SessionPage() {
   if (!session || !exerciseLogsWithTemplate) return <Loader />;
 
   return (
-    <Stack>
-      <Title order={2}>{`Session: ${session.date}`}</Title>
+    <Stack className="justify-center">
+      <Title order={2}>{`Session: ${new Date(session.date).toLocaleString(
+        "lt-LT",
+        {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        },
+      )}`}</Title>
 
       {exerciseLogsWithTemplate.map(({ log, template }) => (
         <ExerciseEditor

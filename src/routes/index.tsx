@@ -3,6 +3,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type WorkoutTemplate } from "../store/db";
+import { SessionCard } from "../components/SessionCard";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -42,18 +43,20 @@ function Index() {
           Workout Template
         </Button>
       </Link>
-      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap">
+      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-3">
         {workoutTemplates?.map((template) => {
           return (
             <li key={template.id}>
-              <Card key={template.id} shadow="sm" padding="lg" className="mt-3">
+              <Card shadow="sm" padding="sm">
                 <Stack>
-                  <Title order={4}>{template.name}</Title>
+                  <div>
+                    <Title order={4}>{template.name}</Title>
+                  </div>
                   <Link
                     to="/workout/$templateId"
                     params={{ templateId: template.id!.toString() }}
                   >
-                    <Button>Start Workout</Button>
+                    <Button color="green">Start</Button>
                   </Link>
                 </Stack>
               </Card>
@@ -71,26 +74,11 @@ function Index() {
           type="auto"
         >
           {sessionsWithTemplate?.map(({ session, template }) => (
-            <Card key={session.id} shadow="sm" padding="sm">
-              <Stack>
-                <Title order={4}>{`${template.name} — ${new Date(
-                  session.date,
-                ).toLocaleString("lt-LT", {
-                  year: "numeric",
-                  month: "short", // abbreviated month (e.g., vas for vasaris)
-                  day: "2-digit",
-                  hour: "2-digit",
-                  hour12: false, // 24-hour format
-                })}`}</Title>
-
-                <Link
-                  to="/session/$sessionId"
-                  params={{ sessionId: session.id!.toString() }}
-                >
-                  <Button>Continue / View</Button>
-                </Link>
-              </Stack>
-            </Card>
+            <SessionCard
+              key={session.id}
+              session={session}
+              template={template}
+            />
           ))}
         </ScrollArea>
       </Stack>

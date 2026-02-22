@@ -1,4 +1,4 @@
-import { Button, Group, Input, NumberInput, Stack, Title } from "@mantine/core";
+import { Button, Card, Group, Input, NumberInput, Title } from "@mantine/core";
 import { useExerciseEdtior } from "../hooks/useExerciseEditor";
 import { type ExerciseTemplate } from "../store/db";
 
@@ -16,33 +16,43 @@ export function ExerciseEditor({ exercise, sessionId }: Props) {
   }
 
   return (
-    <Stack>
+    <div className="flex flex-col items-center">
       <Title order={4}>{exercise.name}</Title>
-      <Group>
+      <div className="flex flex-nowrap flex-col gap-4 max-w-96">
         {(sets ?? []).map((set) => (
-          <Group key={set.id}>
-            <Input.Wrapper label="Weight">
-              <NumberInput
-                value={set.weight}
-                onChange={async (weight) =>
-                  updateSetWeight(Number(weight), set.id)
-                }
-                placeholder="Weight"
-              />
-            </Input.Wrapper>
+          <div className="flex flex-col">
+            <Card key={set.id}>
+              <Group>
+                <Input.Wrapper label="Weight" className="text-left">
+                  <NumberInput
+                    size="xs"
+                    value={set.weight}
+                    onChange={async (weight) =>
+                      updateSetWeight(Number(weight), set.id)
+                    }
+                    placeholder="Weight"
+                  />
+                </Input.Wrapper>
 
-            <Input.Wrapper label="Reps">
-              <NumberInput
-                value={set.reps}
-                onChange={async (reps) => updateSetReps(Number(reps), set.id)}
-                placeholder="Reps"
-              />
-            </Input.Wrapper>
-          </Group>
+                <Input.Wrapper label="Reps" className="text-left">
+                  <NumberInput
+                    size="xs"
+                    value={set.reps}
+                    onChange={async (reps) =>
+                      updateSetReps(Number(reps), set.id)
+                    }
+                    placeholder="Reps"
+                  />
+                </Input.Wrapper>
+              </Group>
+            </Card>
+          </div>
         ))}
 
-        <Button onClick={addSet}>Add Set</Button>
-      </Group>
-    </Stack>
+        <Button onClick={addSet} className="self-end">
+          Add Set
+        </Button>
+      </div>
+    </div>
   );
 }
