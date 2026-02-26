@@ -1,3 +1,4 @@
+import { Fragment } from "react/jsx-runtime";
 import {
   ActionIcon,
   Button,
@@ -42,10 +43,10 @@ function Index() {
           Workout Template
         </Button>
       </Link>
-      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-3">
+      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-5">
         {workoutTemplates?.map((template) => {
           return (
-            <>
+            <Fragment key={template.id}>
               <Modal
                 centered
                 opened={opened}
@@ -93,7 +94,7 @@ function Index() {
                   </Stack>
                 </Card>
               </li>
-            </>
+            </Fragment>
           );
         })}
       </ul>
@@ -106,11 +107,11 @@ function Index() {
           }}
           type="auto"
         >
-          <Stack gap="sm" p="sm">
+          <div className="grid gap-2 sm:grid-cols-2 px-5">
             {sessionsWithTemplate?.map((session) => (
               <SessionCard key={session.id} session={session} />
             ))}
-          </Stack>
+          </div>
         </ScrollArea>
       </Stack>
     </div>

@@ -17,13 +17,15 @@ export interface ExerciseTemplate {
   id: number;
   workoutTemplateId: number;
   name: string; // independent exercise library
-  order?: number; // optional, for sorting if needed
+  order?: number;
 }
 
 export interface ExerciseLog {
   id: number;
   sessionId: number; // links exercise to a session
-  exerciseTemplateId: number; // reference to exercise template
+  name: string;
+  order?: number; // copied
+  exerciseTemplateId?: number; // reference to exercise template
 }
 
 export interface SetLog {
@@ -44,34 +46,55 @@ interface WorkoutDB extends Dexie {
 
 export const db = new Dexie("WorkoutDB") as WorkoutDB;
 
-db.version(3)
+db.version(6)
   .stores({
     workoutTemplates: "++id, name, createdAt",
     exerciseTemplates: "++id, workoutTemplateId, order",
-    workoutSessions: "++id, name, date", // updated schema
+    workoutSessions: "++id, name, date",
     exerciseLogs:
-      "++id, sessionId, exerciseTemplateId, [sessionId+exerciseTemplateId]",
+      "++id, sessionId, name, order, createdAt, exerciseTemplateId, [sessionId+exerciseTemplateId]",
     setLogs: "++id, exerciseLogId, setNumber",
   })
   .upgrade(async (tx) => {
-    // Fetch all existing workout sessions
-    const sessions = await tx.table("workoutSessions").toArray();
+    const logs = await tx.table("exerciseLogs").toArray();
 
-    console.log("onUpgrade");
+    for (const log of logs) {
+      // already migrated
+      if (log.name) continue;
 
-    for (const session of sessions) {
-      // For old sessions, copy the template name into session.name
-      if ("workoutTemplateId" in session) {
-        const template = await tx
-          .table("workoutTemplates")
-          .get(session.workoutTemplateId);
-        // fallback name if template was deleted
-        session.name = template?.name ?? "Untitled Session";
-        // remove the old workoutTemplateId field
-        delete session.workoutTemplateId;
+      const template = await tx
+        .table("exerciseTemplates")
+        .get(log.exerciseTemplateId);
 
-        // update the session in the database
-        await tx.table("workoutSessions").put(session);
+      await tx.table("exerciseLogs").put({
+        ...log,
+        name: template?.name ?? "Exercise",
+      });
+    }
+  })
+  .upgrade(async (tx) => {
+    const logs = await tx.table("exerciseLogs").toArray();
+
+    // Group logs by session
+    const bySession = new Map<number, typeof logs>();
+
+    for (const log of logs) {
+      if (!bySession.has(log.sessionId)) {
+        bySession.set(log.sessionId, []);
       }
+      bySession.get(log.sessionId)!.push(log);
+    }
+
+    for (const [, sessionLogs] of bySession) {
+      // Sort existing logs deterministically
+      sessionLogs.sort((a, b) => a.id - b.id);
+
+      const updated = sessionLogs.map((log, index) => ({
+        ...log,
+        order: (index + 1) * 1000,
+        createdAt: log.createdAt ?? Date.now(),
+      }));
+
+      await tx.table("exerciseLogs").bulkPut(updated);
     }
   });

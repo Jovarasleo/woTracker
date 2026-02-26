@@ -1,31 +1,23 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Button, Loader, Stack, Title } from "@mantine/core";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../store/db";
-import { Stack, Title, Loader, Button } from "@mantine/core";
-import { ExerciseEditor } from "../../components/ExerciseEditor";
 
 export const Route = createFileRoute("/workout/$templateId")({
   component: WorkoutPage,
 });
 
 function WorkoutPage() {
+  const navigate = useNavigate();
   const { templateId } = Route.useParams();
   const numericTemplateId = Number(templateId);
-  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
-
-  const onEditExercise = (id: number) => {
-    setActiveExerciseId(id);
-  };
-
-  const [sessionId, setSessionId] = useState<number | null>(null);
 
   const template = useLiveQuery(
     () => db.workoutTemplates.get(numericTemplateId),
     [numericTemplateId],
   );
 
-  const exercises = useLiveQuery(
+  const exerciseTemplates = useLiveQuery(
     () =>
       db.exerciseTemplates
         .where("workoutTemplateId")
@@ -35,7 +27,7 @@ function WorkoutPage() {
   );
 
   const startSession = async () => {
-    if (!exercises) return;
+    if (!exerciseTemplates) return;
 
     const newSessionId = await db.workoutSessions.add({
       name: template?.name ?? "Unnamed",
@@ -43,10 +35,11 @@ function WorkoutPage() {
     });
 
     await Promise.all(
-      exercises.map(async (exercise) => {
+      exerciseTemplates.map(async (exerciseTemplate) => {
         const logId = await db.exerciseLogs.add({
+          name: exerciseTemplate.name,
           sessionId: newSessionId,
-          exerciseTemplateId: exercise.id!,
+          exerciseTemplateId: exerciseTemplate.id!,
         });
 
         await db.setLogs.add({
@@ -58,41 +51,25 @@ function WorkoutPage() {
       }),
     );
 
-    setSessionId(newSessionId);
+    navigate({
+      to: "/session/$sessionId",
+      params: { sessionId: newSessionId.toString() },
+    });
   };
 
-  if (!template || !exercises) {
+  if (!template || !exerciseTemplates) {
     return <Loader />;
   }
 
   return (
     <Stack>
       <Title order={2}>{template.name}</Title>
-      {!sessionId && (
-        <>
-          {exercises.map((exercise) => (
-            <Title key={exercise.id} order={4}>
-              {exercise.name}
-            </Title>
-          ))}
-          <Button onClick={startSession}>Start Session</Button>
-        </>
-      )}
-
-      {sessionId && (
-        <>
-          <Title order={4}>Session started (ID: {sessionId})</Title>
-          {exercises.map((exercise) => (
-            <ExerciseEditor
-              key={exercise.id}
-              exercise={exercise}
-              sessionId={sessionId}
-              editable={activeExerciseId === exercise.id}
-              onEditExercise={onEditExercise}
-            />
-          ))}
-        </>
-      )}
+      {exerciseTemplates.map((exercise) => (
+        <Title key={exercise.id} order={4}>
+          {exercise.name}
+        </Title>
+      ))}
+      <Button onClick={startSession}>Start Session</Button>
     </Stack>
   );
 }

@@ -1,55 +1,23 @@
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type ExerciseTemplate } from "../store/db";
+import { db, type ExerciseLog, type ExerciseTemplate } from "../store/db";
 
-export function useExerciseEdtior(
-  exercise: ExerciseTemplate,
-  sessionId: number,
-) {
-  const exerciseLog = useLiveQuery(
-    () =>
-      db.exerciseLogs
-        .where({ sessionId, exerciseTemplateId: exercise.id! })
-        .first(),
-    [sessionId, exercise.id],
-  );
-
+export function useExerciseEdtior(exercise: ExerciseLog | ExerciseTemplate) {
   const sets = useLiveQuery(
     () =>
-      exerciseLog
-        ? db.setLogs
-            .where("exerciseLogId")
-            .equals(exerciseLog.id!)
-            .sortBy("setNumber")
-        : [],
-    [exerciseLog?.id],
+      db.setLogs.where("exerciseLogId").equals(exercise.id).sortBy("setNumber"),
+    [exercise],
   );
 
   const addSet = async () => {
-    if (!exerciseLog) {
-      const id = await db.exerciseLogs.add({
-        sessionId,
-        exerciseTemplateId: exercise.id!,
-      });
+    const setNumber = (sets?.length ?? 0) + 1;
+    const setId = await db.setLogs.add({
+      exerciseLogId: exercise.id,
+      weight: 0,
+      reps: 0,
+      setNumber,
+    });
 
-      const setId = await db.setLogs.add({
-        exerciseLogId: id,
-        weight: 0,
-        reps: 0,
-        setNumber: 1,
-      });
-
-      return setId;
-    } else {
-      const setNumber = (sets?.length ?? 0) + 1;
-      const setId = await db.setLogs.add({
-        exerciseLogId: exerciseLog.id!,
-        weight: 0,
-        reps: 0,
-        setNumber,
-      });
-
-      return setId;
-    }
+    return setId;
   };
 
   const updateSetWeight = async (weight: number, setId: number) => {
@@ -69,7 +37,6 @@ export function useExerciseEdtior(
   };
 
   return {
-    exerciseLog,
     sets,
     addSet,
     updateSetWeight,

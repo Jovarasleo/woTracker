@@ -9,24 +9,23 @@ import {
 import { IconCheck, IconEdit } from "@tabler/icons-react";
 import { useState } from "react";
 import { useExerciseEdtior } from "../hooks/useExerciseEditor";
-import { type ExerciseTemplate } from "../store/db";
+import { type ExerciseLog, type ExerciseTemplate } from "../store/db";
 
 interface Props {
-  exercise: ExerciseTemplate;
+  exerciseLog: ExerciseLog | ExerciseTemplate;
   sessionId: number;
   editable: boolean;
   onEditExercise: (exerciseId: number) => void;
 }
 
 export function ExerciseEditor({
-  exercise,
-  sessionId,
+  exerciseLog,
   editable,
   onEditExercise,
 }: Props) {
   const [activeSetId, setActiveSetId] = useState<number | null>(null);
-  const { exerciseLog, sets, addSet, updateSetWeight, updateSetReps } =
-    useExerciseEdtior(exercise, sessionId);
+  const { sets, addSet, updateSetWeight, updateSetReps } =
+    useExerciseEdtior(exerciseLog);
 
   const onSetEditable = (exerciseId: number, setId: number) => {
     if (setId === activeSetId) {
@@ -40,7 +39,7 @@ export function ExerciseEditor({
 
   const addActiveSet = async () => {
     const setId = await addSet();
-    onSetEditable(exercise.id, setId);
+    onSetEditable(exerciseLog.id, setId);
   };
 
   if (!exerciseLog && !sets) {
@@ -49,7 +48,7 @@ export function ExerciseEditor({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <Title order={4}>{exercise.name}</Title>
+      <Title order={4}>{exerciseLog.name}</Title>
       <div className="flex flex-col gap-4 ">
         {(sets ?? []).map((set) => {
           const disabled = activeSetId !== set.id || !editable;
@@ -87,7 +86,7 @@ export function ExerciseEditor({
                 <ActionIcon
                   className="self-end"
                   variant="subtle"
-                  onClick={() => onSetEditable(exercise.id, set.id)}
+                  onClick={() => onSetEditable(exerciseLog.id, set.id)}
                 >
                   {disabled ? (
                     <IconEdit
