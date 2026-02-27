@@ -54,7 +54,7 @@ function SessionPage() {
         hour12: false,
       })}`}</Title>
 
-      <div className="max-w-110 w-full text-left mt-4">
+      <div className="max-w-87 sm:max-w-110 w-full text-left my-4">
         <Button
           size="sm"
           variant="outline"

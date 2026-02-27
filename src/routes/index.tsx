@@ -26,7 +26,7 @@ function Index() {
     [],
   );
 
-  const sessionsWithTemplate = useLiveQuery(
+  const workoutSessions = useLiveQuery(
     async () => db.workoutSessions.toArray(),
     [],
   );
@@ -99,21 +99,18 @@ function Index() {
         })}
       </ul>
 
-      <Stack className="bottom-0 fixed left-0 right-0 ">
-        <Title order={2}>Past Sessions</Title>
-        <ScrollArea
-          style={{
-            height: "50vh",
-          }}
-          type="auto"
-        >
-          <div className="grid gap-2 sm:grid-cols-2 px-5">
-            {sessionsWithTemplate?.map((session) => (
-              <SessionCard key={session.id} session={session} />
-            ))}
-          </div>
-        </ScrollArea>
-      </Stack>
+      {!!workoutSessions?.length && (
+        <Stack className="bottom-0 fixed left-0 right-0 ">
+          <Title order={2}>Past Sessions</Title>
+          <ScrollArea type="scroll" className="h-[40vh]">
+            <div className="grid gap-2 sm:grid-cols-2 px-5">
+              {workoutSessions?.map((session) => (
+                <SessionCard key={session.id} session={session} />
+              ))}
+            </div>
+          </ScrollArea>
+        </Stack>
+      )}
     </div>
   );
 }

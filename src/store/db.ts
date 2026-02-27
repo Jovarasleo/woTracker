@@ -46,55 +46,11 @@ interface WorkoutDB extends Dexie {
 
 export const db = new Dexie("WorkoutDB") as WorkoutDB;
 
-db.version(6)
-  .stores({
-    workoutTemplates: "++id, name, createdAt",
-    exerciseTemplates: "++id, workoutTemplateId, order",
-    workoutSessions: "++id, name, date",
-    exerciseLogs:
-      "++id, sessionId, name, order, createdAt, exerciseTemplateId, [sessionId+exerciseTemplateId]",
-    setLogs: "++id, exerciseLogId, setNumber",
-  })
-  .upgrade(async (tx) => {
-    const logs = await tx.table("exerciseLogs").toArray();
-
-    for (const log of logs) {
-      // already migrated
-      if (log.name) continue;
-
-      const template = await tx
-        .table("exerciseTemplates")
-        .get(log.exerciseTemplateId);
-
-      await tx.table("exerciseLogs").put({
-        ...log,
-        name: template?.name ?? "Exercise",
-      });
-    }
-  })
-  .upgrade(async (tx) => {
-    const logs = await tx.table("exerciseLogs").toArray();
-
-    // Group logs by session
-    const bySession = new Map<number, typeof logs>();
-
-    for (const log of logs) {
-      if (!bySession.has(log.sessionId)) {
-        bySession.set(log.sessionId, []);
-      }
-      bySession.get(log.sessionId)!.push(log);
-    }
-
-    for (const [, sessionLogs] of bySession) {
-      // Sort existing logs deterministically
-      sessionLogs.sort((a, b) => a.id - b.id);
-
-      const updated = sessionLogs.map((log, index) => ({
-        ...log,
-        order: (index + 1) * 1000,
-        createdAt: log.createdAt ?? Date.now(),
-      }));
-
-      await tx.table("exerciseLogs").bulkPut(updated);
-    }
-  });
+db.version(6).stores({
+  workoutTemplates: "++id, name, createdAt",
+  exerciseTemplates: "++id, workoutTemplateId, order",
+  workoutSessions: "++id, name, date",
+  exerciseLogs:
+    "++id, sessionId, name, order, createdAt, exerciseTemplateId, [sessionId+exerciseTemplateId]",
+  setLogs: "++id, exerciseLogId, setNumber",
+});
