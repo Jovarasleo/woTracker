@@ -27,7 +27,10 @@ function Index() {
   );
 
   const workoutSessions = useLiveQuery(
-    async () => db.workoutSessions.toArray(),
+    async () =>
+      (await db.workoutSessions.toArray()).sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      ),
     [],
   );
 

@@ -23,7 +23,6 @@ registerSW({
   immediate: true,
   onNeedRefresh() {
     console.log("New version available!");
-    // You could reload the page immediately:
     window.location.reload();
   },
 });

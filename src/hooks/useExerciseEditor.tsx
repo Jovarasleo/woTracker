@@ -1,7 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type ExerciseLog, type ExerciseTemplate } from "../store/db";
+import { db, type ExerciseLog } from "../store/db";
 
-export function useExerciseEdtior(exercise: ExerciseLog | ExerciseTemplate) {
+export function useExerciseLogEditor(exercise: ExerciseLog) {
   const sets = useLiveQuery(
     () =>
       db.setLogs.where("exerciseLogId").equals(exercise.id).sortBy("setNumber"),

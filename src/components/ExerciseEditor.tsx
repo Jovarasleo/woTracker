@@ -8,11 +8,11 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconEdit } from "@tabler/icons-react";
 import { useState } from "react";
-import { useExerciseEdtior } from "../hooks/useExerciseEditor";
-import { type ExerciseLog, type ExerciseTemplate } from "../store/db";
+import { useExerciseLogEditor } from "../hooks/useExerciseEditor";
+import { type ExerciseLog } from "../store/db";
 
 interface Props {
-  exerciseLog: ExerciseLog | ExerciseTemplate;
+  exerciseLog: ExerciseLog;
   sessionId: number;
   editable: boolean;
   onEditExercise: (exerciseId: number) => void;
@@ -25,7 +25,7 @@ export function ExerciseEditor({
 }: Props) {
   const [activeSetId, setActiveSetId] = useState<number | null>(null);
   const { sets, addSet, updateSetWeight, updateSetReps } =
-    useExerciseEdtior(exerciseLog);
+    useExerciseLogEditor(exerciseLog);
 
   const onSetEditable = (exerciseId: number, setId: number) => {
     if (setId === activeSetId) {
