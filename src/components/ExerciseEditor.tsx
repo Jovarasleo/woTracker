@@ -6,7 +6,7 @@ import {
   NumberInput,
   Title,
 } from "@mantine/core";
-import { IconCheck, IconEdit } from "@tabler/icons-react";
+import { IconCheck, IconEdit, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { useExerciseLogEditor } from "../hooks/useExerciseEditor";
 import { type ExerciseLog } from "../store/db";
@@ -15,16 +15,20 @@ interface Props {
   exerciseLog: ExerciseLog;
   sessionId: number;
   editable: boolean;
+  sessionEditable: boolean;
   onEditExercise: (exerciseId: number) => void;
+  onDeleteExercise: (exerciseId: number) => void;
 }
 
 export function ExerciseEditor({
   exerciseLog,
   editable,
+  sessionEditable,
   onEditExercise,
+  onDeleteExercise,
 }: Props) {
   const [activeSetId, setActiveSetId] = useState<number | null>(null);
-  const { sets, addSet, updateSetWeight, updateSetReps } =
+  const { sets, addSet, deleteSet, updateSetWeight, updateSetReps } =
     useExerciseLogEditor(exerciseLog);
 
   const onSetEditable = (exerciseId: number, setId: number) => {
@@ -47,18 +51,38 @@ export function ExerciseEditor({
   }
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <Title order={4}>{exerciseLog.name}</Title>
+    <div className="mb-6">
+      <div className="flex justify-between items-center mb-2 h-9">
+        <Title order={2}>{exerciseLog.name}</Title>
+        {sessionEditable && (
+          <Button
+            variant="filled"
+            color="red"
+            onClick={() => onDeleteExercise(exerciseLog.id)}
+          >
+            Remove exercise
+          </Button>
+        )}
+      </div>
+
       <div className="flex flex-col gap-4 ">
         {(sets ?? []).map((set) => {
           const disabled = activeSetId !== set.id || !editable;
           return (
             <Card key={set.id} className="flex">
-              <div className="flex gap-4">
-                <Input.Wrapper
-                  label="Weight"
-                  className="text-left max-w-32 sm:max-w-max"
+              {sessionEditable && (
+                <ActionIcon
+                  size="sm"
+                  color="red"
+                  className="self-start"
+                  variant="subtle"
+                  onClick={() => deleteSet(set.id)}
                 >
+                  <IconX />
+                </ActionIcon>
+              )}
+              <div className="flex gap-4">
+                <Input.Wrapper label="Weight" className="text-left">
                   <NumberInput
                     size="xs"
                     value={set.weight}
@@ -70,10 +94,7 @@ export function ExerciseEditor({
                   />
                 </Input.Wrapper>
 
-                <Input.Wrapper
-                  label="Reps"
-                  className="text-left max-w-32 sm:max-w-max"
-                >
+                <Input.Wrapper label="Reps" className="text-left">
                   <NumberInput
                     size="xs"
                     value={set.reps}

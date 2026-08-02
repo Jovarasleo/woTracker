@@ -20,8 +20,10 @@ export function useExerciseLogEditor(exercise: ExerciseLog) {
     return setId;
   };
 
+  const deleteSet = async (setId: number) => await db.setLogs.delete(setId);
+
   const updateSetWeight = async (weight: number, setId: number) => {
-    if (!weight || !setId) {
+    if (weight == null || !setId) {
       return;
     }
 
@@ -29,7 +31,7 @@ export function useExerciseLogEditor(exercise: ExerciseLog) {
   };
 
   const updateSetReps = async (reps: number, setId: number) => {
-    if (!reps || !setId) {
+    if (reps == null || !setId) {
       return;
     }
 
@@ -39,6 +41,7 @@ export function useExerciseLogEditor(exercise: ExerciseLog) {
   return {
     sets,
     addSet,
+    deleteSet,
     updateSetWeight,
     updateSetReps,
   };

@@ -54,6 +54,7 @@ function WorkoutPage() {
     navigate({
       to: "/session/$sessionId",
       params: { sessionId: newSessionId.toString() },
+      replace: true,
     });
   };
 

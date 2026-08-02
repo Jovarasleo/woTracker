@@ -1,10 +1,7 @@
 import { db } from "../store/db";
 
-export function useCreateExercise() {
-  const addNewExerciseToSession = async (
-    exerciseName: string,
-    sessionId: number,
-  ) => {
+export function useExercise() {
+  const addExercise = async (exerciseName: string, sessionId: number) => {
     const existing = await db.exerciseLogs
       .where("sessionId")
       .equals(sessionId)
@@ -28,7 +25,13 @@ export function useCreateExercise() {
     return exerciseLogId;
   };
 
+  const deleteExercise = async (exerciseLogId: number) => {
+    await db.setLogs.where("exerciseLogId").equals(exerciseLogId).delete();
+    await db.exerciseLogs.delete(exerciseLogId);
+  };
+
   return {
-    addNewExerciseToSession,
+    addExercise,
+    deleteExercise,
   };
 }
