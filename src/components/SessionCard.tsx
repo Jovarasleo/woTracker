@@ -21,11 +21,8 @@ export function SessionCard({ session }: Props) {
                 year: "numeric",
                 month: "short", // abbreviated month (e.g., vas for vasaris)
                 day: "2-digit",
-                hour: "2-digit",
-                hour12: false, // 24-hour format
               },
             )}`}
-            h
           </Title>
         </div>
       </Card>

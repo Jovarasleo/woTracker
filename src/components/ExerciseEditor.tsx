@@ -52,7 +52,7 @@ export function ExerciseEditor({
 
   return (
     <div className="mb-6">
-      <div className="flex justify-between items-center mb-2 h-9">
+      <div className="flex justify-between items-center mb-2 min-h-9">
         <Title order={2}>{exerciseLog.name}</Title>
         {sessionEditable && (
           <Button

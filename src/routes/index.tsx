@@ -41,11 +41,13 @@ function Index() {
 
   return (
     <div>
-      <Link to="/workout/new">
-        <Button size="md" leftSection={<IconPlus />}>
-          Workout Template
-        </Button>
-      </Link>
+      <div className="text-end">
+        <Link to="/workout/new">
+          <Button size="md" leftSection={<IconPlus />}>
+            Workout Template
+          </Button>
+        </Link>
+      </div>
       <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-5">
         {workoutTemplates?.map((template) => {
           return (

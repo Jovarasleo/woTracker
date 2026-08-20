@@ -48,16 +48,24 @@ function SessionPage() {
 
   return (
     <div className="max-w-110 mx-auto">
-      <Title order={2}>{`${session.name} session:  ${new Date(
-        session.date,
-      ).toLocaleString("lt-LT", {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      })}`}</Title>
+      <Title order={2}>
+        {session.name}
+        <br />
+        <div>
+          {new Date(session.date).toLocaleString("lt-LT", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+          })}
+        </div>
+        <div>
+          {new Date(session.date).toLocaleString("lt-LT", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })}
+        </div>
+      </Title>
       <div className="text-left my-4 flex justify-between">
         {sessionEditable && (
           <Button
