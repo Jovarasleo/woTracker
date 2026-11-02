@@ -5,8 +5,8 @@ import {
   ColorSwatch,
   Menu,
   Modal,
-  Stack,
   Title,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDotsVertical, IconPencil, IconTrash } from "@tabler/icons-react";
@@ -45,60 +45,61 @@ export function TemplatesOverview() {
       <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-5">
         {workoutTemplates?.map((template) => (
           <li key={template.id}>
-            <Card shadow="sm" padding="sm">
-              <Stack>
-                <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full">
-                  <ColorSwatch
-                    color={template.indicatorColor}
-                    size={16}
-                    className="col-start-1 justify-self-start"
-                  />
-                  <Title order={4} className="text-center col-start-2">
-                    {template.name}
-                  </Title>
-                  <Menu position="bottom-end" shadow="md" width={160}>
-                    <Menu.Target>
-                      <ActionIcon
-                        className="col-start-3 justify-self-end"
-                        variant="subtle"
-                        aria-label="Template options"
-                      >
-                        <IconDotsVertical
-                          size={18}
-                          stroke={1.75}
-                          className="text-gray-200"
-                        />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        leftSection={<IconPencil size={16} />}
-                        onClick={() =>
-                          navigate({
-                            to: "/workout/edit/$templateId",
-                            params: { templateId: template.id.toString() },
-                          })
-                        }
-                      >
-                        Edit
-                      </Menu.Item>
-                      <Menu.Item
-                        color="red"
-                        leftSection={<IconTrash size={16} />}
-                        onClick={() => handleOpenModal(template.id)}
-                      >
-                        Delete
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </div>
+            <Card shadow="sm" padding="sm" radius="md" withBorder>
+              <div className="flex gap-2 items-center">
                 <Link
                   to="/workout/$templateId"
+                  className="w-full"
                   params={{ templateId: template.id!.toString() }}
                 >
-                  <Button color="green">Start</Button>
+                  <UnstyledButton className="flex items-center gap-2 w-full">
+                    <ColorSwatch
+                      color={template.indicatorColor}
+                      size={16}
+                      className="col-start-1 justify-self-start"
+                    />
+                    <Title order={4} className="truncate">
+                      {template.name}
+                    </Title>
+                  </UnstyledButton>
                 </Link>
-              </Stack>
+
+                <Menu position="bottom-end" shadow="md" width={160}>
+                  <Menu.Target>
+                    <ActionIcon
+                      className="ms-auto justify-self-end"
+                      variant="subtle"
+                      aria-label="Template options"
+                    >
+                      <IconDotsVertical
+                        size={18}
+                        stroke={1.75}
+                        className="text-gray-200"
+                      />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      leftSection={<IconPencil size={16} />}
+                      onClick={() =>
+                        navigate({
+                          to: "/workout/edit/$templateId",
+                          params: { templateId: template.id.toString() },
+                        })
+                      }
+                    >
+                      Edit
+                    </Menu.Item>
+                    <Menu.Item
+                      color="red"
+                      leftSection={<IconTrash size={16} />}
+                      onClick={() => handleOpenModal(template.id)}
+                    >
+                      Delete
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </div>
             </Card>
           </li>
         ))}
