@@ -21,12 +21,15 @@ interface SeedExercise {
 
 interface SeedWorkout {
   name: string;
+  /** Hex indicator color for the template. */
+  color: string;
   exercises: SeedExercise[];
 }
 
 const WORKOUTS: SeedWorkout[] = [
   {
     name: "Push Day",
+    color: "#fa5252",
     exercises: [
       { name: "Bench Press", baseWeight: 60, gain: 20, repRange: [5, 8] },
       { name: "Overhead Press", baseWeight: 35, gain: 12, repRange: [5, 8] },
@@ -42,6 +45,7 @@ const WORKOUTS: SeedWorkout[] = [
   },
   {
     name: "Pull Day",
+    color: "#228be6",
     exercises: [
       { name: "Deadlift", baseWeight: 90, gain: 35, repRange: [3, 6] },
       { name: "Barbell Row", baseWeight: 55, gain: 15, repRange: [6, 10] },
@@ -52,6 +56,7 @@ const WORKOUTS: SeedWorkout[] = [
   },
   {
     name: "Leg Day",
+    color: "#40c057",
     exercises: [
       { name: "Back Squat", baseWeight: 80, gain: 30, repRange: [4, 8] },
       { name: "Romanian Deadlift", baseWeight: 60, gain: 20, repRange: [6, 10] },
@@ -67,6 +72,7 @@ const WORKOUTS: SeedWorkout[] = [
   },
   {
     name: "Upper Body",
+    color: "#be4bdb",
     exercises: [
       { name: "Pull-Up", baseWeight: 0, gain: 15, repRange: [6, 10] },
       { name: "Flat Bench Press", baseWeight: 60, gain: 20, repRange: [5, 8] },
@@ -81,6 +87,7 @@ const WORKOUTS: SeedWorkout[] = [
   },
   {
     name: "Lower Body",
+    color: "#fab005",
     exercises: [
       { name: "Front Squat", baseWeight: 50, gain: 20, repRange: [5, 8] },
       { name: "Hip Thrust", baseWeight: 80, gain: 40, repRange: [8, 12] },
@@ -90,6 +97,7 @@ const WORKOUTS: SeedWorkout[] = [
   },
   {
     name: "Full Body",
+    color: "#15aabf",
     exercises: [
       { name: "Deadlift", baseWeight: 90, gain: 35, repRange: [3, 6] },
       { name: "Overhead Press", baseWeight: 35, gain: 12, repRange: [5, 8] },
@@ -98,6 +106,7 @@ const WORKOUTS: SeedWorkout[] = [
   },
   {
     name: "Chest & Back",
+    color: "#fd7e14",
     exercises: [
       {
         name: "Incline Bench Press",
@@ -221,6 +230,7 @@ export async function seedDevData(): Promise<SeedSummary> {
           const templateId = await db.workoutTemplates.add({
             name: workout.name,
             createdAt: createdAt.toISOString(),
+            indicatorColor: workout.color,
           });
 
           const exerciseTemplateIds = await Promise.all(

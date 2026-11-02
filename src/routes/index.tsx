@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Button,
   Card,
+  ColorSwatch,
   Modal,
   ScrollArea,
   Stack,
@@ -77,6 +78,11 @@ function Index() {
                 <Card shadow="sm" padding="sm">
                   <Stack>
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full">
+                      <ColorSwatch
+                        color={template.indicatorColor}
+                        size={16}
+                        className="col-start-1 justify-self-start"
+                      />
                       <Title order={4} className="text-center col-start-2">
                         {template.name}
                       </Title>

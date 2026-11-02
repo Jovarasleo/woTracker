@@ -1,7 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { db } from "../../store/db";
-import { Button, Card, Group, Stack, TextInput } from "@mantine/core";
+import {
+  Button,
+  Card,
+  ColorPicker,
+  ColorSwatch,
+  Group,
+  Input,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useState } from "react";
+import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
 
 export const Route = createFileRoute("/workout/new")({
   component: RouteComponent,
@@ -11,6 +22,7 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [exercises, setExercises] = useState<string[]>([""]);
+  const [indicatorColor, setIndicatorColor] = useState(randomIndicatorColor);
 
   const addExerciseField = () => {
     setExercises([...exercises, ""]);
@@ -33,6 +45,7 @@ function RouteComponent() {
         const templateId = await db.workoutTemplates.add({
           name,
           createdAt: new Date().toISOString(),
+          indicatorColor,
         });
 
         const filteredExercises = exercises.filter((e) => e.trim() !== "");
@@ -51,6 +64,7 @@ function RouteComponent() {
 
     setName("");
     setExercises([""]);
+    setIndicatorColor(randomIndicatorColor());
     navigate({ to: "/" });
   };
 
@@ -75,6 +89,27 @@ function RouteComponent() {
         <Button variant="light" onClick={addExerciseField}>
           Add Exercise
         </Button>
+
+        <Input.Wrapper
+          label="Indicator Color"
+          description="Shown as a colored tag for this workout"
+        >
+          <Group gap="sm" align="center" className="mt-1 mb-2">
+            <ColorSwatch color={indicatorColor} size={28} />
+            <Text size="sm" c="dimmed">
+              {indicatorColor}
+            </Text>
+          </Group>
+          <ColorPicker
+            format="hex"
+            value={indicatorColor}
+            onChange={setIndicatorColor}
+            swatches={[...INDICATOR_COLORS]}
+            swatchesPerRow={6}
+            fullWidth
+            size="lg"
+          />
+        </Input.Wrapper>
 
         <Group justify="flex-end">
           <Button onClick={handleSubmit}>Save Template</Button>
