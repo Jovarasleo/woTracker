@@ -10,14 +10,13 @@ import {
   Stack,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "../../store/db";
-import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
 import { useTemplateEditor } from "../../hooks/useTemplateEditor";
+import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
+import { db } from "../../store/db";
 import { INDICATOR_COLORS } from "../../utils/colors";
 
 export const Route = createFileRoute("/workout/edit/$templateId")({
@@ -89,8 +88,6 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
   return (
     <Card shadow="sm" padding="lg">
       <Stack>
-        <Title order={2}>Edit Workout</Title>
-
         <TextInput
           label="Workout Name"
           value={name}

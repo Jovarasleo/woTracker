@@ -1,6 +1,22 @@
-import { Button, Loader, Stack, Title } from "@mantine/core";
+import {
+  Badge,
+  Button,
+  Card,
+  ColorSwatch,
+  Group,
+  Loader,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import {
+  IconCalendarEvent,
+  IconPencil,
+  IconPlayerPlayFilled,
+} from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
+import dayjs from "dayjs";
 import { db } from "../../store/db";
 
 export const Route = createFileRoute("/workout/$templateId")({
@@ -23,6 +39,15 @@ function WorkoutPage() {
         .where("workoutTemplateId")
         .equals(numericTemplateId)
         .sortBy("order"),
+    [numericTemplateId],
+  );
+
+  const sessions = useLiveQuery(
+    () =>
+      db.workoutSessions
+        .where("workoutTemplateId")
+        .equals(numericTemplateId)
+        .toArray(),
     [numericTemplateId],
   );
 
@@ -60,19 +85,97 @@ function WorkoutPage() {
     });
   };
 
-  if (!template || !exerciseTemplates) {
-    return <Loader />;
+  if (!template || !exerciseTemplates || !sessions) {
+    return (
+      <div className="flex justify-center mt-10">
+        <Loader />
+      </div>
+    );
   }
 
+  const lastSession = [...sessions].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )[0];
+
   return (
-    <Stack>
-      <Title order={2}>{template.name}</Title>
-      {exerciseTemplates.map((exercise) => (
-        <Title key={exercise.id} order={4}>
-          {exercise.name}
+    <Stack className="max-w-xl mx-auto" gap="md">
+      <Card withBorder shadow="sm" padding="lg" radius="md">
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
+          <Group gap="sm" align="center" wrap="nowrap">
+            <ColorSwatch color={template.indicatorColor} size={32} />
+            <div>
+              <Title order={2}>{template.name}</Title>
+              <Text size="sm" c="dimmed">
+                <span className="me-1">{exerciseTemplates.length}</span>
+                {exerciseTemplates.length === 1 ? "exercise" : "exercises"}
+              </Text>
+            </div>
+          </Group>
+          <Button
+            variant="subtle"
+            size="compact-sm"
+            leftSection={<IconPencil size={16} />}
+            onClick={() =>
+              navigate({
+                to: "/workout/edit/$templateId",
+                params: { templateId },
+              })
+            }
+          >
+            Edit
+          </Button>
+        </Group>
+
+        <Group gap="sm" mt="md" align="center">
+          <IconCalendarEvent size={16} className="text-gray-400" />
+          <Text size="sm" c="dimmed">
+            {lastSession
+              ? `Last performed ${dayjs(lastSession.date).format("MMM D, YYYY")}`
+              : "Not performed yet"}
+          </Text>
+          {sessions.length > 0 && (
+            <Badge variant="light" color={template.indicatorColor}>
+              {sessions.length} {sessions.length === 1 ? "session" : "sessions"}
+            </Badge>
+          )}
+        </Group>
+      </Card>
+
+      <Card withBorder padding="md" radius="md">
+        <Title order={4} mb="sm">
+          Exercises
         </Title>
-      ))}
-      <Button onClick={startSession}>Start Session</Button>
+        <Stack gap={0}>
+          {exerciseTemplates.map((exercise, index) => (
+            <Group
+              key={exercise.id}
+              gap="sm"
+              align="center"
+              wrap="nowrap"
+              className="py-2 border-b border-gray-700 last:border-b-0"
+            >
+              <Text
+                size="sm"
+                c="dimmed"
+                className="w-6 text-right tabular-nums"
+              >
+                {index + 1}
+              </Text>
+              <Text fw={500}>{exercise.name}</Text>
+            </Group>
+          ))}
+        </Stack>
+      </Card>
+
+      <Button
+        size="md"
+        fullWidth
+        color="green"
+        leftSection={<IconPlayerPlayFilled size={18} />}
+        onClick={startSession}
+      >
+        Start Session
+      </Button>
     </Stack>
   );
 }

@@ -42,7 +42,7 @@ export function TemplatesOverview() {
 
   return (
     <>
-      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-5">
+      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-8">
         {workoutTemplates?.map((template) => (
           <li key={template.id}>
             <Card shadow="sm" padding="sm" radius="md" withBorder>

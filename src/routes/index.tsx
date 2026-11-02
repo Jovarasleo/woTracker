@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div>
+    <>
       <DevTools />
       <div className="text-end">
         <Link to="/workout/newTemplate">
@@ -35,6 +35,6 @@ function Index() {
       </div>
       <TemplatesOverview />
       <SessionsOverview />
-    </div>
+    </>
   );
 }

@@ -39,7 +39,7 @@ export function SessionsOverview() {
   if (!workoutSessions?.length) return null;
 
   return (
-    <Box className="mt-8 max-w-3xl mx-auto">
+    <Box className="mt-auto max-w-3xl mx-auto mb-5">
       <SessionCalendar
         sessions={workoutSessions}
         templateColorById={templateColorById ?? new Map()}
