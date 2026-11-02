@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconEdit, IconX } from "@tabler/icons-react";
 import { useState } from "react";
-import { useExerciseLogEditor } from "../hooks/useExerciseEditor";
+import { useExerciseLogEditor } from "../hooks/useExerciseLogEditor";
 import { type ExerciseLog } from "../store/db";
 
 interface Props {

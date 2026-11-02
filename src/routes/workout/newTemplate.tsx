@@ -14,11 +14,11 @@ import {
 import { useState } from "react";
 import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
 
-export const Route = createFileRoute("/workout/new")({
-  component: RouteComponent,
+export const Route = createFileRoute("/workout/newTemplate")({
+  component: NewWorkoutTemplate,
 });
 
-function RouteComponent() {
+function NewWorkoutTemplate() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [exercises, setExercises] = useState<string[]>([""]);

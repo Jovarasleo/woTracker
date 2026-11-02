@@ -13,7 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as SessionSessionIdRouteImport } from './routes/session/$sessionId'
 import { Route as WorkoutTemplateIdRouteImport } from './routes/workout/$templateId'
-import { Route as WorkoutNewRouteImport } from './routes/workout/new'
+import { Route as WorkoutNewTemplateRouteImport } from './routes/workout/newTemplate'
+import { Route as WorkoutEditTemplateIdRouteImport } from './routes/workout/edit.$templateId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +36,14 @@ const WorkoutTemplateIdRoute = WorkoutTemplateIdRouteImport.update({
   path: '/workout/$templateId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkoutNewRoute = WorkoutNewRouteImport.update({
-  id: '/workout/new',
-  path: '/workout/new',
+const WorkoutNewTemplateRoute = WorkoutNewTemplateRouteImport.update({
+  id: '/workout/newTemplate',
+  path: '/workout/newTemplate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkoutEditTemplateIdRoute = WorkoutEditTemplateIdRouteImport.update({
+  id: '/workout/edit/$templateId',
+  path: '/workout/edit/$templateId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -46,14 +52,16 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/session/$sessionId': typeof SessionSessionIdRoute
   '/workout/$templateId': typeof WorkoutTemplateIdRoute
-  '/workout/new': typeof WorkoutNewRoute
+  '/workout/newTemplate': typeof WorkoutNewTemplateRoute
+  '/workout/edit/$templateId': typeof WorkoutEditTemplateIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/session/$sessionId': typeof SessionSessionIdRoute
   '/workout/$templateId': typeof WorkoutTemplateIdRoute
-  '/workout/new': typeof WorkoutNewRoute
+  '/workout/newTemplate': typeof WorkoutNewTemplateRoute
+  '/workout/edit/$templateId': typeof WorkoutEditTemplateIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,7 +69,8 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/session/$sessionId': typeof SessionSessionIdRoute
   '/workout/$templateId': typeof WorkoutTemplateIdRoute
-  '/workout/new': typeof WorkoutNewRoute
+  '/workout/newTemplate': typeof WorkoutNewTemplateRoute
+  '/workout/edit/$templateId': typeof WorkoutEditTemplateIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -70,21 +79,24 @@ export interface FileRouteTypes {
     | '/about'
     | '/session/$sessionId'
     | '/workout/$templateId'
-    | '/workout/new'
+    | '/workout/newTemplate'
+    | '/workout/edit/$templateId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/session/$sessionId'
     | '/workout/$templateId'
-    | '/workout/new'
+    | '/workout/newTemplate'
+    | '/workout/edit/$templateId'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/session/$sessionId'
     | '/workout/$templateId'
-    | '/workout/new'
+    | '/workout/newTemplate'
+    | '/workout/edit/$templateId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,7 +104,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   SessionSessionIdRoute: typeof SessionSessionIdRoute
   WorkoutTemplateIdRoute: typeof WorkoutTemplateIdRoute
-  WorkoutNewRoute: typeof WorkoutNewRoute
+  WorkoutNewTemplateRoute: typeof WorkoutNewTemplateRoute
+  WorkoutEditTemplateIdRoute: typeof WorkoutEditTemplateIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -125,11 +138,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkoutTemplateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/workout/new': {
-      id: '/workout/new'
-      path: '/workout/new'
-      fullPath: '/workout/new'
-      preLoaderRoute: typeof WorkoutNewRouteImport
+    '/workout/newTemplate': {
+      id: '/workout/newTemplate'
+      path: '/workout/newTemplate'
+      fullPath: '/workout/newTemplate'
+      preLoaderRoute: typeof WorkoutNewTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workout/edit/$templateId': {
+      id: '/workout/edit/$templateId'
+      path: '/workout/edit/$templateId'
+      fullPath: '/workout/edit/$templateId'
+      preLoaderRoute: typeof WorkoutEditTemplateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -140,7 +160,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   SessionSessionIdRoute: SessionSessionIdRoute,
   WorkoutTemplateIdRoute: WorkoutTemplateIdRoute,
-  WorkoutNewRoute: WorkoutNewRoute,
+  WorkoutNewTemplateRoute: WorkoutNewTemplateRoute,
+  WorkoutEditTemplateIdRoute: WorkoutEditTemplateIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
