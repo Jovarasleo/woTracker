@@ -12,6 +12,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconDotsVertical, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
+import { DevTools } from "../components/DevTools";
 import { SessionCard } from "../components/SessionCard";
 import { db } from "../store/db";
 
@@ -41,6 +42,7 @@ function Index() {
 
   return (
     <div>
+      <DevTools />
       <div className="text-end">
         <Link to="/workout/new">
           <Button size="md" leftSection={<IconPlus />}>

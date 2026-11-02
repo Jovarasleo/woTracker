@@ -9,25 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorkoutNewRouteImport } from './routes/workout/new'
-import { Route as WorkoutTemplateIdRouteImport } from './routes/workout/$templateId'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as SessionSessionIdRouteImport } from './routes/session/$sessionId'
+import { Route as WorkoutTemplateIdRouteImport } from './routes/workout/$templateId'
+import { Route as WorkoutNewRouteImport } from './routes/workout/new'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkoutNewRoute = WorkoutNewRouteImport.update({
-  id: '/workout/new',
-  path: '/workout/new',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionSessionIdRoute = SessionSessionIdRouteImport.update({
+  id: '/session/$sessionId',
+  path: '/session/$sessionId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WorkoutTemplateIdRoute = WorkoutTemplateIdRouteImport.update({
@@ -35,9 +35,9 @@ const WorkoutTemplateIdRoute = WorkoutTemplateIdRouteImport.update({
   path: '/workout/$templateId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SessionSessionIdRoute = SessionSessionIdRouteImport.update({
-  id: '/session/$sessionId',
-  path: '/session/$sessionId',
+const WorkoutNewRoute = WorkoutNewRouteImport.update({
+  id: '/workout/new',
+  path: '/workout/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -97,13 +97,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -111,11 +104,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/workout/new': {
-      id: '/workout/new'
-      path: '/workout/new'
-      fullPath: '/workout/new'
-      preLoaderRoute: typeof WorkoutNewRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/session/$sessionId': {
+      id: '/session/$sessionId'
+      path: '/session/$sessionId'
+      fullPath: '/session/$sessionId'
+      preLoaderRoute: typeof SessionSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/workout/$templateId': {
@@ -125,11 +125,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkoutTemplateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/session/$sessionId': {
-      id: '/session/$sessionId'
-      path: '/session/$sessionId'
-      fullPath: '/session/$sessionId'
-      preLoaderRoute: typeof SessionSessionIdRouteImport
+    '/workout/new': {
+      id: '/workout/new'
+      path: '/workout/new'
+      fullPath: '/workout/new'
+      preLoaderRoute: typeof WorkoutNewRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
