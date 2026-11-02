@@ -5,16 +5,15 @@ import {
   Card,
   ColorSwatch,
   Modal,
-  ScrollArea,
   Stack,
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDotsVertical, IconPlus } from "@tabler/icons-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { DevTools } from "../components/DevTools";
-import { SessionCard } from "../components/SessionCard";
+import { SessionCalendar } from "../components/SessionCalendar";
 import { db } from "../store/db";
 
 export const Route = createFileRoute("/")({
@@ -22,6 +21,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const navigate = useNavigate();
   const [opened, { open, close }] = useDisclosure(false);
   const workoutTemplates = useLiveQuery(
     () => db.workoutTemplates?.toArray(),
@@ -113,15 +113,17 @@ function Index() {
       </ul>
 
       {!!workoutSessions?.length && (
-        <Stack className="bottom-0 fixed left-0 right-0 ">
+        <Stack className="mt-8">
           <Title order={2}>Past Sessions</Title>
-          <ScrollArea type="scroll" className="h-[40vh]">
-            <div className="grid gap-2 sm:grid-cols-2 px-5">
-              {workoutSessions?.map((session) => (
-                <SessionCard key={session.id} session={session} />
-              ))}
-            </div>
-          </ScrollArea>
+          <SessionCalendar
+            sessions={workoutSessions}
+            onSelectSession={(sessionId) =>
+              navigate({
+                to: "/session/$sessionId",
+                params: { sessionId: sessionId.toString() },
+              })
+            }
+          />
         </Stack>
       )}
     </div>

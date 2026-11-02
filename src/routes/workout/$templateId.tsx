@@ -27,11 +27,13 @@ function WorkoutPage() {
   );
 
   const startSession = async () => {
-    if (!exerciseTemplates) return;
+    if (!template || !exerciseTemplates) return;
 
     const newSessionId = await db.workoutSessions.add({
-      name: template?.name ?? "Unnamed",
+      name: template.name,
       date: new Date().toISOString(),
+      workoutTemplateId: template.id,
+      indicatorColor: template.indicatorColor,
     });
 
     await Promise.all(

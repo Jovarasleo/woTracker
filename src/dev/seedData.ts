@@ -243,17 +243,20 @@ export async function seedDevData(): Promise<SeedSummary> {
             ),
           );
 
-          return { workout, exerciseTemplateIds };
+          return { workout, templateId, exerciseTemplateIds };
         }),
       );
 
       for (let s = 0; s < sessionPlan.length; s++) {
         const plan = sessionPlan[s];
-        const { workout, exerciseTemplateIds } = templates[s % templates.length];
+        const { workout, templateId, exerciseTemplateIds } =
+          templates[s % templates.length];
 
         const sessionId = await db.workoutSessions.add({
           name: workout.name,
           date: plan.date.toISOString(),
+          workoutTemplateId: templateId,
+          indicatorColor: workout.color,
         });
 
         for (let e = 0; e < workout.exercises.length; e++) {

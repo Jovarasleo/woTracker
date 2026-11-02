@@ -13,6 +13,8 @@ export interface WorkoutSession {
   name: string; // independent name
   date: string;
   notes?: string;
+  workoutTemplateId?: number; // template this session was created from (may dangle if template deleted)
+  indicatorColor: string; // copied from the template at creation
 }
 
 export interface ExerciseTemplate {
@@ -75,6 +77,39 @@ db.version(7)
       .modify((template) => {
         if (!template.indicatorColor) {
           template.indicatorColor = randomIndicatorColor();
+        }
+      });
+  });
+
+// v8: link sessions to their source template (`workoutTemplateId`) and snapshot
+// the template's `indicatorColor` onto the session. Existing sessions are
+// backfilled by matching the (copied) session name to a template name.
+db.version(8)
+  .stores({
+    workoutTemplates: "++id, name, createdAt",
+    exerciseTemplates: "++id, workoutTemplateId, order",
+    workoutSessions: "++id, name, date, workoutTemplateId",
+    exerciseLogs:
+      "++id, sessionId, name, order, createdAt, exerciseTemplateId, [sessionId+exerciseTemplateId]",
+    setLogs: "++id, exerciseLogId, setNumber",
+  })
+  .upgrade(async (tx) => {
+    const templates = await tx
+      .table<WorkoutTemplate>("workoutTemplates")
+      .toArray();
+    const templateByName = new Map(templates.map((t) => [t.name, t]));
+
+    await tx
+      .table<WorkoutSession>("workoutSessions")
+      .toCollection()
+      .modify((session) => {
+        const template = templateByName.get(session.name);
+        if (session.workoutTemplateId == null && template) {
+          session.workoutTemplateId = template.id;
+        }
+        if (!session.indicatorColor) {
+          session.indicatorColor =
+            template?.indicatorColor ?? randomIndicatorColor();
         }
       });
   });
