@@ -25,12 +25,24 @@ export function SessionsOverview() {
     [],
   );
 
+  const templateColorById = useLiveQuery(
+    async () =>
+      new Map(
+        (await db.workoutTemplates.toArray()).map((template) => [
+          template.id,
+          template.indicatorColor,
+        ]),
+      ),
+    [],
+  );
+
   if (!workoutSessions?.length) return null;
 
   return (
     <Box className="mt-8 max-w-3xl mx-auto">
       <SessionCalendar
         sessions={workoutSessions}
+        templateColorById={templateColorById ?? new Map()}
         month={displayedMonth}
         onMonthChange={(newMonth) =>
           navigate({

@@ -5,11 +5,29 @@ import type { WorkoutSession } from "../store/db";
 
 interface Props {
   sessions: WorkoutSession[];
+  /** Current indicator color of each template, keyed by template id. */
+  templateColorById: Map<number, string>;
   /** Currently displayed month in `YYYY-MM` format (controlled). */
   month: string;
   onSelectSession: (sessionId: number) => void;
   onMonthChange: (month: string) => void;
 }
+
+/**
+ * Indicator color for a session: the live color of the template it was created
+ * from, falling back to the color snapshotted on the session itself (used when
+ * the template was deleted or the session has no template link).
+ */
+const sessionIndicatorColor = (
+  session: WorkoutSession,
+  templateColorById: Map<number, string>,
+): string => {
+  const templateColor =
+    session.workoutTemplateId != null
+      ? templateColorById.get(session.workoutTemplateId)
+      : undefined;
+  return templateColor ?? session.indicatorColor;
+};
 
 const DAY_FORMAT = "YYYY-MM-DD";
 const MONTH_KEY_FORMAT = "YYYY-MM";
@@ -47,6 +65,7 @@ const collectSessionMonths = (sessions: WorkoutSession[]): Set<string> =>
 
 export function SessionCalendar({
   sessions,
+  templateColorById,
   month,
   onSelectSession,
   onMonthChange,
@@ -101,7 +120,11 @@ export function SessionCalendar({
           <Indicator
             size={8}
             offset={-2}
-            color={session?.indicatorColor}
+            color={
+              session
+                ? sessionIndicatorColor(session, templateColorById)
+                : undefined
+            }
             disabled={!session}
           >
             {dayOfMonth}
