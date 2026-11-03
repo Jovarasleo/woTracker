@@ -40,6 +40,11 @@ let catalogPromise: Promise<CatalogExercise[]> | null = null;
 export function loadExerciseCatalog() {
   catalogPromise ??= import("./exercises.json").then(
     (module) => module.default as CatalogExercise[],
+    (error: unknown) => {
+      // Don't cache a failed load, so the next call can retry.
+      catalogPromise = null;
+      throw error;
+    },
   );
 
   return catalogPromise;

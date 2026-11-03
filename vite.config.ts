@@ -13,10 +13,19 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true,
         cleanupOutdatedCaches: true,
+        // App files are already precached by hash. Only cache the external
+        // exercise images at runtime; a catch-all rule here would also cache
+        // index.html and old hashed chunks in a cache that is never cleaned up.
         runtimeCaching: [
           {
-            urlPattern: /.*/,
-            handler: "NetworkFirst",
+            urlPattern: ({ url }) =>
+              url.origin === "https://raw.githubusercontent.com",
+            handler: "CacheFirst",
+            options: {
+              cacheName: "exercise-images",
+              expiration: { maxEntries: 500 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
           },
         ],
       },

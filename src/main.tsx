@@ -20,13 +20,21 @@ declare module "@tanstack/react-router" {
   }
 }
 
-registerSW({
-  immediate: true,
-  onNeedRefresh() {
-    console.log("New version available!");
-    window.location.reload();
-  },
+// After a deploy, an already-open page can still try to lazy-load a chunk
+// (e.g. the exercise catalog) whose hashed filename no longer exists. Reload
+// once to pick up the new index.html instead of leaving the app broken.
+const PRELOAD_RELOAD_KEY = "preload-error-reload";
+window.addEventListener("vite:preloadError", (event) => {
+  if (sessionStorage.getItem(PRELOAD_RELOAD_KEY)) return;
+  event.preventDefault();
+  sessionStorage.setItem(PRELOAD_RELOAD_KEY, "1");
+  window.location.reload();
 });
+window.addEventListener("load", () => {
+  sessionStorage.removeItem(PRELOAD_RELOAD_KEY);
+});
+
+registerSW({ immediate: true });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
