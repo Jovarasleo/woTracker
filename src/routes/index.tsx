@@ -1,6 +1,7 @@
 import { Button } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BackupMenu } from "../components/BackupMenu";
 import { DevTools } from "../components/DevTools";
 import { SessionsOverview } from "../components/SessionsOverview";
 import { TemplatesOverview } from "../components/TemplatesOverview";
@@ -26,7 +27,8 @@ function Index() {
   return (
     <>
       <DevTools />
-      <div className="text-end">
+      <div className="flex justify-end items-center gap-2">
+        <BackupMenu />
         <Link to="/workout/newTemplate">
           <Button size="md" leftSection={<IconPlus />}>
             Workout Template

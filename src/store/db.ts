@@ -49,6 +49,14 @@ export interface CustomExercise {
   createdAt: string;
 }
 
+/** Contents of an exported backup file (see useBackup). */
+export interface BackupFile {
+  app?: string;
+  exportedAt: string;
+  dbVersion: number; // Dexie schema version (db.verno) the data came from
+  tables: Record<string, unknown[]>;
+}
+
 interface WorkoutDB extends Dexie {
   workoutTemplates: EntityTable<WorkoutTemplate, "id">;
   exerciseTemplates: EntityTable<ExerciseTemplate, "id">;
