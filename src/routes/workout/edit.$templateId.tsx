@@ -7,13 +7,21 @@ import {
   Group,
   Input,
   Loader,
+  Modal,
   Stack,
   Text,
   TextInput,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
+import { ExerciseCreator } from "../../components/ExerciseCreator";
+import { type LibraryExercise } from "../../data/exerciseCatalog";
+import {
+  useCustomExercises,
+  type CustomExerciseDraft,
+} from "../../hooks/useCustomExercises";
 import { useTemplateEditor } from "../../hooks/useTemplateEditor";
 import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
 import { db } from "../../store/db";
@@ -71,10 +79,24 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
     editableExercises,
     updateExercise,
     removeExercise,
-    addExerciseField,
+    addExercise,
     canSave,
     save,
   } = useTemplateEditor(template, exercises);
+  const { customExercises, addCustomExercise } = useCustomExercises();
+  const [pickerOpened, { open: openPicker, close: closePicker }] =
+    useDisclosure(false);
+
+  const handleSelectExercise = (exercise: LibraryExercise) => {
+    addExercise(exercise.name);
+    closePicker();
+  };
+
+  const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
+    await addCustomExercise(draft);
+    addExercise(draft.name);
+    closePicker();
+  };
 
   const handleCancel = () => {
     navigate({ to: "/" });
@@ -120,10 +142,24 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
         <Button
           variant="light"
           leftSection={<IconPlus size={18} />}
-          onClick={addExerciseField}
+          onClick={openPicker}
         >
           Add Exercise
         </Button>
+
+        <Modal
+          centered
+          size="lg"
+          opened={pickerOpened}
+          onClose={closePicker}
+          title="Add exercise to this template"
+        >
+          <ExerciseCreator
+            customExercises={customExercises}
+            onSelectExercise={handleSelectExercise}
+            onCreateCustomExercise={handleCreateCustomExercise}
+          />
+        </Modal>
 
         <Input.Wrapper
           label="Indicator Color"

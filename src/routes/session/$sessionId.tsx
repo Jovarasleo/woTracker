@@ -7,15 +7,20 @@ import {
   Modal,
   Stack,
   Text,
-  TextInput,
   Title,
 } from "@mantine/core";
 import { useDisclosure, useToggle } from "@mantine/hooks";
 import { IconEdit, IconEditOff, IconPlus } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useState } from "react";
+import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { ExerciseEditor } from "../../components/ExerciseEditor";
+import { type LibraryExercise } from "../../data/exerciseCatalog";
+import {
+  useCustomExercises,
+  type CustomExerciseDraft,
+} from "../../hooks/useCustomExercises";
 import { useExercise } from "../../hooks/useExercise";
 import { db } from "../../store/db";
 
@@ -44,7 +49,7 @@ function SessionPage() {
   const { addExercise, deleteExercise } = useExercise();
   const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { customExercises, addCustomExercise } = useCustomExercises();
   const [sessionMode, toggleSessionMode] = useToggle([
     "default",
     "edit",
@@ -57,8 +62,14 @@ function SessionPage() {
     setActiveExerciseId(id);
   };
 
-  const handleAddExercise = () => {
-    addExercise(inputRef.current?.value ?? "Unnamed", numericSessionId);
+  const handleSelectExercise = async (exercise: LibraryExercise) => {
+    await addExercise(exercise.name, numericSessionId);
+    close();
+  };
+
+  const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
+    await addCustomExercise(draft);
+    await addExercise(draft.name, numericSessionId);
     close();
   };
 
@@ -135,19 +146,16 @@ function SessionPage() {
 
       <Modal
         centered
+        size="lg"
         opened={opened}
         onClose={close}
         title="Add exercise to this session"
       >
-        <Stack>
-          <TextInput ref={inputRef} label="Exercise name" />
-          <Group justify="flex-end">
-            <Button variant="outline" onClick={close}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddExercise}>Add</Button>
-          </Group>
-        </Stack>
+        <ExerciseCreator
+          customExercises={customExercises}
+          onSelectExercise={handleSelectExercise}
+          onCreateCustomExercise={handleCreateCustomExercise}
+        />
       </Modal>
     </Card>
   );

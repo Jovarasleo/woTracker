@@ -35,8 +35,8 @@ export function useTemplateEditor(
     setEditableExercises((current) => current.filter((_, i) => i !== index));
   };
 
-  const addExerciseField = () => {
-    setEditableExercises((current) => [...current, { name: "" }]);
+  const addExercise = (exerciseName: string) => {
+    setEditableExercises((current) => [...current, { name: exerciseName }]);
   };
 
   const canSave = name.trim() !== "";
@@ -98,7 +98,7 @@ export function useTemplateEditor(
     editableExercises,
     updateExercise,
     removeExercise,
-    addExerciseField,
+    addExercise,
     canSave,
     save,
   };

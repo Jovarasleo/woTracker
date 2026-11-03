@@ -40,12 +40,22 @@ export interface SetLog {
   setNumber: number;
 }
 
+export interface CustomExercise {
+  id: number;
+  name: string;
+  description?: string;
+  primaryMuscle?: string;
+  equipment?: string;
+  createdAt: string;
+}
+
 interface WorkoutDB extends Dexie {
   workoutTemplates: EntityTable<WorkoutTemplate, "id">;
   exerciseTemplates: EntityTable<ExerciseTemplate, "id">;
   workoutSessions: EntityTable<WorkoutSession, "id">;
   exerciseLogs: EntityTable<ExerciseLog, "id">;
   setLogs: EntityTable<SetLog, "id">;
+  customExercises: EntityTable<CustomExercise, "id">;
 }
 
 export const db = new Dexie("WorkoutDB") as WorkoutDB;
@@ -113,3 +123,15 @@ db.version(8)
         }
       });
   });
+
+// v9: add `customExercises`, user-created entries for the exercise library
+// shown next to the built-in catalog.
+db.version(9).stores({
+  workoutTemplates: "++id, name, createdAt",
+  exerciseTemplates: "++id, workoutTemplateId, order",
+  workoutSessions: "++id, name, date, workoutTemplateId",
+  exerciseLogs:
+    "++id, sessionId, name, order, createdAt, exerciseTemplateId, [sessionId+exerciseTemplateId]",
+  setLogs: "++id, exerciseLogId, setNumber",
+  customExercises: "++id, name, createdAt",
+});
