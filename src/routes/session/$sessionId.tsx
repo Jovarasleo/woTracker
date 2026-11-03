@@ -1,16 +1,43 @@
-import { Button, Loader, Modal, Stack, TextInput, Title } from "@mantine/core";
-import { createFileRoute } from "@tanstack/react-router";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useRef, useState } from "react";
-import { ExerciseEditor } from "../../components/ExerciseEditor";
-import { db } from "../../store/db";
-import { useExercise } from "../../hooks/useExercise";
+import {
+  Button,
+  Card,
+  Divider,
+  Group,
+  Loader,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { useDisclosure, useToggle } from "@mantine/hooks";
 import { IconEdit, IconEditOff, IconPlus } from "@tabler/icons-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useLiveQuery } from "dexie-react-hooks";
+import { Fragment, useRef, useState } from "react";
+import { ExerciseEditor } from "../../components/ExerciseEditor";
+import { useExercise } from "../../hooks/useExercise";
+import { db } from "../../store/db";
 
 export const Route = createFileRoute("/session/$sessionId")({
   component: SessionPage,
 });
+
+function formatSessionDate(date: string) {
+  const value = new Date(date);
+  const day = value.toLocaleString("lt-LT", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+  const time = value.toLocaleString("lt-LT", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  return `${day} · ${time}`;
+}
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
@@ -30,6 +57,11 @@ function SessionPage() {
     setActiveExerciseId(id);
   };
 
+  const handleAddExercise = () => {
+    addExercise(inputRef.current?.value ?? "Unnamed", numericSessionId);
+    close();
+  };
+
   const session = useLiveQuery(
     () => db.workoutSessions.get(numericSessionId),
     [numericSessionId],
@@ -44,63 +76,62 @@ function SessionPage() {
       .toArray();
   }, [numericSessionId]);
 
-  if (!session || !exerciseLogs) return <Loader />;
+  if (!session || !exerciseLogs) {
+    return <Loader />;
+  }
 
   return (
-    <div className="max-w-110 mx-auto">
-      <Title order={2}>
-        {session.name}
-        <br />
-        <div>
-          {new Date(session.date).toLocaleString("lt-LT", {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-          })}
-        </div>
-        <div>
-          {new Date(session.date).toLocaleString("lt-LT", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          })}
-        </div>
-      </Title>
-      <div className="text-left my-4 flex justify-between">
+    <Card shadow="sm" padding="lg" className="w-full max-w-110 mx-auto">
+      <Stack>
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
+          <div className="text-left">
+            <Title order={3}>{session.name}</Title>
+            <Text size="sm" c="dimmed">
+              {formatSessionDate(session.date)}
+            </Text>
+          </div>
+          <Button
+            size="xs"
+            variant={sessionEditable ? "filled" : "outline"}
+            leftSection={
+              sessionEditable ? (
+                <IconEditOff size={16} />
+              ) : (
+                <IconEdit size={16} />
+              )
+            }
+            onClick={() => toggleSessionMode()}
+          >
+            {sessionEditable ? "Done" : "Edit"}
+          </Button>
+        </Group>
+
+        <Divider />
+
+        {exerciseLogs.map((exercise, index) => (
+          <Fragment key={exercise.id}>
+            {index > 0 && <Divider />}
+            <ExerciseEditor
+              exerciseLog={exercise}
+              sessionId={numericSessionId}
+              editable={activeExerciseId === exercise.id}
+              sessionEditable={sessionEditable}
+              onEditExercise={onEditExercise}
+              onDeleteExercise={deleteExercise}
+            />
+          </Fragment>
+        ))}
+
         {sessionEditable && (
           <Button
-            size="sm"
-            variant="filled"
-            color="cyan"
-            leftSection={<IconPlus />}
+            variant="light"
+            leftSection={<IconPlus size={18} />}
             onClick={open}
           >
-            Bonus
+            Add Exercise
           </Button>
         )}
-
-        <Button
-          size="sm"
-          variant="outline"
-          className="ms-auto"
-          leftSection={sessionEditable ? <IconEditOff /> : <IconEdit />}
-          onClick={() => toggleSessionMode()}
-        >
-          Edit Session
-        </Button>
-      </div>
-
-      {exerciseLogs.map((exercise) => (
-        <ExerciseEditor
-          key={exercise.id}
-          exerciseLog={exercise}
-          sessionId={numericSessionId}
-          editable={activeExerciseId === exercise.id}
-          sessionEditable={sessionEditable}
-          onEditExercise={onEditExercise}
-          onDeleteExercise={deleteExercise}
-        />
-      ))}
+      </Stack>
 
       <Modal
         centered
@@ -110,20 +141,14 @@ function SessionPage() {
       >
         <Stack>
           <TextInput ref={inputRef} label="Exercise name" />
-          <Button
-            onClick={() => {
-              addExercise(
-                inputRef.current?.value ?? "Unnamed",
-                numericSessionId,
-              );
-
-              close();
-            }}
-          >
-            Add New
-          </Button>
+          <Group justify="flex-end">
+            <Button variant="outline" onClick={close}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddExercise}>Add</Button>
+          </Group>
         </Stack>
       </Modal>
-    </div>
+    </Card>
   );
 }

@@ -1,12 +1,12 @@
 import {
   ActionIcon,
   Button,
-  Card,
-  Input,
+  Group,
   NumberInput,
-  Title,
+  Stack,
+  Text,
 } from "@mantine/core";
-import { IconCheck, IconEdit, IconX } from "@tabler/icons-react";
+import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useExerciseLogEditor } from "../hooks/useExerciseLogEditor";
 import { type ExerciseLog } from "../store/db";
@@ -46,94 +46,97 @@ export function ExerciseEditor({
     onSetEditable(exerciseLog.id, setId);
   };
 
-  if (!exerciseLog && !sets) {
+  if (!sets) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mb-2 min-h-9">
-        <Title order={2}>{exerciseLog.name}</Title>
+    <Stack gap="xs">
+      <Group justify="space-between" wrap="nowrap" className="min-h-7 mb-2">
+        <Text fw={600} className="text-left">
+          {exerciseLog.name}
+        </Text>
         {sessionEditable && (
-          <Button
-            variant="filled"
+          <ActionIcon
+            variant="subtle"
             color="red"
+            aria-label="Remove exercise"
             onClick={() => onDeleteExercise(exerciseLog.id)}
           >
-            Remove exercise
-          </Button>
+            <IconTrash size={18} />
+          </ActionIcon>
         )}
-      </div>
+      </Group>
 
-      <div className="flex flex-col gap-4 ">
-        {(sets ?? []).map((set) => {
-          const disabled = activeSetId !== set.id || !editable;
-          return (
-            <Card key={set.id} className="flex">
-              {sessionEditable && (
-                <ActionIcon
-                  size="sm"
-                  color="red"
-                  className="self-start"
-                  variant="subtle"
-                  onClick={() => deleteSet(set.id)}
-                >
-                  <IconX />
-                </ActionIcon>
-              )}
-              <div className="flex gap-4">
-                <Input.Wrapper label="Weight" className="text-left">
-                  <NumberInput
-                    size="xs"
-                    value={set.weight}
-                    disabled={disabled}
-                    onChange={(weight) =>
-                      updateSetWeight(Number(weight), set.id)
-                    }
-                    placeholder="Weight"
-                  />
-                </Input.Wrapper>
+      {sets.length > 0 && (
+        <Group gap="xs" wrap="nowrap" className="-mb-1">
+          <div className="w-5 shrink-0" />
+          <Text size="sm" fw={500} className="flex-1 text-left">
+            Weight
+          </Text>
+          <Text size="sm" fw={500} className="flex-1 text-left">
+            Reps
+          </Text>
+          <div className="w-8.5 shrink-0" />
+          {sessionEditable && <div className="w-8.5 shrink-0" />}
+        </Group>
+      )}
 
-                <Input.Wrapper label="Reps" className="text-left">
-                  <NumberInput
-                    size="xs"
-                    value={set.reps}
-                    min={0}
-                    disabled={disabled}
-                    onChange={(reps) => updateSetReps(Number(reps), set.id)}
-                    placeholder="Reps"
-                  />
-                </Input.Wrapper>
-                <ActionIcon
-                  className="self-end"
-                  variant="subtle"
-                  onClick={() => onSetEditable(exerciseLog.id, set.id)}
-                >
-                  {disabled ? (
-                    <IconEdit
-                      style={{ width: "70%", height: "70%" }}
-                      stroke={1.75}
-                    />
-                  ) : (
-                    <IconCheck
-                      style={{ width: "70%", height: "70%" }}
-                      stroke={1.75}
-                    />
-                  )}
-                </ActionIcon>
-              </div>
-            </Card>
-          );
-        })}
+      {sets.map((set, index) => {
+        const disabled = activeSetId !== set.id || !editable;
 
-        <Button
-          variant="light"
-          onClick={() => addActiveSet()}
-          className="self-end"
-        >
-          Add Set
-        </Button>
-      </div>
-    </div>
+        return (
+          <Group key={set.id} gap="xs" wrap="nowrap" align="center">
+            <Text size="sm" c="dimmed" className="w-5 shrink-0">
+              {index + 1}
+            </Text>
+            <NumberInput
+              className="flex-1"
+              value={set.weight}
+              min={0}
+              disabled={disabled}
+              onChange={(weight) => updateSetWeight(Number(weight), set.id)}
+              placeholder="Weight"
+            />
+            <NumberInput
+              className="flex-1"
+              value={set.reps}
+              min={0}
+              disabled={disabled}
+              onChange={(reps) => updateSetReps(Number(reps), set.id)}
+              placeholder="Reps"
+            />
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              aria-label={disabled ? "Edit set" : "Confirm set"}
+              onClick={() => onSetEditable(exerciseLog.id, set.id)}
+            >
+              {disabled ? <IconEdit size={18} /> : <IconCheck size={18} />}
+            </ActionIcon>
+            {sessionEditable && (
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                size="lg"
+                aria-label="Remove set"
+                onClick={() => deleteSet(set.id)}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            )}
+          </Group>
+        );
+      })}
+
+      <Button
+        variant="light"
+        size="xs"
+        leftSection={<IconPlus size={16} />}
+        onClick={() => addActiveSet()}
+      >
+        Add Set
+      </Button>
+    </Stack>
   );
 }

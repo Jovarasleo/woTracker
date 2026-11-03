@@ -9,12 +9,17 @@ export function useExerciseLogEditor(exercise: ExerciseLog) {
   );
 
   const addSet = async () => {
-    const setNumber = (sets?.length ?? 0) + 1;
+    const existingSets = await db.setLogs
+      .where("exerciseLogId")
+      .equals(exercise.id)
+      .sortBy("setNumber");
+    const previousSet = existingSets.at(-1);
+
     const setId = await db.setLogs.add({
       exerciseLogId: exercise.id,
-      weight: 0,
-      reps: 0,
-      setNumber,
+      weight: previousSet?.weight ?? 0,
+      reps: previousSet?.reps ?? 0,
+      setNumber: existingSets.length + 1,
     });
 
     return setId;

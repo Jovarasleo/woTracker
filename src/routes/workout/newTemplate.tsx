@@ -50,7 +50,9 @@ function NewWorkoutTemplate() {
 
         const filteredExercises = exercises.filter((e) => e.trim() !== "");
 
-        if (!templateId) throw new Error("Failed to create template");
+        if (!templateId) {
+          throw new Error("Failed to create template");
+        }
 
         await db.exerciseTemplates.bulkAdd(
           filteredExercises.map((exercise, index) => ({
