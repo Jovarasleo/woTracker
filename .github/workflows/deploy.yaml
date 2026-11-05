@@ -23,6 +23,7 @@ jobs:
           fi
 
           curl --fail-with-body --silent --show-error \
+            --request POST \
             --header "Authorization: Bearer $COOLIFY_TOKEN" \
             --header "X-Deploy-Key: $CF_DEPLOY_KEY" \
             "$COOLIFY_WEBHOOK"
