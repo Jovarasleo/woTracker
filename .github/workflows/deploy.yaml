@@ -1,0 +1,27 @@
+name: Deploy to Coolify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+
+    steps:
+      - name: Trigger Coolify deployment
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+        run: |
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_WEBHOOK" ]; then
+            echo "::error::COOLIFY_TOKEN or COOLIFY_WEBHOOK is empty - check secret names and the environment name"
+            exit 1
+          fi
+
+          curl --fail-with-body --silent --show-error \
+            --request GET \
+            --header "Authorization: Bearer $COOLIFY_TOKEN" \
+            "$COOLIFY_WEBHOOK"
