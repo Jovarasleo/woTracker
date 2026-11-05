@@ -2,7 +2,6 @@ import {
   Button,
   Card,
   Divider,
-  Group,
   Loader,
   Modal,
   Stack,
@@ -16,6 +15,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { Fragment, useState } from "react";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { ExerciseEditor } from "../../components/ExerciseEditor";
+import { PageLayout } from "../../components/PageLayout";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import {
   useCustomExercises,
@@ -102,78 +102,85 @@ function SessionPage() {
   const previousPerformance = usePreviousPerformance(session, exerciseLogs);
 
   if (!session || !exerciseLogs) {
-    return <Loader />;
+    return (
+      <PageLayout title="Session" widthClassName="max-w-110">
+        <Loader className="mx-auto" />
+      </PageLayout>
+    );
   }
 
+  const editToggle = (
+    <Button
+      variant={sessionEditable ? "filled" : "outline"}
+      leftSection={
+        sessionEditable ? <IconEditOff size={16} /> : <IconEdit size={16} />
+      }
+      onClick={() => toggleSessionMode()}
+    >
+      {sessionEditable ? "Done" : "Edit"}
+    </Button>
+  );
+
   return (
-    <Card shadow="sm" padding="lg" className="w-full max-w-110 mx-auto">
-      <Stack>
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
+    <PageLayout
+      title={session.name}
+      subtitle={formatSessionDate(session.date)}
+      action={editToggle}
+      widthClassName="max-w-110"
+    >
+      <Card shadow="sm" padding="lg" className="w-full max-w-110 mx-auto">
+        <Stack>
           <div className="text-left">
             <Title order={3}>{session.name}</Title>
             <Text size="sm" c="dimmed">
               {formatSessionDate(session.date)}
             </Text>
           </div>
-          <Button
-            size="xs"
-            variant={sessionEditable ? "filled" : "outline"}
-            leftSection={
-              sessionEditable ? (
-                <IconEditOff size={16} />
-              ) : (
-                <IconEdit size={16} />
-              )
-            }
-            onClick={() => toggleSessionMode()}
-          >
-            {sessionEditable ? "Done" : "Edit"}
-          </Button>
-        </Group>
 
-        <Divider />
+          <Divider />
 
-        {exerciseLogs.map((exercise, index) => (
-          <Fragment key={exercise.id}>
-            {index > 0 && <Divider />}
-            <ExerciseEditor
-              exerciseLog={exercise}
-              previous={previousPerformance?.get(
-                previousPerformanceKey(exercise),
-              )}
-              sessionId={numericSessionId}
-              editable={activeExerciseId === exercise.id}
-              sessionEditable={sessionEditable}
-              onEditExercise={onEditExercise}
-              onDeleteExercise={deleteExercise}
-            />
-          </Fragment>
-        ))}
+          {exerciseLogs.map((exercise, index) => (
+            <Fragment key={exercise.id}>
+              {index > 0 && <Divider />}
+              <ExerciseEditor
+                exerciseLog={exercise}
+                previous={previousPerformance?.get(
+                  previousPerformanceKey(exercise),
+                )}
+                sessionId={numericSessionId}
+                editable={activeExerciseId === exercise.id}
+                sessionEditable={sessionEditable}
+                onEditExercise={onEditExercise}
+                onDeleteExercise={deleteExercise}
+              />
+            </Fragment>
+          ))}
 
-        {sessionEditable && (
-          <Button
-            variant="light"
-            leftSection={<IconPlus size={18} />}
-            onClick={open}
-          >
-            Add Exercise
-          </Button>
-        )}
-      </Stack>
+          {sessionEditable && (
+            <Button
+              variant="light"
+              leftSection={<IconPlus size={18} />}
+              onClick={open}
+            >
+              Add Exercise
+            </Button>
+          )}
+        </Stack>
 
-      <Modal
-        centered
-        size="lg"
-        opened={opened}
-        onClose={close}
-        title="Add exercise to this session"
-      >
-        <ExerciseCreator
-          customExercises={customExercises}
-          onSelectExercise={handleSelectExercise}
-          onCreateCustomExercise={handleCreateCustomExercise}
-        />
-      </Modal>
-    </Card>
+        <Modal
+          centered
+          size="lg"
+          opened={opened}
+          onClose={close}
+          title="Add exercise to this session"
+        >
+          <ExerciseCreator
+            customExercises={customExercises}
+            onSelectExercise={handleSelectExercise}
+            onCreateCustomExercise={handleCreateCustomExercise}
+          />
+        </Modal>
+      </Card>
+    </PageLayout>
   );
 }

@@ -167,6 +167,9 @@ function NewWorkoutTemplate() {
         </Input.Wrapper>
 
         <Group justify="flex-end">
+          <Button variant="outline" onClick={goBack} disabled={isSubmitting}>
+            Cancel
+          </Button>
           <Button type="submit" loading={isSubmitting}>
             Save Template
           </Button>

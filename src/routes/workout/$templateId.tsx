@@ -19,6 +19,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { CardioBadge } from "../../components/CardioBadge";
+import { PageLayout } from "../../components/PageLayout";
 import { useExercise } from "../../hooks/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
 
@@ -105,9 +106,11 @@ function WorkoutPage() {
 
   if (!template || !exerciseTemplates || !sessions) {
     return (
-      <div className="flex justify-center mt-10">
-        <Loader />
-      </div>
+      <PageLayout title="Workout">
+        <div className="flex justify-center mt-10">
+          <Loader />
+        </div>
+      </PageLayout>
     );
   }
 
@@ -115,87 +118,95 @@ function WorkoutPage() {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )[0];
 
+  const exerciseCountLabel = `${exerciseTemplates.length} ${
+    exerciseTemplates.length === 1 ? "exercise" : "exercises"
+  }`;
+
   return (
-    <Stack className="max-w-xl mx-auto" gap="md">
-      <Card withBorder shadow="sm" padding="lg" radius="md">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
+    <PageLayout
+      title={template.name}
+      subtitle={exerciseCountLabel}
+      action={
+        <Button
+          variant="subtle"
+          leftSection={<IconPencil size={16} />}
+          onClick={() =>
+            navigate({
+              to: "/workout/edit/$templateId",
+              params: { templateId },
+            })
+          }
+        >
+          Edit
+        </Button>
+      }
+    >
+      <Stack className="w-full max-w-xl mx-auto" gap="md">
+        <Card withBorder shadow="sm" padding="lg" radius="md">
           <Group gap="sm" align="center" wrap="nowrap">
             <ColorSwatch color={template.indicatorColor} size={32} />
-            <div>
+            <div className="text-left">
               <Title order={2}>{template.name}</Title>
               <Text size="sm" c="dimmed">
-                <span className="me-1">{exerciseTemplates.length}</span>
-                {exerciseTemplates.length === 1 ? "exercise" : "exercises"}
+                {exerciseCountLabel}
               </Text>
             </div>
           </Group>
-          <Button
-            variant="subtle"
-            size="compact-sm"
-            leftSection={<IconPencil size={16} />}
-            onClick={() =>
-              navigate({
-                to: "/workout/edit/$templateId",
-                params: { templateId },
-              })
-            }
-          >
-            Edit
-          </Button>
-        </Group>
 
-        <Group gap="sm" mt="md" align="center">
-          <IconCalendarEvent size={16} className="text-gray-400" />
-          <Text size="sm" c="dimmed">
-            {lastSession
-              ? `Last performed ${dayjs(lastSession.date).format("MMM D, YYYY")}`
-              : "Not performed yet"}
-          </Text>
-          {sessions.length > 0 && (
-            <Badge variant="light" color={template.indicatorColor}>
-              {sessions.length} {sessions.length === 1 ? "session" : "sessions"}
-            </Badge>
-          )}
-        </Group>
-      </Card>
+          <Group gap="sm" mt="md" align="center">
+            <IconCalendarEvent size={16} className="text-gray-400" />
+            <Text size="sm" c="dimmed">
+              {lastSession
+                ? `Last performed ${dayjs(lastSession.date).format("MMM D, YYYY")}`
+                : "Not performed yet"}
+            </Text>
+            {sessions.length > 0 && (
+              <Badge variant="light" color={template.indicatorColor}>
+                {sessions.length}{" "}
+                {sessions.length === 1 ? "session" : "sessions"}
+              </Badge>
+            )}
+          </Group>
+        </Card>
 
-      <Card withBorder padding="md" radius="md">
-        <Title order={4} mb="sm">
-          Exercises
-        </Title>
-        <Stack gap={0}>
-          {exerciseTemplates.map((exercise, index) => (
-            <Group
-              key={exercise.id}
-              gap="sm"
-              align="center"
-              wrap="nowrap"
-              className="py-2 border-b border-gray-700 last:border-b-0"
-            >
-              <Text
-                size="sm"
-                c="dimmed"
-                className="w-6 text-right tabular-nums"
+        <Card withBorder padding="md" radius="md">
+          <Title order={4} mb="sm">
+            Exercises
+          </Title>
+          <Stack gap={0}>
+            {exerciseTemplates.map((exercise, index) => (
+              <Group
+                key={exercise.id}
+                gap="sm"
+                align="center"
+                wrap="nowrap"
+                className="py-2 border-b border-gray-700 last:border-b-0"
               >
-                {index + 1}
-              </Text>
-              <Text fw={500}>{exercise.name}</Text>
-              <CardioBadge kind={exerciseKindOf(exercise)} />
-            </Group>
-          ))}
-        </Stack>
-      </Card>
+                <Text
+                  size="sm"
+                  c="dimmed"
+                  className="w-6 text-right tabular-nums"
+                >
+                  {index + 1}
+                </Text>
+                <Text fw={500}>{exercise.name}</Text>
+                <CardioBadge kind={exerciseKindOf(exercise)} />
+              </Group>
+            ))}
+          </Stack>
+        </Card>
 
-      <Button
-        size="md"
-        fullWidth
-        color="green"
-        leftSection={<IconPlayerPlayFilled size={18} />}
-        loading={starting}
-        onClick={startSession}
-      >
-        Start Session
-      </Button>
-    </Stack>
+        <Button
+          size="md"
+          fullWidth
+          color="green"
+          leftSection={<IconPlayerPlayFilled size={18} />}
+          loading={starting}
+          onClick={startSession}
+        >
+          Start Session
+        </Button>
+      </Stack>
+    </PageLayout>
   );
 }
