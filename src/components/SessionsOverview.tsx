@@ -57,6 +57,7 @@ export function SessionsOverview({ sessions, templateColorById }: Props) {
               to: "/",
               search: (prev) => ({ ...prev, month: newMonth }),
               replace: true,
+              resetScroll: false,
             })
           }
           onSelectSession={openSession}
