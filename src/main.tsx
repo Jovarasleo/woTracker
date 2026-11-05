@@ -9,6 +9,7 @@ import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { syncFaviconWithVisibility } from "./utils/favicon";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -38,6 +39,7 @@ window.addEventListener("load", () => {
 });
 
 registerSW({ immediate: true });
+syncFaviconWithVisibility();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

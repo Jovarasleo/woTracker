@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background-tab icon: same plate with muted colors and no glow -->
+  <circle cx="32" cy="32" r="30" fill="#1a1b1e" />
+  <g fill="none" stroke-width="9" transform="rotate(-90 32 32)" opacity="0.6">
+    <circle cx="32" cy="32" r="23" stroke="#7950f2" pathLength="100" stroke-dasharray="23 77" />
+    <circle cx="32" cy="32" r="23" stroke="#15aabf" pathLength="100" stroke-dasharray="23 77" stroke-dashoffset="-25" />
+    <circle cx="32" cy="32" r="23" stroke="#e64980" pathLength="100" stroke-dasharray="23 77" stroke-dashoffset="-50" />
+    <circle cx="32" cy="32" r="23" stroke="#fd7e14" pathLength="100" stroke-dasharray="23 77" stroke-dashoffset="-75" />
+  </g>
+  <circle cx="32" cy="32" r="13" fill="#2c2e33" />
+  <circle cx="32" cy="32" r="5" fill="#1a1b1e" />
+</svg>

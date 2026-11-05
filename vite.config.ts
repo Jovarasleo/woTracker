@@ -9,6 +9,12 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: "autoUpdate",
+      // Precache the tab icons (both active and inactive) so they work offline.
+      includeAssets: [
+        "favicon.svg",
+        "favicon-inactive.svg",
+        "icons/apple-touch-icon.png",
+      ],
       workbox: {
         clientsClaim: true,
         skipWaiting: true,
@@ -31,7 +37,7 @@ export default defineConfig({
       },
       manifest: {
         name: "Workout Tracker",
-        short_name: "Workout",
+        short_name: "woTracker",
         description: "Simple workout tracking app",
         theme_color: "#1c7ed6",
         background_color: "#ffffff",
@@ -47,6 +53,7 @@ export default defineConfig({
             src: "icons/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any maskable",
           },
         ],
       },
