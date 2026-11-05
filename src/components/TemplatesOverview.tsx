@@ -1,132 +1,128 @@
 import {
-  ActionIcon,
+  Badge,
   Button,
-  Card,
-  ColorSwatch,
-  Menu,
   Modal,
+  Paper,
+  Text,
+  ThemeIcon,
   Title,
-  UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconDotsVertical, IconPencil, IconTrash } from "@tabler/icons-react";
+import { IconBarbell, IconPlus } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
-import { db } from "../store/db";
+import { TemplateCard } from "./TemplateCard";
+import type { TemplateSummary } from "../hooks/useHomeOverview";
+
+interface Props {
+  templates: TemplateSummary[];
+  onDeleteTemplate: (templateId: number) => Promise<void>;
+}
 
 /**
- * Grid of workout templates on the home page. Each card can be started, and its
- * menu edits the template or opens the delete-confirmation modal.
+ * Responsive grid of workout templates for the home page, with an empty state
+ * and the delete-confirmation modal.
  */
-export function TemplatesOverview() {
+export function TemplatesOverview({ templates, onDeleteTemplate }: Props) {
   const navigate = useNavigate();
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(
+  const [pendingDelete, setPendingDelete] = useState<TemplateSummary | null>(
     null,
   );
-  const [opened, { open, close }] = useDisclosure(false);
-  const workoutTemplates = useLiveQuery(
-    () => db.workoutTemplates?.toArray(),
-    [],
-  );
+  const [deleting, setDeleting] = useState(false);
 
-  async function deleteWorkoutTemplate(templateId: number, close: () => void) {
-    await db.workoutTemplates.delete(templateId);
-    close();
-  }
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) {
+      return;
+    }
 
-  const handleOpenModal = (templateId: number) => {
-    setSelectedTemplateId(templateId);
-    open();
+    setDeleting(true);
+    try {
+      await onDeleteTemplate(pendingDelete.template.id);
+      setPendingDelete(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
-    <>
-      <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-wrap mt-8">
-        {workoutTemplates?.map((template) => (
-          <li key={template.id}>
-            <Card shadow="sm" padding="sm" radius="md" withBorder>
-              <div className="flex gap-2 items-center">
-                <Link
-                  to="/workout/$templateId"
-                  className="w-full"
-                  params={{ templateId: template.id!.toString() }}
-                >
-                  <UnstyledButton className="flex items-center gap-2 w-full">
-                    <ColorSwatch
-                      color={template.indicatorColor}
-                      size={16}
-                      className="col-start-1 justify-self-start"
-                    />
-                    <Title order={4} className="truncate">
-                      {template.name}
-                    </Title>
-                  </UnstyledButton>
-                </Link>
+    <section aria-labelledby="templates-heading">
+      <div className="mb-3 flex items-center gap-2">
+        <Title order={3} id="templates-heading">
+          Workouts
+        </Title>
+        {templates.length > 0 && (
+          <Badge variant="light" color="gray" radius="sm">
+            {templates.length}
+          </Badge>
+        )}
+      </div>
 
-                <Menu position="bottom-end" shadow="md" width={160}>
-                  <Menu.Target>
-                    <ActionIcon
-                      className="ms-auto justify-self-end"
-                      variant="subtle"
-                      aria-label="Template options"
-                    >
-                      <IconDotsVertical
-                        size={18}
-                        stroke={1.75}
-                        className="text-gray-200"
-                      />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item
-                      leftSection={<IconPencil size={16} />}
-                      onClick={() =>
-                        navigate({
-                          to: "/workout/edit/$templateId",
-                          params: { templateId: template.id.toString() },
-                        })
-                      }
-                    >
-                      Edit
-                    </Menu.Item>
-                    <Menu.Item
-                      color="red"
-                      leftSection={<IconTrash size={16} />}
-                      onClick={() => handleOpenModal(template.id)}
-                    >
-                      Delete
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </div>
-            </Card>
-          </li>
-        ))}
-      </ul>
+      {templates.length === 0 ? (
+        <Paper
+          withBorder
+          radius="lg"
+          p="xl"
+          className="flex flex-col items-center gap-3 border-dashed text-center"
+        >
+          <ThemeIcon variant="light" size={56} radius="xl">
+            <IconBarbell size={30} />
+          </ThemeIcon>
+          <div>
+            <Text fw={600}>No workouts yet</Text>
+            <Text size="sm" c="dimmed">
+              Create a workout template to start logging sessions.
+            </Text>
+          </div>
+          <Button
+            component={Link}
+            tabIndex={0}
+            to="/workout/newTemplate"
+            leftSection={<IconPlus size={18} />}
+          >
+            Create workout
+          </Button>
+        </Paper>
+      ) : (
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {templates.map((summary) => (
+            <li key={summary.template.id}>
+              <TemplateCard
+                summary={summary}
+                onEdit={() =>
+                  navigate({
+                    to: "/workout/edit/$templateId",
+                    params: { templateId: summary.template.id.toString() },
+                  })
+                }
+                onDelete={() => setPendingDelete(summary)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
 
       <Modal
         centered
-        opened={opened && selectedTemplateId !== null}
-        onClose={close}
+        opened={pendingDelete !== null}
+        onClose={() => !deleting && setPendingDelete(null)}
         title="Delete workout template?"
       >
-        <div className="flex gap-4 justify-end">
+        <Text size="sm" mb="md">
+          <b>{pendingDelete?.template.name}</b> and its exercise list will be
+          removed. Sessions you already logged are kept.
+        </Text>
+        <div className="flex justify-end gap-3">
           <Button
-            variant="filled"
-            color="red"
-            onClick={() =>
-              selectedTemplateId !== null &&
-              deleteWorkoutTemplate(selectedTemplateId, close)
-            }
+            variant="default"
+            onClick={() => setPendingDelete(null)}
+            disabled={deleting}
           >
-            Delete
+            Cancel
           </Button>
-          <Button variant="outline" onClick={close}>
-            Close
+          <Button color="red" loading={deleting} onClick={handleConfirmDelete}>
+            Delete
           </Button>
         </div>
       </Modal>
-    </>
+    </section>
   );
 }

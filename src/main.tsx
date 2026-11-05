@@ -25,7 +25,10 @@ declare module "@tanstack/react-router" {
 // once to pick up the new index.html instead of leaving the app broken.
 const PRELOAD_RELOAD_KEY = "preload-error-reload";
 window.addEventListener("vite:preloadError", (event) => {
-  if (sessionStorage.getItem(PRELOAD_RELOAD_KEY)) return;
+  if (sessionStorage.getItem(PRELOAD_RELOAD_KEY)) {
+    return;
+  }
+
   event.preventDefault();
   sessionStorage.setItem(PRELOAD_RELOAD_KEY, "1");
   window.location.reload();

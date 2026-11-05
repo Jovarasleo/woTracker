@@ -96,6 +96,33 @@ kit) for something the stack above already handles.
 - Keep imports grouped: external packages first, then local modules (`../store/db`,
   `../hooks/...`).
 - Prefer small, pure helper functions and early returns over deeply nested conditionals.
+- **Every `if` uses braces**, including one-line early returns, and is **followed by
+  an empty line** before the next statement (no blank line needed when the `if` is the
+  last statement in its block). Enforced by ESLint (`curly`,
+  `padding-line-between-statements`); `npx eslint . --fix` applies both.
+
+  ```ts
+  if (!session) {
+    return;
+  }
+
+  await db.workoutSessions.update(session.id, changes);
+  ```
+
+- **Build `Map`s (and `Set`s) declaratively** by passing an array of entries to the
+  constructor — don't create an empty `Map` and fill it with a `for` loop or
+  `.set()` calls in a `reduce`.
+
+  ```ts
+  const colorById = new Map(
+    templates.map((template) => [template.id, template.indicatorColor]),
+  );
+  ```
+
+  When several items share a key, rely on later entries overwriting earlier ones:
+  order the array so the entry you want to keep comes last (e.g. sort oldest →
+  newest to keep the latest session per day). Use `flatMap` returning `[]` to skip
+  items that have no key.
 
 ## Before Committing
 

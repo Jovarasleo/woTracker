@@ -79,7 +79,9 @@ function SessionPage() {
   );
 
   const exerciseLogs = useLiveQuery(async () => {
-    if (!numericSessionId) return [];
+    if (!numericSessionId) {
+      return [];
+    }
 
     return await db.exerciseLogs
       .where("sessionId")

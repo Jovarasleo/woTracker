@@ -2,6 +2,7 @@ import { Indicator } from "@mantine/core";
 import { Calendar } from "@mantine/dates";
 import dayjs from "dayjs";
 import type { WorkoutSession } from "../store/db";
+import { sessionIndicatorColor } from "../utils/colors";
 
 interface Props {
   sessions: WorkoutSession[];
@@ -13,49 +14,26 @@ interface Props {
   onMonthChange: (month: string) => void;
 }
 
-/**
- * Indicator color for a session: the live color of the template it was created
- * from, falling back to the color snapshotted on the session itself (used when
- * the template was deleted or the session has no template link).
- */
-const sessionIndicatorColor = (
-  session: WorkoutSession,
-  templateColorById: Map<number, string>,
-): string => {
-  const templateColor =
-    session.workoutTemplateId != null
-      ? templateColorById.get(session.workoutTemplateId)
-      : undefined;
-  return templateColor ?? session.indicatorColor;
-};
-
 const DAY_FORMAT = "YYYY-MM-DD";
 const MONTH_KEY_FORMAT = "YYYY-MM";
 const MONTH_LABEL_FORMAT = "MMMM";
 
+const byOldestDate = (a: WorkoutSession, b: WorkoutSession) =>
+  dayjs(a.date).valueOf() - dayjs(b.date).valueOf();
+
 /**
  * Indexes sessions by calendar day. When a day has more than one session, the
- * most recent one wins — that's where selecting the day navigates.
+ * most recent one wins — that's where selecting the day navigates. (Sessions
+ * are fed oldest → newest, so later entries overwrite earlier ones.)
  */
 const groupLatestSessionByDay = (
   sessions: WorkoutSession[],
 ): Map<string, WorkoutSession> =>
-  sessions.reduce((sessionsByDay, session) => {
-    const sessionDate = dayjs(session.date);
-    const dayKey = sessionDate.format(DAY_FORMAT);
-
-    const existingSession = sessionsByDay.get(dayKey);
-    const sessionTime = sessionDate.valueOf();
-    const existingTime = existingSession
-      ? dayjs(existingSession.date).valueOf()
-      : -Infinity;
-
-    if (sessionTime > existingTime) {
-      sessionsByDay.set(dayKey, session);
-    }
-
-    return sessionsByDay;
-  }, new Map<string, WorkoutSession>());
+  new Map(
+    [...sessions]
+      .sort(byOldestDate)
+      .map((session) => [dayjs(session.date).format(DAY_FORMAT), session]),
+  );
 
 /** Collects the set of months (`YYYY-MM`) that contain at least one session. */
 const collectSessionMonths = (sessions: WorkoutSession[]): Set<string> =>
@@ -85,8 +63,8 @@ export function SessionCalendar({
       styles={{
         levelsGroup: { display: "block" },
         calendarHeader: { maxWidth: "100%" },
-        month: { width: "100%", height: 46, margin: "0 auto" },
-        day: { width: "100%", height: 46, margin: "0 auto" },
+        month: { width: "100%", margin: "0 auto" },
+        day: { width: "100%", height: 42, margin: "0 auto" },
         monthsList: { margin: "0 auto", width: "100%" },
         monthsListControl: { height: 64, margin: "0 auto" },
       }}

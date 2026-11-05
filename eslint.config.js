@@ -19,5 +19,14 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Every if/else body uses braces, even single-line returns.
+      curly: ['error', 'all'],
+      // Leave an empty line after every if statement.
+      'padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: 'if', next: '*' },
+      ],
+    },
   },
 ])

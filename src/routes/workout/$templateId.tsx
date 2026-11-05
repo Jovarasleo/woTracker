@@ -52,7 +52,9 @@ function WorkoutPage() {
   );
 
   const startSession = async () => {
-    if (!template || !exerciseTemplates) return;
+    if (!template || !exerciseTemplates) {
+      return;
+    }
 
     const newSessionId = await db.workoutSessions.add({
       name: template.name,

@@ -125,6 +125,7 @@ db.version(8)
         if (session.workoutTemplateId == null && template) {
           session.workoutTemplateId = template.id;
         }
+
         if (!session.indicatorColor) {
           session.indicatorColor =
             template?.indicatorColor ?? randomIndicatorColor();

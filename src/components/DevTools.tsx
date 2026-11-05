@@ -11,7 +11,9 @@ export function DevTools() {
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (!import.meta.env.DEV) return null;
+  if (!import.meta.env.DEV) {
+    return null;
+  }
 
   const handleSeed = async () => {
     setBusy(true);

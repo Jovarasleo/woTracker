@@ -1,3 +1,5 @@
+import type { WorkoutSession } from "../store/db";
+
 /**
  * Curated indicator-color palette for workout templates. These are Mantine's
  * primary swatch values, chosen to read well on the app's dark background.
@@ -20,4 +22,20 @@ export const INDICATOR_COLORS = [
 /** Picks a random color from the indicator palette. */
 export function randomIndicatorColor(): string {
   return INDICATOR_COLORS[Math.floor(Math.random() * INDICATOR_COLORS.length)];
+}
+
+/**
+ * Indicator color for a session: the live color of the template it was created
+ * from, falling back to the color snapshotted on the session itself (used when
+ * the template was deleted or the session has no template link).
+ */
+export function sessionIndicatorColor(
+  session: WorkoutSession,
+  templateColorById: Map<number, string>,
+): string {
+  const templateColor =
+    session.workoutTemplateId != null
+      ? templateColorById.get(session.workoutTemplateId)
+      : undefined;
+  return templateColor ?? session.indicatorColor;
 }

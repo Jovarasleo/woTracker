@@ -63,7 +63,9 @@ function NewWorkoutTemplate() {
   };
 
   const handleSubmit = async () => {
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      return;
+    }
 
     await db.transaction(
       "rw",

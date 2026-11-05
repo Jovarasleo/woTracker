@@ -34,7 +34,10 @@ export function BackupMenu() {
   const resetFileRef = useRef<() => void>(null);
 
   const closeModal = () => {
-    if (busy) return;
+    if (busy) {
+      return;
+    }
+
     setPendingBackup(null);
     setFeedback(null);
   };
@@ -56,7 +59,9 @@ export function BackupMenu() {
 
   const handleFileSelected = async (file: File | null) => {
     resetFileRef.current?.();
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     try {
       setPendingBackup(await parseBackupFile(file));
@@ -69,7 +74,9 @@ export function BackupMenu() {
   };
 
   const handleConfirmImport = async () => {
-    if (!pendingBackup) return;
+    if (!pendingBackup) {
+      return;
+    }
 
     setBusy(true);
     try {
