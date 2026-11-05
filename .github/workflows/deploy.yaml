@@ -15,13 +15,14 @@ jobs:
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+          CF_DEPLOY_KEY: ${{ secrets.CF_DEPLOY_KEY }}
         run: |
-          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_WEBHOOK" ]; then
-            echo "::error::COOLIFY_TOKEN or COOLIFY_WEBHOOK is empty - check secret names and the environment name"
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_WEBHOOK" ] || [ -z "$CF_DEPLOY_KEY" ]; then
+            echo "::error::A required secret is empty - check secret names and the environment name"
             exit 1
           fi
 
           curl --fail-with-body --silent --show-error \
-            --request GET \
             --header "Authorization: Bearer $COOLIFY_TOKEN" \
+            --header "X-Deploy-Key: $CF_DEPLOY_KEY" \
             "$COOLIFY_WEBHOOK"
