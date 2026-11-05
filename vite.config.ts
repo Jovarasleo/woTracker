@@ -39,8 +39,8 @@ export default defineConfig({
         name: "Workout Tracker",
         short_name: "woTracker",
         description: "Simple workout tracking app",
-        theme_color: "#1c7ed6",
-        background_color: "#ffffff",
+        theme_color: "#242424",
+        background_color: "#242424",
         display: "standalone",
         // Stable app identity. Must stay "/" (the id installed copies already
         // have); never change it, or browsers treat the app as a new install.

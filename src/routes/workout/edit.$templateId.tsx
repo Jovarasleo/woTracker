@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Button,
   Card,
   ColorPicker,
@@ -13,17 +12,22 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import { CardioBadge } from "../../components/CardioBadge";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
+import { TemplateExerciseList } from "../../components/TemplateExerciseList";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
 } from "../../hooks/useCustomExercises";
 import { useTemplateEditor } from "../../hooks/useTemplateEditor";
+import {
+  useWorkoutTemplateForm,
+  WORKOUT_NAME_MAX_LENGTH,
+  type WorkoutTemplateFormValues,
+} from "../../hooks/useWorkoutTemplateForm";
 import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
 import { db, exerciseKindOf } from "../../store/db";
 import { INDICATOR_COLORS } from "../../utils/colors";
@@ -72,30 +76,43 @@ interface TemplateEditFormProps {
 
 function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
   const navigate = useNavigate();
+  const { indicatorColor, setIndicatorColor, save } = useTemplateEditor(
+    template,
+    exercises,
+  );
   const {
-    name,
-    setName,
-    indicatorColor,
-    setIndicatorColor,
-    editableExercises,
-    updateExercise,
+    register,
+    onSubmit,
+    errors,
+    isSubmitting,
+    nameRules,
+    exerciseNameRules,
+    exerciseFields,
+    appendExercise,
     removeExercise,
-    addExercise,
-    canSave,
-    save,
-  } = useTemplateEditor(template, exercises);
+  } = useWorkoutTemplateForm(
+    {
+      name: template.name,
+      exercises: exercises.map((exercise) => ({
+        templateExerciseId: exercise.id,
+        name: exercise.name,
+        kind: exerciseKindOf(exercise),
+      })),
+    },
+    template.id,
+  );
   const { customExercises, addCustomExercise } = useCustomExercises();
   const [pickerOpened, { open: openPicker, close: closePicker }] =
     useDisclosure(false);
 
   const handleSelectExercise = (exercise: LibraryExercise) => {
-    addExercise(exercise.name, exercise.kind);
+    appendExercise({ name: exercise.name, kind: exercise.kind });
     closePicker();
   };
 
   const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
     await addCustomExercise(draft);
-    addExercise(draft.name, exerciseKindOf(draft));
+    appendExercise({ name: draft.name, kind: exerciseKindOf(draft) });
     closePicker();
   };
 
@@ -103,46 +120,37 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
     navigate({ to: "/" });
   };
 
-  const handleSave = async () => {
-    await save();
+  /** Runs only with valid, trimmed values; see `useWorkoutTemplateForm`. */
+  const handleSave = async (values: WorkoutTemplateFormValues) => {
+    await save(values);
     navigate({ to: "/" });
   };
 
   return (
-    <Card shadow="sm" padding="lg">
+    <Card
+      shadow="sm"
+      padding="lg"
+      component="form"
+      noValidate
+      onSubmit={onSubmit(handleSave)}
+    >
       <Stack>
         <TextInput
+          {...register("name", nameRules)}
           label="Workout Name"
-          value={name}
-          onChange={(e) => setName(e.currentTarget.value)}
+          withAsterisk
+          maxLength={WORKOUT_NAME_MAX_LENGTH}
+          error={errors.name?.message}
         />
 
-        <Input.Wrapper label="Exercises">
-          <Stack gap="xs" className="mt-1">
-            {editableExercises.map((exercise, index) => (
-              <Group key={exercise.id ?? `new-${index}`} gap="xs" wrap="nowrap">
-                <TextInput
-                  className="grow"
-                  value={exercise.name}
-                  placeholder={`Exercise ${index + 1}`}
-                  onChange={(e) => updateExercise(index, e.currentTarget.value)}
-                  rightSection={<CardioBadge kind={exercise.kind} />}
-                  rightSectionWidth={
-                    exercise.kind === "cardio" ? 64 : undefined
-                  }
-                />
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  aria-label="Remove exercise"
-                  onClick={() => removeExercise(index)}
-                >
-                  <IconTrash size={18} />
-                </ActionIcon>
-              </Group>
-            ))}
-          </Stack>
-        </Input.Wrapper>
+        <TemplateExerciseList
+          fields={exerciseFields}
+          register={register}
+          nameRules={exerciseNameRules}
+          errors={errors.exercises}
+          minExercises={1}
+          onRemove={removeExercise}
+        />
 
         <Button
           variant="light"
@@ -191,7 +199,7 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!canSave}>
+          <Button type="submit" loading={isSubmitting}>
             Save
           </Button>
         </Group>

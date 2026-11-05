@@ -1,72 +1,28 @@
 import { useState } from "react";
-import { db, exerciseKindOf } from "../store/db";
-import type {
-  ExerciseKind,
-  ExerciseTemplate,
-  WorkoutTemplate,
-} from "../store/db";
-
-interface EditableExercise {
-  /** Present for existing rows, absent for newly added ones. */
-  id?: number;
-  name: string;
-  kind: ExerciseKind;
-}
+import { db } from "../store/db";
+import type { ExerciseTemplate, WorkoutTemplate } from "../store/db";
+import type { WorkoutTemplateFormValues } from "./useWorkoutTemplateForm";
 
 /**
- * Editing state and persistence for a single workout template. Seed it with the
- * loaded template and its exercises (mount the consumer with a `key` tied to the
- * template id so the draft resets when a different template loads).
+ * Color state and persistence for editing a workout template; the name and
+ * exercises live in the page's form (see `useWorkoutTemplateForm`). Mount the
+ * consumer with a `key` tied to the template id so the draft resets when a
+ * different template loads.
  */
 export function useTemplateEditor(
   template: WorkoutTemplate,
   exercises: ExerciseTemplate[],
 ) {
-  const [name, setName] = useState(template.name);
   const [indicatorColor, setIndicatorColor] = useState(template.indicatorColor);
-  const [editableExercises, setEditableExercises] = useState<
-    EditableExercise[]
-  >(
-    exercises.map((exercise) => ({
-      id: exercise.id,
-      name: exercise.name,
-      kind: exerciseKindOf(exercise),
-    })),
-  );
 
-  const updateExercise = (index: number, value: string) => {
-    setEditableExercises((current) =>
-      current.map((exercise, i) =>
-        i === index ? { ...exercise, name: value } : exercise,
-      ),
-    );
-  };
-
-  const removeExercise = (index: number) => {
-    setEditableExercises((current) => current.filter((_, i) => i !== index));
-  };
-
-  const addExercise = (exerciseName: string, kind: ExerciseKind) => {
-    setEditableExercises((current) => [
-      ...current,
-      { name: exerciseName, kind },
-    ]);
-  };
-
-  const canSave = name.trim() !== "";
-
-  const save = async () => {
-    if (!canSave) {
-      return;
-    }
-
-    const keptExercises = editableExercises.filter(
-      (exercise) => exercise.name.trim() !== "",
-    );
+  /** Persists validated, trimmed form values. */
+  const save = async (values: WorkoutTemplateFormValues) => {
     const keptIds = new Set(
-      keptExercises
-        .map((exercise) => exercise.id)
-        .filter((id): id is number => id != null),
+      values.exercises.flatMap((exercise) =>
+        exercise.templateExerciseId == null
+          ? []
+          : [exercise.templateExerciseId],
+      ),
     );
     const removedIds = exercises
       .map((exercise) => exercise.id)
@@ -78,7 +34,7 @@ export function useTemplateEditor(
       db.exerciseTemplates,
       async () => {
         await db.workoutTemplates.update(template.id, {
-          name: name.trim(),
+          name: values.name,
           indicatorColor,
         });
 
@@ -87,15 +43,15 @@ export function useTemplateEditor(
         }
 
         await Promise.all(
-          keptExercises.map((exercise, index) =>
-            exercise.id != null
-              ? db.exerciseTemplates.update(exercise.id, {
-                  name: exercise.name.trim(),
+          values.exercises.map((exercise, index) =>
+            exercise.templateExerciseId != null
+              ? db.exerciseTemplates.update(exercise.templateExerciseId, {
+                  name: exercise.name,
                   order: index,
                 })
               : db.exerciseTemplates.add({
                   workoutTemplateId: template.id,
-                  name: exercise.name.trim(),
+                  name: exercise.name,
                   kind: exercise.kind,
                   order: index,
                 }),
@@ -105,16 +61,5 @@ export function useTemplateEditor(
     );
   };
 
-  return {
-    name,
-    setName,
-    indicatorColor,
-    setIndicatorColor,
-    editableExercises,
-    updateExercise,
-    removeExercise,
-    addExercise,
-    canSave,
-    save,
-  };
+  return { indicatorColor, setIndicatorColor, save };
 }

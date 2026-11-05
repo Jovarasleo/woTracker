@@ -15,6 +15,11 @@ doubt, match the surrounding files.
   components, **Tailwind CSS v4** for layout/spacing utilities.
 - **Dexie 4** (IndexedDB) with **dexie-react-hooks** for all persistence.
 - **@tabler/icons-react** for icons.
+- **react-hook-form** for forms with validation (`useForm`, `useFieldArray`). Put
+  rules in a shared hook (see `useWorkoutTemplateForm`), not hand-rolled state.
+  Don't rely on `useFieldArray` `rules` — with StrictMode + the React Compiler
+  they are skipped in development; check array-level rules in the submit handler
+  with `setError` instead.
 
 Do not introduce a competing library (another router, state manager, data layer, or UI
 kit) for something the stack above already handles.

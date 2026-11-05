@@ -93,6 +93,7 @@ export function CustomExerciseForm({
         onChange={setPrimaryMuscle}
         searchable
         clearable
+        classNames={{ option: "capitalize", input: "capitalize" }}
       />
 
       <TextInput
