@@ -62,6 +62,11 @@ kit) for something the stack above already handles.
   `useExerciseLogEditor`) rather than inlining DB calls in components.
 - When updating the schema, add a **new `db.version(n).stores({...})`** migration — do
   not edit an existing version block.
+- Exercises are either **strength** (sets of weight × reps in `setLogs`) or
+  **cardio** (`durationMinutes`/`distanceKm` on the `ExerciseLog`, no sets). The
+  `kind` field is optional on stored rows (older data has none), so always read
+  it through **`exerciseKindOf(...)`** rather than `exercise.kind`, and copy it
+  along when an exercise moves from library → template → session.
 - Preserve ordering with the **sparse `order` field** convention (new items get
   `existing.length * 1000`) so rows can be reordered later without renumbering.
 

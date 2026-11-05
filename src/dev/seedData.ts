@@ -19,12 +19,26 @@ interface SeedExercise {
   repRange: [number, number];
 }
 
+/** Cardio entry: logged as a duration and distance instead of sets. */
+interface SeedCardioExercise {
+  name: string;
+  kind: "cardio";
+  /** Inclusive [min, max] session length in minutes. */
+  minuteRange: [number, number];
+  /** Average pace, used to derive distance from duration. */
+  kmPerMinute: number;
+}
+
 interface SeedWorkout {
   name: string;
   /** Hex indicator color for the template. */
   color: string;
-  exercises: SeedExercise[];
+  exercises: (SeedExercise | SeedCardioExercise)[];
 }
+
+const isCardio = (
+  exercise: SeedExercise | SeedCardioExercise,
+): exercise is SeedCardioExercise => "kind" in exercise;
 
 const WORKOUTS: SeedWorkout[] = [
   {
@@ -59,7 +73,12 @@ const WORKOUTS: SeedWorkout[] = [
     color: "#40c057",
     exercises: [
       { name: "Back Squat", baseWeight: 80, gain: 30, repRange: [4, 8] },
-      { name: "Romanian Deadlift", baseWeight: 60, gain: 20, repRange: [6, 10] },
+      {
+        name: "Romanian Deadlift",
+        baseWeight: 60,
+        gain: 20,
+        repRange: [6, 10],
+      },
       { name: "Leg Press", baseWeight: 120, gain: 60, repRange: [8, 12] },
       { name: "Leg Curl", baseWeight: 35, gain: 15, repRange: [10, 12] },
       {
@@ -93,6 +112,12 @@ const WORKOUTS: SeedWorkout[] = [
       { name: "Hip Thrust", baseWeight: 80, gain: 40, repRange: [8, 12] },
       { name: "Walking Lunge", baseWeight: 20, gain: 10, repRange: [10, 12] },
       { name: "Leg Extension", baseWeight: 40, gain: 20, repRange: [10, 15] },
+      {
+        name: "Rowing, Stationary",
+        kind: "cardio",
+        minuteRange: [10, 20],
+        kmPerMinute: 0.25,
+      },
     ],
   },
   {
@@ -102,6 +127,12 @@ const WORKOUTS: SeedWorkout[] = [
       { name: "Deadlift", baseWeight: 90, gain: 35, repRange: [3, 6] },
       { name: "Overhead Press", baseWeight: 35, gain: 12, repRange: [5, 8] },
       { name: "Pull-Up", baseWeight: 0, gain: 15, repRange: [6, 10] },
+      {
+        name: "Running, Treadmill",
+        kind: "cardio",
+        minuteRange: [20, 35],
+        kmPerMinute: 0.17,
+      },
     ],
   },
   {
@@ -238,6 +269,7 @@ export async function seedDevData(): Promise<SeedSummary> {
               db.exerciseTemplates.add({
                 workoutTemplateId: templateId,
                 name: exercise.name,
+                kind: isCardio(exercise) ? "cardio" : "strength",
                 order: index * 1000,
               }),
             ),
@@ -261,9 +293,33 @@ export async function seedDevData(): Promise<SeedSummary> {
 
         for (let e = 0; e < workout.exercises.length; e++) {
           const exercise = workout.exercises[e];
+
+          if (isCardio(exercise)) {
+            const minutes = randInt(
+              rng,
+              exercise.minuteRange[0],
+              exercise.minuteRange[1],
+            );
+            await db.exerciseLogs.add({
+              sessionId,
+              name: exercise.name,
+              kind: "cardio",
+              order: e * 1000,
+              exerciseTemplateId: exerciseTemplateIds[e],
+              durationMinutes: minutes,
+              distanceKm:
+                Math.round(minutes * exercise.kmPerMinute * 100) / 100,
+              calories: Math.round(minutes * randInt(rng, 9, 12)),
+              avgHeartRate: randInt(rng, 130, 160),
+              rpe: randInt(rng, 5, 8),
+            });
+            continue;
+          }
+
           const exerciseLogId = await db.exerciseLogs.add({
             sessionId,
             name: exercise.name,
+            kind: "strength",
             order: e * 1000,
             exerciseTemplateId: exerciseTemplateIds[e],
           });

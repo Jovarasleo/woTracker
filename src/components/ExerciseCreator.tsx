@@ -17,6 +17,7 @@ import {
   IconBarbell,
   IconChevronRight,
   IconPlus,
+  IconRun,
   IconSearch,
 } from "@tabler/icons-react";
 import { useDeferredValue, useState } from "react";
@@ -29,6 +30,7 @@ import {
 import { type CustomExerciseDraft } from "../hooks/useCustomExercises";
 import { useExerciseCatalog } from "../hooks/useExerciseCatalog";
 import { type CustomExercise } from "../store/db";
+import { CardioBadge } from "./CardioBadge";
 import { CustomExerciseForm } from "./CustomExerciseForm";
 import { ExerciseDetails } from "./ExerciseDetails";
 
@@ -152,7 +154,11 @@ export function ExerciseCreator({
                       variant="light"
                       className="shrink-0"
                     >
-                      <IconBarbell size={24} />
+                      {exercise.kind === "cardio" ? (
+                        <IconRun size={24} />
+                      ) : (
+                        <IconBarbell size={24} />
+                      )}
                     </ThemeIcon>
                   )}
                   <div className="min-w-0 flex-1">
@@ -165,6 +171,7 @@ export function ExerciseCreator({
                         .join(" · ")}
                     </Text>
                   </div>
+                  <CardioBadge kind={exercise.kind} />
                   {exercise.source === "custom" && (
                     <Badge size="xs" variant="light">
                       Custom

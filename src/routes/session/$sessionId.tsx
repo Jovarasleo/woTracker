@@ -22,8 +22,11 @@ import {
   type CustomExerciseDraft,
 } from "../../hooks/useCustomExercises";
 import { useExercise } from "../../hooks/useExercise";
-import { usePreviousExerciseSets } from "../../hooks/usePreviousExerciseSets";
-import { db } from "../../store/db";
+import {
+  previousPerformanceKey,
+  usePreviousPerformance,
+} from "../../hooks/usePreviousPerformance";
+import { db, exerciseKindOf } from "../../store/db";
 
 export const Route = createFileRoute("/session/$sessionId")({
   component: SessionPage,
@@ -64,13 +67,19 @@ function SessionPage() {
   };
 
   const handleSelectExercise = async (exercise: LibraryExercise) => {
-    await addExercise(exercise.name, numericSessionId);
+    await addExercise(
+      { name: exercise.name, kind: exercise.kind },
+      numericSessionId,
+    );
     close();
   };
 
   const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
     await addCustomExercise(draft);
-    await addExercise(draft.name, numericSessionId);
+    await addExercise(
+      { name: draft.name, kind: exerciseKindOf(draft) },
+      numericSessionId,
+    );
     close();
   };
 
@@ -90,7 +99,7 @@ function SessionPage() {
       .toArray();
   }, [numericSessionId]);
 
-  const previousSetsByLogId = usePreviousExerciseSets(session, exerciseLogs);
+  const previousPerformance = usePreviousPerformance(session, exerciseLogs);
 
   if (!session || !exerciseLogs) {
     return <Loader />;
@@ -129,7 +138,9 @@ function SessionPage() {
             {index > 0 && <Divider />}
             <ExerciseEditor
               exerciseLog={exercise}
-              previous={previousSetsByLogId?.get(exercise.id)}
+              previous={previousPerformance?.get(
+                previousPerformanceKey(exercise),
+              )}
               sessionId={numericSessionId}
               editable={activeExerciseId === exercise.id}
               sessionEditable={sessionEditable}

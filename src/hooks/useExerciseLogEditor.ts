@@ -1,11 +1,13 @@
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type ExerciseLog } from "../store/db";
+import { db, type CardioMetrics, type ExerciseLog } from "../store/db";
 
 export function useExerciseLogEditor(exercise: ExerciseLog) {
   const sets = useLiveQuery(
     () =>
       db.setLogs.where("exerciseLogId").equals(exercise.id).sortBy("setNumber"),
-    [exercise],
+    // The id, not the object: the log object changes on every edit of its own
+    // values (e.g. cardio), which would needlessly re-subscribe this query.
+    [exercise.id],
   );
 
   const addSet = async () => {
@@ -43,8 +45,14 @@ export function useExerciseLogEditor(exercise: ExerciseLog) {
     await db.setLogs.update(setId, { reps });
   };
 
+  /** Saves one or more of a cardio exercise's values. */
+  const updateCardio = async (changes: CardioMetrics) => {
+    await db.exerciseLogs.update(exercise.id, changes);
+  };
+
   return {
     sets,
+    updateCardio,
     addSet,
     deleteSet,
     updateSetWeight,

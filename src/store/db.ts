@@ -1,6 +1,17 @@
 import { Dexie, type EntityTable } from "dexie";
 import { randomIndicatorColor } from "../utils/colors";
 
+/**
+ * How an exercise is logged: `strength` as sets of weight × reps, `cardio` as a
+ * single duration and distance. Rows saved before this field existed have no
+ * `kind` and are strength — read it through `exerciseKindOf`.
+ */
+export type ExerciseKind = "strength" | "cardio";
+
+export function exerciseKindOf(exercise: { kind?: ExerciseKind }) {
+  return exercise.kind ?? "strength";
+}
+
 export interface WorkoutTemplate {
   id: number;
   name: string;
@@ -22,14 +33,26 @@ export interface ExerciseTemplate {
   workoutTemplateId: number;
   name: string; // independent exercise library
   order?: number;
+  kind?: ExerciseKind; // copied into the session's exercise log
 }
 
-export interface ExerciseLog {
+/** Values logged for a cardio exercise; every field is optional. */
+export interface CardioMetrics {
+  durationMinutes?: number;
+  distanceKm?: number;
+  calories?: number;
+  avgHeartRate?: number; // beats per minute
+  rpe?: number; // rate of perceived exertion, 1–10
+}
+
+/** Cardio exercises store their `CardioMetrics` on the log itself (no sets). */
+export interface ExerciseLog extends CardioMetrics {
   id: number;
   sessionId: number; // links exercise to a session
   name: string;
   order?: number; // copied
   exerciseTemplateId?: number; // reference to exercise template
+  kind?: ExerciseKind;
 }
 
 export interface SetLog {
@@ -46,6 +69,7 @@ export interface CustomExercise {
   description?: string;
   primaryMuscle?: string;
   equipment?: string;
+  kind?: ExerciseKind;
   createdAt: string;
 }
 

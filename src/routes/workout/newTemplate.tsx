@@ -15,13 +15,19 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { CardioBadge } from "../../components/CardioBadge";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
 } from "../../hooks/useCustomExercises";
-import { db } from "../../store/db";
+import { db, exerciseKindOf, type ExerciseKind } from "../../store/db";
+
+interface TemplateExerciseDraft {
+  name: string;
+  kind: ExerciseKind;
+}
 import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
 
 export const Route = createFileRoute("/workout/newTemplate")({
@@ -31,20 +37,22 @@ export const Route = createFileRoute("/workout/newTemplate")({
 function NewWorkoutTemplate() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [exercises, setExercises] = useState<string[]>([]);
+  const [exercises, setExercises] = useState<TemplateExerciseDraft[]>([]);
   const [indicatorColor, setIndicatorColor] = useState(randomIndicatorColor);
   const { customExercises, addCustomExercise } = useCustomExercises();
   const [pickerOpened, { open: openPicker, close: closePicker }] =
     useDisclosure(false);
 
-  const addExercise = (exerciseName: string) => {
-    setExercises([...exercises, exerciseName]);
+  const addExercise = (exerciseName: string, kind: ExerciseKind) => {
+    setExercises([...exercises, { name: exerciseName, kind }]);
   };
 
   const updateExercise = (index: number, value: string) => {
-    const updated = [...exercises];
-    updated[index] = value;
-    setExercises(updated);
+    setExercises(
+      exercises.map((exercise, i) =>
+        i === index ? { ...exercise, name: value } : exercise,
+      ),
+    );
   };
 
   const removeExercise = (index: number) => {
@@ -52,13 +60,13 @@ function NewWorkoutTemplate() {
   };
 
   const handleSelectExercise = (exercise: LibraryExercise) => {
-    addExercise(exercise.name);
+    addExercise(exercise.name, exercise.kind);
     closePicker();
   };
 
   const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
     await addCustomExercise(draft);
-    addExercise(draft.name);
+    addExercise(draft.name, exerciseKindOf(draft));
     closePicker();
   };
 
@@ -78,7 +86,9 @@ function NewWorkoutTemplate() {
           indicatorColor,
         });
 
-        const filteredExercises = exercises.filter((e) => e.trim() !== "");
+        const filteredExercises = exercises.filter(
+          (exercise) => exercise.name.trim() !== "",
+        );
 
         if (!templateId) {
           throw new Error("Failed to create template");
@@ -87,7 +97,8 @@ function NewWorkoutTemplate() {
         await db.exerciseTemplates.bulkAdd(
           filteredExercises.map((exercise, index) => ({
             workoutTemplateId: templateId,
-            name: exercise.trim(),
+            name: exercise.name.trim(),
+            kind: exercise.kind,
             order: index,
           })),
         );
@@ -113,10 +124,16 @@ function NewWorkoutTemplate() {
           <Input.Wrapper label="Exercises">
             <Stack gap="xs" className="mt-1">
               {exercises.map((exercise, index) => (
-                <Group key={exercise} gap="xs" wrap="nowrap">
+                // Index key: keying by name would remount the input (and drop
+                // focus) on every keystroke.
+                <Group key={index} gap="xs" wrap="nowrap">
                   <TextInput
                     className="grow"
-                    value={exercise}
+                    value={exercise.name}
+                    rightSection={<CardioBadge kind={exercise.kind} />}
+                    rightSectionWidth={
+                      exercise.kind === "cardio" ? 64 : undefined
+                    }
                     placeholder={`Exercise ${index + 1}`}
                     onChange={(e) =>
                       updateExercise(index, e.currentTarget.value)

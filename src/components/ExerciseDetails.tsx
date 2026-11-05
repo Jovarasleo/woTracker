@@ -21,7 +21,7 @@ interface Props {
 export function ExerciseDetails({ exercise, onBack, onAdd }: Props) {
   const tags = [
     exercise.source === "custom" ? "custom" : null,
-    exercise.category,
+    exercise.category ?? (exercise.kind === "cardio" ? "cardio" : null),
     exercise.level,
     exercise.equipment,
   ].filter((tag): tag is string => Boolean(tag));

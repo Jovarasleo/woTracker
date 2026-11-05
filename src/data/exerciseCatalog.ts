@@ -2,7 +2,11 @@
 // dataset (https://github.com/yuhonas/free-exercise-db). Regenerate
 // exercises.json with `npm run exercises:fetch`.
 
-import type { CustomExercise } from "../store/db";
+import {
+  exerciseKindOf,
+  type CustomExercise,
+  type ExerciseKind,
+} from "../store/db";
 
 export interface CatalogExercise {
   id: string;
@@ -29,6 +33,7 @@ export interface LibraryExercise {
   equipment: string | null;
   level?: string;
   category?: string;
+  kind: ExerciseKind;
 }
 
 const CATALOG_IMAGE_BASE_URL =
@@ -66,6 +71,7 @@ export function fromCatalogExercise(
     equipment: exercise.equipment,
     level: exercise.level,
     category: exercise.category,
+    kind: exercise.category === "cardio" ? "cardio" : "strength",
   };
 }
 
@@ -80,6 +86,7 @@ export function fromCustomExercise(exercise: CustomExercise): LibraryExercise {
     primaryMuscles: exercise.primaryMuscle ? [exercise.primaryMuscle] : [],
     secondaryMuscles: [],
     equipment: exercise.equipment ?? null,
+    kind: exerciseKindOf(exercise),
   };
 }
 

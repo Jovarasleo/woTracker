@@ -1,34 +1,51 @@
-import { db } from "../store/db";
+import { db, type ExerciseKind } from "../store/db";
+
+interface NewExercise {
+  name: string;
+  kind: ExerciseKind;
+  /** Set when the exercise comes from a workout template. */
+  exerciseTemplateId?: number;
+}
 
 export function useExercise() {
-  const addExercise = async (exerciseName: string, sessionId: number) => {
-    const existing = await db.exerciseLogs
-      .where("sessionId")
-      .equals(sessionId)
-      .sortBy("order");
+  /**
+   * Adds an exercise to a session. Strength exercises start with one empty set;
+   * cardio is logged on the exercise itself, so it gets none. Safe to call
+   * inside an outer transaction that includes `exerciseLogs` and `setLogs`.
+   */
+  const addExercise = (exercise: NewExercise, sessionId: number) =>
+    db.transaction("rw", db.exerciseLogs, db.setLogs, async () => {
+      const existingCount = await db.exerciseLogs
+        .where("sessionId")
+        .equals(sessionId)
+        .count();
 
-    const nextOrder = existing.length * 1000;
+      const exerciseLogId = await db.exerciseLogs.add({
+        sessionId,
+        name: exercise.name,
+        kind: exercise.kind,
+        order: existingCount * 1000,
+        exerciseTemplateId: exercise.exerciseTemplateId,
+      });
 
-    const exerciseLogId = await db.exerciseLogs.add({
-      sessionId,
-      name: exerciseName,
-      order: nextOrder,
+      if (exercise.kind === "strength") {
+        await db.setLogs.add({
+          exerciseLogId,
+          weight: 0,
+          reps: 0,
+          setNumber: 1,
+        });
+      }
+
+      return exerciseLogId;
     });
 
-    await db.setLogs.add({
-      exerciseLogId,
-      weight: 0,
-      reps: 0,
-      setNumber: 1,
+  /** Removes an exercise and its sets together. */
+  const deleteExercise = (exerciseLogId: number) =>
+    db.transaction("rw", db.exerciseLogs, db.setLogs, async () => {
+      await db.setLogs.where("exerciseLogId").equals(exerciseLogId).delete();
+      await db.exerciseLogs.delete(exerciseLogId);
     });
-
-    return exerciseLogId;
-  };
-
-  const deleteExercise = async (exerciseLogId: number) => {
-    await db.setLogs.where("exerciseLogId").equals(exerciseLogId).delete();
-    await db.exerciseLogs.delete(exerciseLogId);
-  };
 
   return {
     addExercise,

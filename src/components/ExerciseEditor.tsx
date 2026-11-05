@@ -8,10 +8,11 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { PreviousSetsHint } from "./PreviousSetsHint";
+import { CardioEditor } from "./CardioEditor";
+import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
 import { useExerciseLogEditor } from "../hooks/useExerciseLogEditor";
-import { type PreviousPerformance } from "../hooks/usePreviousExerciseSets";
-import { type ExerciseLog } from "../store/db";
+import { type PreviousPerformance } from "../hooks/usePreviousPerformance";
+import { exerciseKindOf, type ExerciseLog } from "../store/db";
 
 interface Props {
   exerciseLog: ExerciseLog;
@@ -20,7 +21,7 @@ interface Props {
   sessionEditable: boolean;
   onEditExercise: (exerciseId: number) => void;
   onDeleteExercise: (exerciseId: number) => void;
-  /** Sets from the last time this exercise was done, shown as a hint. */
+  /** What was logged the last time this exercise was done, shown as a hint. */
   previous?: PreviousPerformance;
 }
 
@@ -33,8 +34,18 @@ export function ExerciseEditor({
   onDeleteExercise,
 }: Props) {
   const [activeSetId, setActiveSetId] = useState<number | null>(null);
-  const { sets, addSet, deleteSet, updateSetWeight, updateSetReps } =
-    useExerciseLogEditor(exerciseLog);
+  const [cardioEditing, setCardioEditing] = useState(false);
+  const {
+    sets,
+    addSet,
+    deleteSet,
+    updateSetWeight,
+    updateSetReps,
+    updateCardio,
+  } = useExerciseLogEditor(exerciseLog);
+  const isCardio = exerciseKindOf(exerciseLog) === "cardio";
+  // Locked unless this exercise is the active one and its edit toggle is on.
+  const cardioLocked = !cardioEditing || !editable;
 
   const onSetEditable = (exerciseId: number, setId: number) => {
     if (setId === activeSetId) {
@@ -44,6 +55,16 @@ export function ExerciseEditor({
 
     onEditExercise(exerciseId);
     setActiveSetId(setId);
+  };
+
+  const toggleCardioEditing = () => {
+    if (cardioLocked) {
+      onEditExercise(exerciseLog.id);
+      setCardioEditing(true);
+      return;
+    }
+
+    setCardioEditing(false);
   };
 
   const addActiveSet = async () => {
@@ -62,7 +83,7 @@ export function ExerciseEditor({
           <Text fw={600} className="text-left">
             {exerciseLog.name}
           </Text>
-          {previous && <PreviousSetsHint previous={previous} />}
+          {previous && <PreviousPerformanceHint previous={previous} />}
         </div>
         {sessionEditable && (
           <ActionIcon
@@ -76,75 +97,86 @@ export function ExerciseEditor({
         )}
       </Group>
 
-      {sets.length > 0 && (
-        <Group gap="xs" wrap="nowrap" className="-mb-1">
-          <div className="w-5 shrink-0" />
-          <Text size="sm" fw={500} className="flex-1 text-left">
-            Weight
-          </Text>
-          <Text size="sm" fw={500} className="flex-1 text-left">
-            Reps
-          </Text>
-          <div className="w-8.5 shrink-0" />
-          {sessionEditable && <div className="w-8.5 shrink-0" />}
-        </Group>
+      {isCardio ? (
+        <CardioEditor
+          metrics={exerciseLog}
+          disabled={cardioLocked}
+          onToggleEdit={toggleCardioEditing}
+          onChange={updateCardio}
+        />
+      ) : (
+        <>
+          {sets.length > 0 && (
+            <Group gap="xs" wrap="nowrap" className="-mb-1">
+              <div className="w-5 shrink-0" />
+              <Text size="sm" fw={500} className="flex-1 text-left">
+                Weight
+              </Text>
+              <Text size="sm" fw={500} className="flex-1 text-left">
+                Reps
+              </Text>
+              <div className="w-8.5 shrink-0" />
+              {sessionEditable && <div className="w-8.5 shrink-0" />}
+            </Group>
+          )}
+
+          {sets.map((set, index) => {
+            const disabled = activeSetId !== set.id || !editable;
+
+            return (
+              <Group key={set.id} gap="xs" wrap="nowrap" align="center">
+                <Text size="sm" c="dimmed" className="w-5 shrink-0">
+                  {index + 1}
+                </Text>
+                <NumberInput
+                  className="flex-1"
+                  value={set.weight}
+                  min={0}
+                  disabled={disabled}
+                  onChange={(weight) => updateSetWeight(Number(weight), set.id)}
+                  placeholder="Weight"
+                />
+                <NumberInput
+                  className="flex-1"
+                  value={set.reps}
+                  min={0}
+                  disabled={disabled}
+                  onChange={(reps) => updateSetReps(Number(reps), set.id)}
+                  placeholder="Reps"
+                />
+                <ActionIcon
+                  variant="subtle"
+                  size="lg"
+                  aria-label={disabled ? "Edit set" : "Confirm set"}
+                  onClick={() => onSetEditable(exerciseLog.id, set.id)}
+                >
+                  {disabled ? <IconEdit size={18} /> : <IconCheck size={18} />}
+                </ActionIcon>
+                {sessionEditable && (
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    size="lg"
+                    aria-label="Remove set"
+                    onClick={() => deleteSet(set.id)}
+                  >
+                    <IconTrash size={18} />
+                  </ActionIcon>
+                )}
+              </Group>
+            );
+          })}
+
+          <Button
+            variant="light"
+            size="xs"
+            leftSection={<IconPlus size={16} />}
+            onClick={() => addActiveSet()}
+          >
+            Add Set
+          </Button>
+        </>
       )}
-
-      {sets.map((set, index) => {
-        const disabled = activeSetId !== set.id || !editable;
-
-        return (
-          <Group key={set.id} gap="xs" wrap="nowrap" align="center">
-            <Text size="sm" c="dimmed" className="w-5 shrink-0">
-              {index + 1}
-            </Text>
-            <NumberInput
-              className="flex-1"
-              value={set.weight}
-              min={0}
-              disabled={disabled}
-              onChange={(weight) => updateSetWeight(Number(weight), set.id)}
-              placeholder="Weight"
-            />
-            <NumberInput
-              className="flex-1"
-              value={set.reps}
-              min={0}
-              disabled={disabled}
-              onChange={(reps) => updateSetReps(Number(reps), set.id)}
-              placeholder="Reps"
-            />
-            <ActionIcon
-              variant="subtle"
-              size="lg"
-              aria-label={disabled ? "Edit set" : "Confirm set"}
-              onClick={() => onSetEditable(exerciseLog.id, set.id)}
-            >
-              {disabled ? <IconEdit size={18} /> : <IconCheck size={18} />}
-            </ActionIcon>
-            {sessionEditable && (
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                size="lg"
-                aria-label="Remove set"
-                onClick={() => deleteSet(set.id)}
-              >
-                <IconTrash size={18} />
-              </ActionIcon>
-            )}
-          </Group>
-        );
-      })}
-
-      <Button
-        variant="light"
-        size="xs"
-        leftSection={<IconPlus size={16} />}
-        onClick={() => addActiveSet()}
-      >
-        Add Set
-      </Button>
     </Stack>
   );
 }

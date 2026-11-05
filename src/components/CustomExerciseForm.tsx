@@ -1,6 +1,8 @@
 import {
   Button,
   Group,
+  Input,
+  SegmentedControl,
   Select,
   Stack,
   TextInput,
@@ -9,6 +11,17 @@ import {
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { type CustomExerciseDraft } from "../hooks/useCustomExercises";
+import { type ExerciseKind } from "../store/db";
+
+const KIND_OPTIONS: { label: string; value: ExerciseKind }[] = [
+  { label: "Strength", value: "strength" },
+  { label: "Cardio", value: "cardio" },
+];
+
+const KIND_DESCRIPTIONS: Record<ExerciseKind, string> = {
+  strength: "Logged as sets of weight × reps",
+  cardio: "Logged as duration and distance",
+};
 
 interface Props {
   initialName: string;
@@ -24,6 +37,7 @@ export function CustomExerciseForm({
   onSubmit,
 }: Props) {
   const [name, setName] = useState(initialName);
+  const [kind, setKind] = useState<ExerciseKind>("strength");
   const [primaryMuscle, setPrimaryMuscle] = useState<string | null>(null);
   const [equipment, setEquipment] = useState("");
   const [description, setDescription] = useState("");
@@ -42,6 +56,7 @@ export function CustomExerciseForm({
 
     onSubmit({
       name: trimmedName,
+      kind,
       primaryMuscle: primaryMuscle ?? undefined,
       equipment: equipment.trim() || undefined,
       description: description.trim() || undefined,
@@ -58,6 +73,18 @@ export function CustomExerciseForm({
         onChange={(e) => setName(e.currentTarget.value)}
       />
 
+      <Input.Wrapper label="Type" description={KIND_DESCRIPTIONS[kind]}>
+        <SegmentedControl
+          fullWidth
+          mt={4}
+          data={KIND_OPTIONS}
+          value={kind}
+          onChange={(value) =>
+            setKind(value === "cardio" ? "cardio" : "strength")
+          }
+        />
+      </Input.Wrapper>
+
       <Select
         label="Primary muscle"
         placeholder="Optional"
@@ -70,7 +97,11 @@ export function CustomExerciseForm({
 
       <TextInput
         label="Equipment"
-        placeholder="Optional, e.g. dumbbell"
+        placeholder={
+          kind === "cardio"
+            ? "Optional, e.g. treadmill"
+            : "Optional, e.g. dumbbell"
+        }
         value={equipment}
         onChange={(e) => setEquipment(e.currentTarget.value)}
       />

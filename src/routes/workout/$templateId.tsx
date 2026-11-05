@@ -17,7 +17,10 @@ import {
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import dayjs from "dayjs";
-import { db } from "../../store/db";
+import { useState } from "react";
+import { CardioBadge } from "../../components/CardioBadge";
+import { useExercise } from "../../hooks/useExercise";
+import { db, exerciseKindOf } from "../../store/db";
 
 export const Route = createFileRoute("/workout/$templateId")({
   component: WorkoutPage,
@@ -27,6 +30,8 @@ function WorkoutPage() {
   const navigate = useNavigate();
   const { templateId } = Route.useParams();
   const numericTemplateId = Number(templateId);
+  const { addExercise } = useExercise();
+  const [starting, setStarting] = useState(false);
 
   const template = useLiveQuery(
     () => db.workoutTemplates.get(numericTemplateId),
@@ -52,33 +57,44 @@ function WorkoutPage() {
   );
 
   const startSession = async () => {
-    if (!template || !exerciseTemplates) {
+    // `starting` blocks a double tap from creating two sessions.
+    if (!template || !exerciseTemplates || starting) {
       return;
     }
 
-    const newSessionId = await db.workoutSessions.add({
-      name: template.name,
-      date: new Date().toISOString(),
-      workoutTemplateId: template.id,
-      indicatorColor: template.indicatorColor,
-    });
+    setStarting(true);
 
-    await Promise.all(
-      exerciseTemplates.map(async (exerciseTemplate) => {
-        const logId = await db.exerciseLogs.add({
-          name: exerciseTemplate.name,
-          sessionId: newSessionId,
-          exerciseTemplateId: exerciseTemplate.id!,
-        });
+    // One transaction, so a failure never leaves a half-built session.
+    const newSessionId = await db
+      .transaction(
+        "rw",
+        db.workoutSessions,
+        db.exerciseLogs,
+        db.setLogs,
+        async () => {
+          const sessionId = await db.workoutSessions.add({
+            name: template.name,
+            date: new Date().toISOString(),
+            workoutTemplateId: template.id,
+            indicatorColor: template.indicatorColor,
+          });
 
-        await db.setLogs.add({
-          exerciseLogId: logId,
-          weight: 0,
-          reps: 0,
-          setNumber: 1,
-        });
-      }),
-    );
+          // One at a time, so each exercise gets the next `order` slot.
+          for (const exerciseTemplate of exerciseTemplates) {
+            await addExercise(
+              {
+                name: exerciseTemplate.name,
+                kind: exerciseKindOf(exerciseTemplate),
+                exerciseTemplateId: exerciseTemplate.id,
+              },
+              sessionId,
+            );
+          }
+
+          return sessionId;
+        },
+      )
+      .finally(() => setStarting(false));
 
     navigate({
       to: "/session/$sessionId",
@@ -164,6 +180,7 @@ function WorkoutPage() {
                 {index + 1}
               </Text>
               <Text fw={500}>{exercise.name}</Text>
+              <CardioBadge kind={exerciseKindOf(exercise)} />
             </Group>
           ))}
         </Stack>
@@ -174,6 +191,7 @@ function WorkoutPage() {
         fullWidth
         color="green"
         leftSection={<IconPlayerPlayFilled size={18} />}
+        loading={starting}
         onClick={startSession}
       >
         Start Session

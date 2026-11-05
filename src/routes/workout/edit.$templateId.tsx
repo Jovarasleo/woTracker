@@ -16,6 +16,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
+import { CardioBadge } from "../../components/CardioBadge";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import {
@@ -24,7 +25,7 @@ import {
 } from "../../hooks/useCustomExercises";
 import { useTemplateEditor } from "../../hooks/useTemplateEditor";
 import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
-import { db } from "../../store/db";
+import { db, exerciseKindOf } from "../../store/db";
 import { INDICATOR_COLORS } from "../../utils/colors";
 
 export const Route = createFileRoute("/workout/edit/$templateId")({
@@ -88,13 +89,13 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
     useDisclosure(false);
 
   const handleSelectExercise = (exercise: LibraryExercise) => {
-    addExercise(exercise.name);
+    addExercise(exercise.name, exercise.kind);
     closePicker();
   };
 
   const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
     await addCustomExercise(draft);
-    addExercise(draft.name);
+    addExercise(draft.name, exerciseKindOf(draft));
     closePicker();
   };
 
@@ -125,6 +126,10 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
                   value={exercise.name}
                   placeholder={`Exercise ${index + 1}`}
                   onChange={(e) => updateExercise(index, e.currentTarget.value)}
+                  rightSection={<CardioBadge kind={exercise.kind} />}
+                  rightSectionWidth={
+                    exercise.kind === "cardio" ? 64 : undefined
+                  }
                 />
                 <ActionIcon
                   variant="subtle"

@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { db } from "../store/db";
-import type { ExerciseTemplate, WorkoutTemplate } from "../store/db";
+import { db, exerciseKindOf } from "../store/db";
+import type {
+  ExerciseKind,
+  ExerciseTemplate,
+  WorkoutTemplate,
+} from "../store/db";
 
 interface EditableExercise {
   /** Present for existing rows, absent for newly added ones. */
   id?: number;
   name: string;
+  kind: ExerciseKind;
 }
 
 /**
@@ -21,7 +26,13 @@ export function useTemplateEditor(
   const [indicatorColor, setIndicatorColor] = useState(template.indicatorColor);
   const [editableExercises, setEditableExercises] = useState<
     EditableExercise[]
-  >(exercises.map((exercise) => ({ id: exercise.id, name: exercise.name })));
+  >(
+    exercises.map((exercise) => ({
+      id: exercise.id,
+      name: exercise.name,
+      kind: exerciseKindOf(exercise),
+    })),
+  );
 
   const updateExercise = (index: number, value: string) => {
     setEditableExercises((current) =>
@@ -35,8 +46,11 @@ export function useTemplateEditor(
     setEditableExercises((current) => current.filter((_, i) => i !== index));
   };
 
-  const addExercise = (exerciseName: string) => {
-    setEditableExercises((current) => [...current, { name: exerciseName }]);
+  const addExercise = (exerciseName: string, kind: ExerciseKind) => {
+    setEditableExercises((current) => [
+      ...current,
+      { name: exerciseName, kind },
+    ]);
   };
 
   const canSave = name.trim() !== "";
@@ -82,6 +96,7 @@ export function useTemplateEditor(
               : db.exerciseTemplates.add({
                   workoutTemplateId: template.id,
                   name: exercise.name.trim(),
+                  kind: exercise.kind,
                   order: index,
                 }),
           ),
