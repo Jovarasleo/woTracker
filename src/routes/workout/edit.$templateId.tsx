@@ -13,11 +13,12 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { TemplateExerciseList } from "../../components/TemplateExerciseList";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
+import { useGoBack } from "../../hooks/useGoBack";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
@@ -75,7 +76,7 @@ interface TemplateEditFormProps {
 }
 
 function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const { indicatorColor, setIndicatorColor, save } = useTemplateEditor(
     template,
     exercises,
@@ -117,13 +118,13 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
   };
 
   const handleCancel = () => {
-    navigate({ to: "/" });
+    goBack();
   };
 
   /** Runs only with valid, trimmed values; see `useWorkoutTemplateForm`. */
   const handleSave = async (values: WorkoutTemplateFormValues) => {
     await save(values);
-    navigate({ to: "/" });
+    goBack();
   };
 
   return (

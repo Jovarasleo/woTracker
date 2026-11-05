@@ -12,11 +12,12 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { TemplateExerciseList } from "../../components/TemplateExerciseList";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
+import { useGoBack } from "../../hooks/useGoBack";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
@@ -34,7 +35,7 @@ export const Route = createFileRoute("/workout/newTemplate")({
 });
 
 function NewWorkoutTemplate() {
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const {
     register,
     onSubmit,
@@ -93,7 +94,7 @@ function NewWorkoutTemplate() {
       },
     );
 
-    navigate({ to: "/" });
+    goBack();
   };
 
   return (
