@@ -22,6 +22,7 @@ import {
   type CustomExerciseDraft,
 } from "../../hooks/useCustomExercises";
 import { useExercise } from "../../hooks/useExercise";
+import { usePreviousExerciseSets } from "../../hooks/usePreviousExerciseSets";
 import { db } from "../../store/db";
 
 export const Route = createFileRoute("/session/$sessionId")({
@@ -89,6 +90,8 @@ function SessionPage() {
       .toArray();
   }, [numericSessionId]);
 
+  const previousSetsByLogId = usePreviousExerciseSets(session, exerciseLogs);
+
   if (!session || !exerciseLogs) {
     return <Loader />;
   }
@@ -126,6 +129,7 @@ function SessionPage() {
             {index > 0 && <Divider />}
             <ExerciseEditor
               exerciseLog={exercise}
+              previous={previousSetsByLogId?.get(exercise.id)}
               sessionId={numericSessionId}
               editable={activeExerciseId === exercise.id}
               sessionEditable={sessionEditable}

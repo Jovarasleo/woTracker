@@ -8,7 +8,9 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { PreviousSetsHint } from "./PreviousSetsHint";
 import { useExerciseLogEditor } from "../hooks/useExerciseLogEditor";
+import { type PreviousPerformance } from "../hooks/usePreviousExerciseSets";
 import { type ExerciseLog } from "../store/db";
 
 interface Props {
@@ -18,10 +20,13 @@ interface Props {
   sessionEditable: boolean;
   onEditExercise: (exerciseId: number) => void;
   onDeleteExercise: (exerciseId: number) => void;
+  /** Sets from the last time this exercise was done, shown as a hint. */
+  previous?: PreviousPerformance;
 }
 
 export function ExerciseEditor({
   exerciseLog,
+  previous,
   editable,
   sessionEditable,
   onEditExercise,
@@ -53,9 +58,12 @@ export function ExerciseEditor({
   return (
     <Stack gap="xs">
       <Group justify="space-between" wrap="nowrap" className="min-h-7 mb-2">
-        <Text fw={600} className="text-left">
-          {exerciseLog.name}
-        </Text>
+        <div className="min-w-0">
+          <Text fw={600} className="text-left">
+            {exerciseLog.name}
+          </Text>
+          {previous && <PreviousSetsHint previous={previous} />}
+        </div>
         {sessionEditable && (
           <ActionIcon
             variant="subtle"
