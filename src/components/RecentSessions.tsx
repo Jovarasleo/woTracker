@@ -1,8 +1,8 @@
 import { Paper, Text, Title, UnstyledButton } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import dayjs from "dayjs";
 import type { WorkoutSession } from "../store/db";
 import { sessionIndicatorColor } from "../utils/colors";
+import { formatDateTime } from "../utils/dates";
 import { formatRelativeDay } from "../utils/sessionStats";
 
 interface Props {
@@ -47,7 +47,7 @@ export function RecentSessions({
                   {session.name}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  {dayjs(session.date).format("ddd, MMM D · HH:mm")}
+                  {formatDateTime(session.date)}
                 </Text>
               </div>
               <Text size="xs" c="dimmed" className="shrink-0">

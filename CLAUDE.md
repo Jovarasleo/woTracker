@@ -97,7 +97,24 @@ kit) for something the stack above already handles.
   layout. Avoid inline `style={{...}}` except for small one-offs where a utility doesn't
   exist (e.g. icon sizing).
 - The app is **dark-mode first** (`MantineProvider defaultColorScheme="dark"`) — pick
-  colors that work on a dark background.
+  colors that work on a dark background. For borders and surfaces use Mantine's
+  palette variables (`border-(--mantine-color-dark-4)`), not Tailwind grays.
+- Shared visual defaults live in the **Mantine theme** (`src/theme.ts`): cards are
+  bordered, `radius="lg"`, no shadow; controls use `radius="md"`. Don't override
+  these per page — change the theme instead.
+- Mantine styles override Tailwind on Mantine components (margins, borders, font
+  size); use Mantine props (`mt`, `fz`, `c`) there and Tailwind on plain elements.
+- **Button hierarchy:** one filled button per view for the primary action;
+  `variant="default"` for secondary actions (Cancel, Back, Edit); `variant="light"`
+  for repeated "add" actions inside content (Add exercise, + Set);
+  `variant="subtle"` only for icon buttons.
+- Use **sentence case** for all labels and buttons ("Add exercise", "Workout name").
+- Sub-pages (anything below home) are wrapped in **`PageLayout`**: it provides the
+  back button/title bar (bottom on phones, top from `sm`) and the shared content
+  width — don't set page widths yourself.
+- Format dates only with the helpers in **`src/utils/dates.ts`** (`formatDate`,
+  `formatDateTime`, `formatFullDate`), never ad-hoc `format()`/`toLocaleString()`.
+- Text is left-aligned by default; `#root` must not set `text-align`.
 
 ## Formatting & Conventions
 

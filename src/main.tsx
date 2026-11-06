@@ -9,6 +9,7 @@ import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { theme } from "./theme";
 import { syncFaviconWithVisibility } from "./utils/favicon";
 
 const router = createRouter({
@@ -45,7 +46,7 @@ syncFaviconWithVisibility();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MantineProvider defaultColorScheme="dark">
+    <MantineProvider theme={theme} defaultColorScheme="dark">
       <RouterProvider router={router} />
     </MantineProvider>
   </StrictMode>,

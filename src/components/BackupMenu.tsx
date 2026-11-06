@@ -13,6 +13,7 @@ import { IconDatabase, IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 import { countBackupRows, useBackup } from "../hooks/useBackup";
 import { type BackupFile } from "../store/db";
+import { formatDateTime } from "../utils/dates";
 
 type Feedback = { type: "success" | "error"; message: string };
 
@@ -145,10 +146,10 @@ export function BackupMenu() {
               the backup from{" "}
               {pendingBackup.exportedAt === "unknown"
                 ? "an unknown date"
-                : new Date(pendingBackup.exportedAt).toLocaleString("lt-LT")}
+                : formatDateTime(pendingBackup.exportedAt)}
               . Your current data is downloaded as a file first.
             </Text>
-            <List size="sm" className="text-left">
+            <List size="sm" className="list-disc">
               {Object.entries(countBackupRows(pendingBackup)).map(
                 ([table, count]) => (
                   <List.Item key={table}>
@@ -158,7 +159,7 @@ export function BackupMenu() {
               )}
             </List>
             <Group justify="flex-end">
-              <Button variant="outline" onClick={closeModal} disabled={busy}>
+              <Button variant="default" onClick={closeModal} disabled={busy}>
                 Cancel
               </Button>
               <Button color="red" loading={busy} onClick={handleConfirmImport}>

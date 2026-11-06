@@ -16,12 +16,12 @@ import {
 } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import dayjs from "dayjs";
 import { useState } from "react";
 import { CardioBadge } from "../../components/CardioBadge";
 import { PageLayout } from "../../components/PageLayout";
 import { useExercise } from "../../hooks/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
+import { formatDate } from "../../utils/dates";
 
 export const Route = createFileRoute("/workout/$templateId")({
   component: WorkoutPage,
@@ -128,7 +128,7 @@ function WorkoutPage() {
       subtitle={exerciseCountLabel}
       action={
         <Button
-          variant="subtle"
+          variant="default"
           leftSection={<IconPencil size={16} />}
           onClick={() =>
             navigate({
@@ -141,8 +141,8 @@ function WorkoutPage() {
         </Button>
       }
     >
-      <Stack className="w-full max-w-xl mx-auto" gap="md">
-        <Card withBorder shadow="sm" padding="lg" radius="md">
+      <Stack gap="md">
+        <Card>
           <Group gap="sm" align="center" wrap="nowrap">
             <ColorSwatch color={template.indicatorColor} size={32} />
             <div className="text-left">
@@ -157,7 +157,7 @@ function WorkoutPage() {
             <IconCalendarEvent size={16} className="text-gray-400" />
             <Text size="sm" c="dimmed">
               {lastSession
-                ? `Last performed ${dayjs(lastSession.date).format("MMM D, YYYY")}`
+                ? `Last performed ${formatDate(lastSession.date)}`
                 : "Not performed yet"}
             </Text>
             {sessions.length > 0 && (
@@ -169,7 +169,7 @@ function WorkoutPage() {
           </Group>
         </Card>
 
-        <Card withBorder padding="md" radius="md">
+        <Card padding="md">
           <Title order={4} mb="sm">
             Exercises
           </Title>
@@ -180,7 +180,7 @@ function WorkoutPage() {
                 gap="sm"
                 align="center"
                 wrap="nowrap"
-                className="py-2 border-b border-gray-700 last:border-b-0"
+                className="py-2 border-b border-(--mantine-color-dark-4) last:border-b-0"
               >
                 <Text
                   size="sm"
@@ -204,7 +204,7 @@ function WorkoutPage() {
           loading={starting}
           onClick={startSession}
         >
-          Start Session
+          Start session
         </Button>
       </Stack>
     </PageLayout>

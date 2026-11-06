@@ -15,6 +15,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
+import { PageLayout } from "../../components/PageLayout";
 import { TemplateExerciseList } from "../../components/TemplateExerciseList";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { useGoBack } from "../../hooks/useGoBack";
@@ -98,83 +99,79 @@ function NewWorkoutTemplate() {
   };
 
   return (
-    <Card
-      shadow="sm"
-      padding="lg"
-      component="form"
-      noValidate
-      onSubmit={onSubmit(saveTemplate)}
-    >
-      <Stack>
-        <TextInput
-          {...register("name", nameRules)}
-          label="Workout Name"
-          withAsterisk
-          maxLength={WORKOUT_NAME_MAX_LENGTH}
-          error={errors.name?.message}
-        />
-
-        <TemplateExerciseList
-          fields={exerciseFields}
-          register={register}
-          nameRules={exerciseNameRules}
-          errors={errors.exercises}
-          minExercises={0}
-          onRemove={removeExercise}
-        />
-
-        <Button
-          variant="light"
-          leftSection={<IconPlus size={18} />}
-          onClick={openPicker}
-        >
-          Add Exercise
-        </Button>
-
-        <Modal
-          centered
-          size="lg"
-          opened={pickerOpened}
-          onClose={closePicker}
-          title="Add exercise to this template"
-        >
-          <ExerciseCreator
-            customExercises={customExercises}
-            onSelectExercise={handleSelectExercise}
-            onCreateCustomExercise={handleCreateCustomExercise}
+    <PageLayout title="New workout">
+      <Card component="form" noValidate onSubmit={onSubmit(saveTemplate)}>
+        <Stack>
+          <TextInput
+            {...register("name", nameRules)}
+            label="Workout name"
+            withAsterisk
+            maxLength={WORKOUT_NAME_MAX_LENGTH}
+            error={errors.name?.message}
           />
-        </Modal>
 
-        <Input.Wrapper
-          label="Indicator Color"
-          description="Shown as a colored tag for this workout"
-        >
-          <Group gap="sm" align="center" className="mt-1 mb-2">
-            <ColorSwatch color={indicatorColor} size={28} />
-            <Text size="sm" c="dimmed">
-              {indicatorColor}
-            </Text>
-          </Group>
-          <ColorPicker
-            format="hex"
-            value={indicatorColor}
-            onChange={setIndicatorColor}
-            swatches={[...INDICATOR_COLORS]}
-            swatchesPerRow={6}
-            fullWidth
+          <TemplateExerciseList
+            fields={exerciseFields}
+            register={register}
+            nameRules={exerciseNameRules}
+            errors={errors.exercises}
+            minExercises={0}
+            onRemove={removeExercise}
+          />
+
+          <Button
+            variant="light"
+            leftSection={<IconPlus size={18} />}
+            onClick={openPicker}
+          >
+            Add exercise
+          </Button>
+
+          <Modal
+            centered
             size="lg"
-          />
-        </Input.Wrapper>
+            opened={pickerOpened}
+            onClose={closePicker}
+            title="Add exercise to this template"
+          >
+            <ExerciseCreator
+              customExercises={customExercises}
+              onSelectExercise={handleSelectExercise}
+              onCreateCustomExercise={handleCreateCustomExercise}
+            />
+          </Modal>
 
-        <Group justify="flex-end">
-          <Button variant="outline" onClick={goBack} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            Save Template
-          </Button>
-        </Group>
-      </Stack>
-    </Card>
+          <Input.Wrapper
+            label="Indicator color"
+            description="Shown as a colored tag for this workout"
+          >
+            <Group gap="sm" align="center" className="mt-1 mb-2">
+              <ColorSwatch color={indicatorColor} size={28} />
+              <Text size="sm" c="dimmed">
+                {indicatorColor}
+              </Text>
+            </Group>
+            <ColorPicker
+              format="hex"
+              value={indicatorColor}
+              onChange={setIndicatorColor}
+              swatches={[...INDICATOR_COLORS]}
+              swatchesPerRow={6}
+              fullWidth
+              size="lg"
+            />
+          </Input.Wrapper>
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={goBack} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={isSubmitting}>
+              Save
+            </Button>
+          </Group>
+        </Stack>
+      </Card>
+    </PageLayout>
   );
 }

@@ -3,14 +3,15 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 import { useGoBack } from "../hooks/useGoBack";
 
+/** Shared max width of sub-page content and its bar. */
+const CONTENT_WIDTH = "max-w-xl";
+
 interface Props {
   /** Shown in the bar, so the page stays identifiable while scrolled. */
   title: string;
   subtitle?: string;
   /** The page's main action (e.g. an Edit button), shown on the right. */
   action?: ReactNode;
-  /** Max-width class for the bar's content, to line up with the page. */
-  widthClassName?: string;
   children: ReactNode;
 }
 
@@ -19,15 +20,10 @@ interface Props {
  * an optional action. On phones the bar is fixed to the bottom of the screen
  * (within thumb reach, clear of the iPhone home indicator); from `sm` up it
  * sticks to the top instead. Installed apps have no browser back button, so
- * pages below the home screen need this.
+ * pages below the home screen need this. Also sets the shared content width,
+ * so every sub-page lines up with its bar.
  */
-export function PageLayout({
-  title,
-  subtitle,
-  action,
-  widthClassName = "max-w-xl",
-  children,
-}: Props) {
+export function PageLayout({ title, subtitle, action, children }: Props) {
   const goBack = useGoBack();
 
   return (
@@ -40,7 +36,7 @@ export function PageLayout({
           home indicator, when larger). Wider screens use compact padding.
         */}
         <div
-          className={`mx-auto flex w-full items-center gap-2 pt-2 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:pr-3 sm:pb-2 sm:pl-3 ${widthClassName}`}
+          className={`mx-auto flex w-full items-center gap-2 pt-2 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:pr-3 sm:pb-2 sm:pl-3 ${CONTENT_WIDTH}`}
         >
           <ActionIcon
             variant="subtle"
@@ -65,7 +61,7 @@ export function PageLayout({
         </div>
       </header>
 
-      {children}
+      <div className={`mx-auto w-full ${CONTENT_WIDTH}`}>{children}</div>
     </div>
   );
 }

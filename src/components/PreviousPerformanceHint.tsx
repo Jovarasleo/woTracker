@@ -1,8 +1,8 @@
 import { Text, Tooltip } from "@mantine/core";
 import { IconHistory } from "@tabler/icons-react";
-import dayjs from "dayjs";
 import type { PreviousPerformance } from "../hooks/usePreviousPerformance";
 import { summarizeCardio } from "../utils/cardio";
+import { formatDate, formatFullDate } from "../utils/dates";
 
 /** "60×8 · 55×10" for strength, "30 min · 5 km · 6:00/km · …" for cardio. */
 function summarizePrevious(previous: PreviousPerformance) {
@@ -29,9 +29,7 @@ export function PreviousPerformanceHint({ previous }: Props) {
     <Tooltip
       label={
         <>
-          <div>
-            Last time: {dayjs(previous.date).format("dddd, MMM D YYYY")}
-          </div>
+          <div>Last time: {formatFullDate(previous.date)}</div>
           <div>{summary}</div>
         </>
       }
@@ -47,7 +45,7 @@ export function PreviousPerformanceHint({ previous }: Props) {
       >
         <IconHistory size={12} className="shrink-0" aria-label="Last time" />
         <span className="truncate">
-          <span className="mr-2">{dayjs(previous.date).format("MMM D")}</span>
+          <span className="mr-2">{formatDate(previous.date)}</span>
           {summary}
         </span>
       </Text>

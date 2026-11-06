@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Button,
   Group,
+  Loader,
   NumberInput,
   Stack,
   Text,
@@ -73,7 +74,7 @@ export function ExerciseEditor({
   };
 
   if (!sets) {
-    return <div>Loading...</div>;
+    return <Loader size="sm" className="mx-auto" />;
   }
 
   return (
@@ -168,6 +169,7 @@ export function ExerciseEditor({
           })}
 
           <Button
+            variant="light"
             size="sm"
             className="self-end mt-3"
             leftSection={<IconPlus size={16} />}

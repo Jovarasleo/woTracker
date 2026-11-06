@@ -71,7 +71,7 @@ export function ExerciseDetails({ exercise, onBack, onAdd }: Props) {
       )}
 
       {exercise.instructions.length > 0 && (
-        <List type="ordered" size="sm" spacing={6} className="text-left">
+        <List type="ordered" size="sm" spacing={6} className="list-decimal">
           {exercise.instructions.map((step, index) => (
             <List.Item key={index}>{step}</List.Item>
           ))}
@@ -80,7 +80,7 @@ export function ExerciseDetails({ exercise, onBack, onAdd }: Props) {
 
       <Group justify="flex-end">
         <Button
-          variant="outline"
+          variant="default"
           leftSection={<IconArrowLeft size={18} />}
           onClick={onBack}
         >

@@ -1,5 +1,6 @@
 import dayjs, { type Dayjs } from "dayjs";
 import type { WorkoutSession } from "../store/db";
+import { formatDate } from "./dates";
 
 export interface SessionStats {
   thisWeek: number;
@@ -98,7 +99,7 @@ export function formatRelativeDay(date: string, now: Dayjs = dayjs()): string {
     return `${Math.floor(days / 7)} weeks ago`;
   }
 
-  return dayjs(date).format("MMM D, YYYY");
+  return formatDate(date);
 }
 
 /** Time-of-day greeting for the home header. */

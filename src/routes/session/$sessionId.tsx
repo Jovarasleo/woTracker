@@ -27,26 +27,11 @@ import {
   usePreviousPerformance,
 } from "../../hooks/usePreviousPerformance";
 import { db, exerciseKindOf } from "../../store/db";
+import { formatDateTime } from "../../utils/dates";
 
 export const Route = createFileRoute("/session/$sessionId")({
   component: SessionPage,
 });
-
-function formatSessionDate(date: string) {
-  const value = new Date(date);
-  const day = value.toLocaleString("lt-LT", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  });
-  const time = value.toLocaleString("lt-LT", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  return `${day} · ${time}`;
-}
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
@@ -103,7 +88,7 @@ function SessionPage() {
 
   if (!session || !exerciseLogs) {
     return (
-      <PageLayout title="Session" widthClassName="max-w-110">
+      <PageLayout title="Session">
         <Loader className="mx-auto" />
       </PageLayout>
     );
@@ -111,7 +96,7 @@ function SessionPage() {
 
   const editToggle = (
     <Button
-      variant={sessionEditable ? "filled" : "outline"}
+      variant={sessionEditable ? "filled" : "default"}
       leftSection={
         sessionEditable ? <IconEditOff size={16} /> : <IconEdit size={16} />
       }
@@ -124,16 +109,15 @@ function SessionPage() {
   return (
     <PageLayout
       title={session.name}
-      subtitle={formatSessionDate(session.date)}
+      subtitle={formatDateTime(session.date)}
       action={editToggle}
-      widthClassName="max-w-110"
     >
-      <Card shadow="sm" padding="lg" className="w-full max-w-110 mx-auto">
+      <Card>
         <Stack>
           <div className="text-left">
             <Title order={3}>{session.name}</Title>
             <Text size="sm" c="dimmed">
-              {formatSessionDate(session.date)}
+              {formatDateTime(session.date)}
             </Text>
           </div>
 
@@ -162,7 +146,7 @@ function SessionPage() {
               leftSection={<IconPlus size={18} />}
               onClick={open}
             >
-              Add Exercise
+              Add exercise
             </Button>
           )}
         </Stack>

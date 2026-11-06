@@ -122,7 +122,7 @@ export function CustomExerciseForm({
           disabled={!canSubmit}
           onClick={handleSubmit}
         >
-          Create & Add
+          Create & add
         </Button>
       </Group>
     </Stack>

@@ -50,7 +50,7 @@ export function DevTools() {
   };
 
   return (
-    <Card shadow="sm" padding="sm" withBorder className="mb-4">
+    <Card padding="sm" className="mb-4">
       <Group justify="space-between" align="center">
         <Text size="sm" c="dimmed">
           Dev tools — local only
