@@ -136,6 +136,7 @@ export function ExerciseEditor({
                   disabled={disabled}
                   onChange={(weight) => updateSetWeight(Number(weight), set.id)}
                   placeholder="Weight"
+                  inputMode="decimal"
                 />
                 <NumberInput
                   className="flex-1"
@@ -144,6 +145,7 @@ export function ExerciseEditor({
                   disabled={disabled}
                   onChange={(reps) => updateSetReps(Number(reps), set.id)}
                   placeholder="Reps"
+                  inputMode="numeric"
                 />
                 <ActionIcon
                   variant="subtle"
