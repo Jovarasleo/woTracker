@@ -43,7 +43,8 @@ kit) for something the stack above already handles.
 - Write **function components**, never class components.
 - Use **named exports** for reusable components (`export function ExerciseEditor(...)`);
   do not add `default` exports.
-- One component per file; name the file after the component (`SessionCard.tsx`).
+- One component per file; name the file after the component (`TemplateCard.tsx`).
+  Delete components once nothing imports them — don't leave dead files behind.
 - Keep presentational components (`src/components/`) free of direct DB mutation logic —
   pass data in via props and surface user actions through `on*`/`onDelete*` callback
   props so parents (routes) own the behavior.

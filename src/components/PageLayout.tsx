@@ -32,10 +32,15 @@ export function PageLayout({
 
   return (
     // Bottom padding keeps the fixed phone bar from covering the last content.
-    <div className="flex w-full flex-col pb-24 sm:pb-0">
-      <header className="fixed inset-x-0 bottom-0 z-50 border-t border-(--mantine-color-dark-4) bg-(--mantine-color-body) pb-[env(safe-area-inset-bottom)] sm:sticky sm:top-0 sm:bottom-auto sm:mb-4 sm:border-t-0 sm:border-b">
+    <div className="flex w-full flex-col pb-28 sm:pb-0">
+      <header className="fixed inset-x-0 bottom-0 z-50 border-t border-(--mantine-color-dark-4) bg-(--mantine-color-body) sm:sticky sm:top-0 sm:bottom-auto sm:mb-4 sm:border-t-0 sm:border-b">
+        {/*
+          Phones: at least 1rem from the sides and bottom so the buttons clear
+          rounded display corners (or the safe-area insets, e.g. the iPhone
+          home indicator, when larger). Wider screens use compact padding.
+        */}
         <div
-          className={`mx-auto flex w-full items-center gap-2 px-3 py-2 ${widthClassName}`}
+          className={`mx-auto flex w-full items-center gap-2 pt-2 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:pr-3 sm:pb-2 sm:pl-3 ${widthClassName}`}
         >
           <ActionIcon
             variant="subtle"

@@ -168,12 +168,12 @@ export function ExerciseEditor({
           })}
 
           <Button
-            variant="light"
-            size="xs"
+            size="sm"
+            className="self-end mt-3"
             leftSection={<IconPlus size={16} />}
             onClick={() => addActiveSet()}
           >
-            Add Set
+            Set
           </Button>
         </>
       )}
