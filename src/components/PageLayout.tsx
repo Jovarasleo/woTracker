@@ -1,14 +1,18 @@
 import { ActionIcon, Text } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 import type { ReactNode } from "react";
+import { TextSkeleton } from "./TextSkeleton";
 import { useGoBack } from "../hooks/useGoBack";
 
 /** Shared max width of sub-page content and its bar. */
 const CONTENT_WIDTH = "max-w-xl";
 
 interface Props {
-  /** Shown in the bar, so the page stays identifiable while scrolled. */
-  title: string;
+  /**
+   * Shown in the bar, so the page stays identifiable while scrolled. Omit it
+   * while the page's data is loading to show a title + subtitle placeholder.
+   */
+  title?: string;
   subtitle?: string;
   /** The page's main action (e.g. an Edit button), shown on the right. */
   action?: ReactNode;
@@ -48,13 +52,22 @@ export function PageLayout({ title, subtitle, action, children }: Props) {
             <IconArrowLeft size={22} />
           </ActionIcon>
           <div className="min-w-0 flex-1 text-left">
-            <Text fw={600} truncate>
-              {title}
-            </Text>
-            {subtitle && (
-              <Text size="xs" c="dimmed" truncate>
-                {subtitle}
-              </Text>
+            {title === undefined ? (
+              <>
+                <TextSkeleton width="45%" />
+                <TextSkeleton width="30%" size="xs" />
+              </>
+            ) : (
+              <>
+                <Text fw={600} truncate>
+                  {title}
+                </Text>
+                {subtitle && (
+                  <Text size="xs" c="dimmed" truncate>
+                    {subtitle}
+                  </Text>
+                )}
+              </>
             )}
           </div>
           {action}

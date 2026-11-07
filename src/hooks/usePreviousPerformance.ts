@@ -53,9 +53,15 @@ export function usePreviousPerformance(
     ...new Set((exerciseLogs ?? []).map((log) => log.name)),
   ].sort();
   const namesKey = names.join("\n");
+  const logsLoaded = exerciseLogs !== undefined;
 
   return useLiveQuery(async () => {
-    if (sessionId == null || !sessionDate || !names.length) {
+    // Inputs still loading: stay `undefined` so callers can keep waiting.
+    if (sessionId == null || !sessionDate || !logsLoaded) {
+      return undefined;
+    }
+
+    if (!names.length) {
       return new Map<string, PreviousPerformance>();
     }
 
@@ -118,5 +124,5 @@ export function usePreviousPerformance(
       }),
     );
     // `names` is derived from `namesKey`, which is the stable dependency.
-  }, [sessionId, sessionDate, namesKey]);
+  }, [sessionId, sessionDate, logsLoaded, namesKey]);
 }

@@ -2,7 +2,6 @@ import {
   ActionIcon,
   Button,
   Group,
-  Loader,
   NumberInput,
   Stack,
   Text,
@@ -11,6 +10,7 @@ import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { CardioEditor } from "./CardioEditor";
 import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
+import { SetRowSkeleton } from "./SetRowSkeleton";
 import { useExerciseLogEditor } from "../hooks/useExerciseLogEditor";
 import { type PreviousPerformance } from "../hooks/usePreviousPerformance";
 import { exerciseKindOf, type ExerciseLog } from "../store/db";
@@ -73,10 +73,6 @@ export function ExerciseEditor({
     onSetEditable(exerciseLog.id, setId);
   };
 
-  if (!sets) {
-    return <Loader size="sm" className="mx-auto" />;
-  }
-
   return (
     <Stack gap="xs">
       <Group justify="space-between" wrap="nowrap" className="min-h-7 mb-2">
@@ -107,7 +103,8 @@ export function ExerciseEditor({
         />
       ) : (
         <>
-          {sets.length > 0 && (
+          {/* Sets still loading: new exercises start with one set. */}
+          {(!sets || sets.length > 0) && (
             <Group gap="xs" wrap="nowrap" className="-mb-1">
               <div className="w-5 shrink-0" />
               <Text size="sm" fw={500} className="flex-1 text-left">
@@ -121,7 +118,9 @@ export function ExerciseEditor({
             </Group>
           )}
 
-          {sets.map((set, index) => {
+          {!sets && <SetRowSkeleton />}
+
+          {sets?.map((set, index) => {
             const disabled = activeSetId !== set.id || !editable;
 
             return (
@@ -175,6 +174,7 @@ export function ExerciseEditor({
             size="sm"
             className="self-end mt-3"
             leftSection={<IconPlus size={16} />}
+            disabled={!sets}
             onClick={() => addActiveSet()}
           >
             Set

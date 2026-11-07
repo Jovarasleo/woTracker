@@ -3,7 +3,6 @@ import {
   Button,
   Group,
   Image,
-  Loader,
   ScrollArea,
   Select,
   Stack,
@@ -33,8 +32,11 @@ import { type CustomExercise } from "../store/db";
 import { CardioBadge } from "./CardioBadge";
 import { CustomExerciseForm } from "./CustomExerciseForm";
 import { ExerciseDetails } from "./ExerciseDetails";
+import { ExerciseRowSkeleton } from "./ExerciseRowSkeleton";
 
 const MAX_VISIBLE_RESULTS = 50;
+/** Name widths of the placeholder rows shown while the library loads. */
+const PLACEHOLDER_NAME_WIDTHS = ["55%", "40%", "65%", "45%", "50%", "35%"];
 
 interface Props {
   customExercises: CustomExercise[] | undefined;
@@ -58,13 +60,12 @@ export function ExerciseCreator({
   const [selected, setSelected] = useState<LibraryExercise | null>(null);
   const deferredQuery = useDeferredValue(query);
 
-  if (!catalog || !customExercises) {
-    return <Loader />;
-  }
-
+  // Tabs, search and the custom form don't need the data, so they render right
+  // away; only the result list shows placeholders while it loads.
+  const loading = !catalog || !customExercises;
   const library = [
-    ...customExercises.map(fromCustomExercise),
-    ...catalog.map(fromCatalogExercise),
+    ...(customExercises ?? []).map(fromCustomExercise),
+    ...(catalog ?? []).map(fromCatalogExercise),
   ];
   const muscleOptions = [
     ...new Set(library.flatMap((exercise) => exercise.primaryMuscles)),
@@ -129,7 +130,12 @@ export function ExerciseCreator({
           </Group>
 
           <ScrollArea.Autosize mah="55vh" offsetScrollbars>
-            <Stack gap={4}>
+            <Stack gap={4} aria-busy={loading}>
+              {loading &&
+                PLACEHOLDER_NAME_WIDTHS.map((width, index) => (
+                  <ExerciseRowSkeleton key={index} nameWidth={width} />
+                ))}
+
               {visibleResults.map((exercise) => (
                 <UnstyledButton
                   key={exercise.key}
@@ -190,7 +196,7 @@ export function ExerciseCreator({
             </Text>
           )}
 
-          {results.length === 0 && (
+          {!loading && results.length === 0 && (
             <Stack gap="xs" align="center" className="py-4">
               <Text size="sm" c="dimmed">
                 No exercises found

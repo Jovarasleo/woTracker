@@ -2,8 +2,8 @@ import {
   Button,
   Card,
   Divider,
-  Loader,
   Modal,
+  Skeleton,
   Stack,
   Text,
   Title,
@@ -16,6 +16,7 @@ import { Fragment, useState } from "react";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { ExerciseEditor } from "../../components/ExerciseEditor";
 import { PageLayout } from "../../components/PageLayout";
+import { SessionSkeleton } from "../../components/SessionSkeleton";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import {
   useCustomExercises,
@@ -86,10 +87,12 @@ function SessionPage() {
 
   const previousPerformance = usePreviousPerformance(session, exerciseLogs);
 
-  if (!session || !exerciseLogs) {
+  // Also wait for the previous-performance hints, so they don't pop in and
+  // push the sets down after the page has rendered.
+  if (!session || !exerciseLogs || !previousPerformance) {
     return (
-      <PageLayout title="Session">
-        <Loader className="mx-auto" />
+      <PageLayout action={<Skeleton height={36} width={80} radius="md" />}>
+        <SessionSkeleton />
       </PageLayout>
     );
   }
@@ -128,7 +131,7 @@ function SessionPage() {
               {index > 0 && <Divider />}
               <ExerciseEditor
                 exerciseLog={exercise}
-                previous={previousPerformance?.get(
+                previous={previousPerformance.get(
                   previousPerformanceKey(exercise),
                 )}
                 sessionId={numericSessionId}

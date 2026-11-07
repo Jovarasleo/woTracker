@@ -4,7 +4,7 @@ import {
   Card,
   ColorSwatch,
   Group,
-  Loader,
+  Skeleton,
   Stack,
   Text,
   Title,
@@ -19,6 +19,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import { CardioBadge } from "../../components/CardioBadge";
 import { PageLayout } from "../../components/PageLayout";
+import { WorkoutSkeleton } from "../../components/WorkoutSkeleton";
 import { useExercise } from "../../hooks/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
 import { formatDate } from "../../utils/dates";
@@ -106,10 +107,8 @@ function WorkoutPage() {
 
   if (!template || !exerciseTemplates || !sessions) {
     return (
-      <PageLayout title="Workout">
-        <div className="flex justify-center mt-10">
-          <Loader />
-        </div>
+      <PageLayout action={<Skeleton height={36} width={80} radius="md" />}>
+        <WorkoutSkeleton />
       </PageLayout>
     );
   }

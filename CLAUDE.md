@@ -50,9 +50,15 @@ kit) for something the stack above already handles.
   props so parents (routes) own the behavior.
 - Event handlers are named `on<Thing>` or `handle<Thing>` (`onEditExercise`,
   `handleSubmit`). Keep that convention.
-- Render a loading state (`<Loader />` or `Loading...`) while live queries are
-  `undefined`, and bail early (`if (!session || !exerciseLogs) return <Loader />`)
-  before rendering content that depends on them.
+- While live queries are `undefined`, render a **skeleton shaped like the real
+  content** (no spinners or "Loading..." text) so nothing shifts when the data
+  arrives. Bail early with a page skeleton (`if (!session || !exerciseLogs)
+  return <PageLayout><SessionSkeleton /></PageLayout>`; omitting `title` shows a
+  bar placeholder), or keep data-independent UI (tabs, search) rendered and only
+  replace the data part. Use `TextSkeleton` for text lines (it matches the line
+  height) and size block skeletons to the real control (36px inputs/buttons).
+  Wait for anything that adds lines (e.g. previous-performance hints) before
+  leaving the skeleton, so it can't pop in afterwards.
 
 ## Data & Persistence (Dexie)
 

@@ -5,7 +5,6 @@ import {
   ColorSwatch,
   Group,
   Input,
-  Loader,
   Modal,
   Stack,
   Text,
@@ -18,6 +17,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { ExerciseCreator } from "../../components/ExerciseCreator";
 import { PageLayout } from "../../components/PageLayout";
 import { TemplateExerciseList } from "../../components/TemplateExerciseList";
+import { TemplateFormSkeleton } from "../../components/TemplateFormSkeleton";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { useGoBack } from "../../hooks/useGoBack";
 import {
@@ -58,8 +58,8 @@ function EditTemplatePage() {
 
   if (!template || !exerciseTemplates) {
     return (
-      <PageLayout title="Edit workout">
-        <Loader className="mx-auto" />
+      <PageLayout>
+        <TemplateFormSkeleton />
       </PageLayout>
     );
   }
