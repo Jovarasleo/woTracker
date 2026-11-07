@@ -11,7 +11,7 @@ doubt, match the surrounding files.
 - **TypeScript** in `strict` mode, bundler module resolution, `verbatimModuleSyntax`.
 - **Vite 7** for dev/build, **vite-plugin-pwa** for offline support.
 - **TanStack Router** with **file-based routing** (`src/routes/`, `routeTree.gen.ts`).
-- **Mantine v8** (`@mantine/core`, `@mantine/hooks`, `@mantine/notifications`) for UI
+- **Mantine v9** (`@mantine/core`, `@mantine/hooks`, `@mantine/dates`) for UI
   components, **Tailwind CSS v4** for layout/spacing utilities.
 - **Dexie 4** (IndexedDB) with **dexie-react-hooks** for all persistence.
 - **@tabler/icons-react** for icons.
@@ -103,6 +103,10 @@ kit) for something the stack above already handles.
 - Use **Mantine components** for interactive UI (`Button`, `Card`, `Modal`,
   `NumberInput`, `ActionIcon`, `Title`, `Stack`, etc.) — don't hand-roll raw HTML
   equivalents.
+- Mantine CSS is imported **per component** in `src/mantineStyles.ts`, not via
+  `@mantine/core/styles.css`. When you use a Mantine component for the first
+  time, add its `@mantine/core/styles/<Component>.css` there (plus any
+  building-block components it needs), or it renders unstyled.
 - Use **Tailwind utility classes** for layout, spacing, and flex/grid positioning
   (`className="flex justify-between items-center mb-2"`).
 - Keep the two concerns separate: Mantine for component behavior/variants, Tailwind for
