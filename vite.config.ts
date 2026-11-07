@@ -63,7 +63,10 @@ export default defineConfig({
     }),
     tanstackRouter({
       target: "react",
-      autoCodeSplitting: false,
+      // Each route's component is its own chunk, loaded when first visited,
+      // so the home page doesn't download the session page or template forms.
+      // The service worker precaches all chunks, so this stays offline-safe.
+      autoCodeSplitting: true,
     }),
     tailwindcss(),
     react({

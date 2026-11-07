@@ -87,6 +87,12 @@ kit) for something the stack above already handles.
 - Add pages as files in `src/routes/`; the route tree is **generated** —
   `src/routeTree.gen.ts` is build output, so never edit it by hand.
 - Each route file exports `Route = createFileRoute("/path")({ component })`.
+- Route components are **code-split automatically** (`autoCodeSplitting` in
+  `vite.config.ts`); keep heavy, page-specific imports inside the route (or a
+  component it uses) so they stay out of the home page's bundle.
+- `index.html` holds only the theme (dark background, `color-scheme`, Mantine's
+  color-scheme attribute) so nothing flashes white before the JS loads — no
+  markup; all structure is rendered by React.
 - Read URL params via `Route.useParams()`, and **convert numeric id params with
   `Number(...)`** into a `numericXId` before using them in queries.
 - Navigate with the typed `Link` component or `useNavigate()`; pass `params` as strings

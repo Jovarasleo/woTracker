@@ -1,7 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-mantine-color-scheme="dark">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      Theme only, painted before the CSS and JS load (no white flash). Must
+      match the Mantine dark body color and the manifest background_color.
+    -->
+    <style>
+      html {
+        color-scheme: dark;
+        background-color: #242424;
+      }
+    </style>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
