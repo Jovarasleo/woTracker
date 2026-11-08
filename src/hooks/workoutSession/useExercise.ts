@@ -1,5 +1,6 @@
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { db, type ExerciseKind } from "../../store/db";
+import { type UndoAction } from "../shared/useUndo";
 
 interface NewExercise {
   name: string;
@@ -13,9 +14,11 @@ interface Options {
   sessionId?: number;
   /** Called after `handleSelectExercise` has added an exercise. */
   onAdded?: () => void;
+  /** Called after `deleteExercise`, with how to restore the exercise. */
+  onDeleted?: (action: UndoAction) => void;
 }
 
-export function useExercise({ sessionId, onAdded }: Options = {}) {
+export function useExercise({ sessionId, onAdded, onDeleted }: Options = {}) {
   /**
    * Adds an exercise to a session. Strength exercises start with one empty set;
    * cardio is logged on the exercise itself, so it gets none. Safe to call
@@ -48,12 +51,42 @@ export function useExercise({ sessionId, onAdded }: Options = {}) {
       return exerciseLogId;
     });
 
-  /** Removes an exercise and its sets together. */
-  const deleteExercise = (exerciseLogId: number) =>
-    db.transaction("rw", db.exerciseLogs, db.setLogs, async () => {
-      await db.setLogs.where("exerciseLogId").equals(exerciseLogId).delete();
-      await db.exerciseLogs.delete(exerciseLogId);
+  /**
+   * Removes an exercise and its sets together. Undo puts the same rows (same
+   * ids, order and set numbers) back, so it reappears exactly where it was.
+   */
+  const deleteExercise = async (exerciseLogId: number) => {
+    const removed = await db.transaction(
+      "rw",
+      db.exerciseLogs,
+      db.setLogs,
+      async () => {
+        const exerciseLog = await db.exerciseLogs.get(exerciseLogId);
+        const sets = await db.setLogs
+          .where("exerciseLogId")
+          .equals(exerciseLogId)
+          .toArray();
+
+        await db.setLogs.bulkDelete(sets.map((set) => set.id));
+        await db.exerciseLogs.delete(exerciseLogId);
+
+        return exerciseLog && { exerciseLog, sets };
+      },
+    );
+
+    if (!removed) {
+      return;
+    }
+
+    onDeleted?.({
+      message: `${removed.exerciseLog.name} removed`,
+      undo: () =>
+        db.transaction("rw", db.exerciseLogs, db.setLogs, async () => {
+          await db.exerciseLogs.put(removed.exerciseLog);
+          await db.setLogs.bulkPut(removed.sets);
+        }),
     });
+  };
 
   /** Adds an exercise picked from the library to `sessionId`. */
   const handleSelectExercise = async (

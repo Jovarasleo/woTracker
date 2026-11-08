@@ -11,6 +11,7 @@ import { useState } from "react";
 import { CardioEditor } from "./CardioEditor";
 import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
 import { SetRowSkeleton } from "./SetRowSkeleton";
+import { type UndoAction } from "../../hooks/shared/useUndo";
 import { useExerciseLogEditor } from "../../hooks/workoutSession/useExerciseLogEditor";
 import { type PreviousPerformance } from "../../hooks/workoutSession/usePreviousPerformance";
 import { ExerciseName } from "../exercise/ExerciseName";
@@ -24,6 +25,8 @@ interface Props {
   sessionEditable: boolean;
   onEditExercise: (exerciseId: number) => void;
   onDeleteExercise: (exerciseId: number) => void;
+  /** Called after a set is deleted, so the page can offer to undo it. */
+  onSetDeleted: (action: UndoAction) => void;
   /** What was logged the last time this exercise was done, shown as a hint. */
   previous?: PreviousPerformance;
   /** Library entry for this exercise, opened from its name. */
@@ -38,17 +41,19 @@ export function ExerciseEditor({
   sessionEditable,
   onEditExercise,
   onDeleteExercise,
+  onSetDeleted,
 }: Props) {
   const [activeSetId, setActiveSetId] = useState<number | null>(null);
   const [cardioEditing, setCardioEditing] = useState(false);
   const {
     sets,
     addSet,
+    canDeleteSet,
     deleteSet,
     updateSetWeight,
     updateSetReps,
     updateCardio,
-  } = useExerciseLogEditor(exerciseLog);
+  } = useExerciseLogEditor(exerciseLog, { onDeleted: onSetDeleted });
   const isCardio = exerciseKindOf(exerciseLog) === "cardio";
   // Locked unless this exercise is the active one and its edit toggle is on.
   const cardioLocked = !cardioEditing || !editable;
@@ -162,7 +167,12 @@ export function ExerciseEditor({
                     variant="subtle"
                     color="red"
                     size="lg"
-                    aria-label="Remove set"
+                    aria-label={
+                      canDeleteSet
+                        ? "Remove set"
+                        : "Can't remove the only set; remove the exercise instead"
+                    }
+                    disabled={!canDeleteSet}
                     onClick={() => deleteSet(set.id)}
                   >
                     <IconTrash size={18} />

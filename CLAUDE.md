@@ -69,6 +69,14 @@ kit) for something the stack above already handles.
     the custom exercise and then hands it on. Chaining callbacks like this
     keeps "create, then add" in one code path.
 
+  Deletes inside a page (sets, exercises) don't ask for confirmation; the
+  deleting hook keeps a copy of what it removes and passes an `UndoAction`
+  (`message` + `undo`, which puts the same rows back) to an `onDeleted`
+  callback. The route wires it to `useUndo().offerUndo` and renders
+  `UndoNotifications`: one entry per delete, each with its own timer, so
+  several deletes in a row can each be undone. Deleting a whole record
+  (session, template) asks for confirmation instead.
+
   Small UI-only state that no other page needs (e.g. which set row is being
   edited) can stay in the component.
 - Event handlers are named `on<Thing>` or `handle<Thing>` (`onEditExercise`,

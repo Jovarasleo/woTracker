@@ -43,6 +43,7 @@ import "@mantine/core/styles/Indicator.css";
 import "@mantine/core/styles/List.css";
 import "@mantine/core/styles/Menu.css";
 import "@mantine/core/styles/Modal.css";
+import "@mantine/core/styles/Notification.css";
 import "@mantine/core/styles/NumberInput.css";
 import "@mantine/core/styles/SegmentedControl.css";
 import "@mantine/core/styles/SimpleGrid.css";

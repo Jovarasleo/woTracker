@@ -26,10 +26,12 @@ import { DeleteSessionModal } from "../../components/workoutSession/DeleteSessio
 import { ExerciseEditor } from "../../components/workoutSession/ExerciseEditor";
 import { PageLayout } from "../../components/shared/PageLayout";
 import { SaveAsTemplateModal } from "../../components/workoutSession/SaveAsTemplateModal";
+import { UndoNotifications } from "../../components/shared/UndoNotifications";
 import { SessionNotFound } from "../../components/workoutSession/SessionNotFound";
 import { SessionSkeleton } from "../../components/workoutSession/SessionSkeleton";
 import { useCustomExercises } from "../../hooks/exercise/useCustomExercises";
 import { useExerciseLookup } from "../../hooks/exercise/useExerciseLookup";
+import { useUndo } from "../../hooks/shared/useUndo";
 import { useExercise } from "../../hooks/workoutSession/useExercise";
 import {
   previousPerformanceKey,
@@ -48,9 +50,11 @@ function SessionPage() {
   const numericSessionId = Number(sessionId);
   const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
+  const { undoOffers, offerUndo, undo, dismissUndo } = useUndo();
   const { deleteExercise, handleSelectExercise } = useExercise({
     sessionId: numericSessionId,
     onAdded: close,
+    onDeleted: offerUndo,
   });
   const { customExercises, handleCreateCustomExercise } = useCustomExercises({
     onCreated: handleSelectExercise,
@@ -202,6 +206,7 @@ function SessionPage() {
                 sessionEditable={sessionEditable}
                 onEditExercise={onEditExercise}
                 onDeleteExercise={deleteExercise}
+                onSetDeleted={offerUndo}
               />
             </Fragment>
           ))}
@@ -245,6 +250,12 @@ function SessionPage() {
           exerciseLogs={exerciseLogs}
           onClose={closeSaveTemplate}
           onSave={saveAsTemplate}
+        />
+
+        <UndoNotifications
+          offers={undoOffers}
+          onUndo={undo}
+          onDismiss={dismissUndo}
         />
       </Card>
     </PageLayout>
