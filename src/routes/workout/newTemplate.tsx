@@ -19,16 +19,13 @@ import { PageLayout } from "../../components/shared/PageLayout";
 import { TemplateExerciseList } from "../../components/workoutTemplate/TemplateExerciseList";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { useGoBack } from "../../hooks/shared/useGoBack";
-import {
-  useCustomExercises,
-  type CustomExerciseDraft,
-} from "../../hooks/exercise/useCustomExercises";
+import { useCustomExercises } from "../../hooks/exercise/useCustomExercises";
 import {
   useWorkoutTemplateForm,
   WORKOUT_NAME_MAX_LENGTH,
   type WorkoutTemplateFormValues,
 } from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
-import { db, exerciseKindOf } from "../../store/db";
+import { db } from "../../store/db";
 import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
 
 export const Route = createFileRoute("/workout/newTemplate")({
@@ -49,20 +46,19 @@ function NewWorkoutTemplate() {
     removeExercise,
   } = useWorkoutTemplateForm({ name: "", exercises: [] });
   const [indicatorColor, setIndicatorColor] = useState(randomIndicatorColor);
-  const { customExercises, addCustomExercise } = useCustomExercises();
   const [pickerOpened, { open: openPicker, close: closePicker }] =
     useDisclosure(false);
 
-  const handleSelectExercise = (exercise: LibraryExercise) => {
+  const handleSelectExercise = (
+    exercise: Pick<LibraryExercise, "name" | "kind">,
+  ) => {
     appendExercise({ name: exercise.name, kind: exercise.kind });
     closePicker();
   };
 
-  const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
-    await addCustomExercise(draft);
-    appendExercise({ name: draft.name, kind: exerciseKindOf(draft) });
-    closePicker();
-  };
+  const { customExercises, handleCreateCustomExercise } = useCustomExercises({
+    onCreated: handleSelectExercise,
+  });
 
   /** Runs only with valid, trimmed values; see `useWorkoutTemplateForm`. */
   const saveTemplate = async ({

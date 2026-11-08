@@ -20,10 +20,7 @@ import { TemplateExerciseList } from "../../components/workoutTemplate/TemplateE
 import { TemplateFormSkeleton } from "../../components/workoutTemplate/TemplateFormSkeleton";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { useGoBack } from "../../hooks/shared/useGoBack";
-import {
-  useCustomExercises,
-  type CustomExerciseDraft,
-} from "../../hooks/exercise/useCustomExercises";
+import { useCustomExercises } from "../../hooks/exercise/useCustomExercises";
 import { useTemplateEditor } from "../../hooks/workoutTemplate/useTemplateEditor";
 import {
   useWorkoutTemplateForm,
@@ -107,20 +104,19 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
     },
     template.id,
   );
-  const { customExercises, addCustomExercise } = useCustomExercises();
   const [pickerOpened, { open: openPicker, close: closePicker }] =
     useDisclosure(false);
 
-  const handleSelectExercise = (exercise: LibraryExercise) => {
+  const handleSelectExercise = (
+    exercise: Pick<LibraryExercise, "name" | "kind">,
+  ) => {
     appendExercise({ name: exercise.name, kind: exercise.kind });
     closePicker();
   };
 
-  const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
-    await addCustomExercise(draft);
-    appendExercise({ name: draft.name, kind: exerciseKindOf(draft) });
-    closePicker();
-  };
+  const { customExercises, handleCreateCustomExercise } = useCustomExercises({
+    onCreated: handleSelectExercise,
+  });
 
   const handleCancel = () => {
     goBack();

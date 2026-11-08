@@ -1,7 +1,9 @@
 import {
+  ActionIcon,
   Button,
   Card,
   Divider,
+  Group,
   Modal,
   Skeleton,
   Stack,
@@ -9,26 +11,25 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure, useToggle } from "@mantine/hooks";
-import { IconEdit, IconEditOff, IconPlus } from "@tabler/icons-react";
+import { IconEdit, IconEditOff, IconPlus, IconTrash } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Fragment, useState } from "react";
 import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
+import { DeleteSessionModal } from "../../components/workoutSession/DeleteSessionModal";
 import { ExerciseEditor } from "../../components/workoutSession/ExerciseEditor";
 import { PageLayout } from "../../components/shared/PageLayout";
+import { SessionNotFound } from "../../components/workoutSession/SessionNotFound";
 import { SessionSkeleton } from "../../components/workoutSession/SessionSkeleton";
-import { type LibraryExercise } from "../../data/exerciseCatalog";
-import {
-  useCustomExercises,
-  type CustomExerciseDraft,
-} from "../../hooks/exercise/useCustomExercises";
+import { useCustomExercises } from "../../hooks/exercise/useCustomExercises";
 import { useExerciseLookup } from "../../hooks/exercise/useExerciseLookup";
 import { useExercise } from "../../hooks/workoutSession/useExercise";
 import {
   previousPerformanceKey,
   usePreviousPerformance,
 } from "../../hooks/workoutSession/usePreviousPerformance";
-import { db, exerciseKindOf } from "../../store/db";
+import { useWorkoutSession } from "../../hooks/workoutSession/useWorkoutSession";
+import { db } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
 
 export const Route = createFileRoute("/session/$sessionId")({
@@ -37,44 +38,44 @@ export const Route = createFileRoute("/session/$sessionId")({
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
-  const { addExercise, deleteExercise } = useExercise();
+  const numericSessionId = Number(sessionId);
   const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const { customExercises, addCustomExercise } = useCustomExercises();
+  const { deleteExercise, handleSelectExercise } = useExercise({
+    sessionId: numericSessionId,
+    onAdded: close,
+  });
+  const { customExercises, handleCreateCustomExercise } = useCustomExercises({
+    onCreated: handleSelectExercise,
+  });
+  const {
+    deleteConfirmOpened,
+    openDeleteConfirm,
+    closeDeleteConfirm,
+    deleting,
+    confirmDelete,
+  } = useWorkoutSession(numericSessionId);
   const findExercise = useExerciseLookup();
   const [sessionMode, toggleSessionMode] = useToggle([
     "default",
     "edit",
   ] as const);
 
-  const numericSessionId = Number(sessionId);
   const sessionEditable = sessionMode === "edit";
 
   const onEditExercise = (id: number) => {
     setActiveExerciseId(id);
   };
 
-  const handleSelectExercise = async (exercise: LibraryExercise) => {
-    await addExercise(
-      { name: exercise.name, kind: exercise.kind },
-      numericSessionId,
-    );
-    close();
-  };
+  // `null` once loaded if there is no such session (e.g. it was deleted), so
+  // the page can say so instead of showing the skeleton forever.
+  const session = useLiveQuery(async () => {
+    if (!Number.isInteger(numericSessionId)) {
+      return null;
+    }
 
-  const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
-    await addCustomExercise(draft);
-    await addExercise(
-      { name: draft.name, kind: exerciseKindOf(draft) },
-      numericSessionId,
-    );
-    close();
-  };
-
-  const session = useLiveQuery(
-    () => db.workoutSessions.get(numericSessionId),
-    [numericSessionId],
-  );
+    return (await db.workoutSessions.get(numericSessionId)) ?? null;
+  }, [numericSessionId]);
 
   const exerciseLogs = useLiveQuery(async () => {
     if (!numericSessionId) {
@@ -87,7 +88,18 @@ function SessionPage() {
       .toArray();
   }, [numericSessionId]);
 
-  const previousPerformance = usePreviousPerformance(session, exerciseLogs);
+  const previousPerformance = usePreviousPerformance(
+    session ?? undefined,
+    exerciseLogs,
+  );
+
+  if (session === null) {
+    return (
+      <PageLayout title="Session not found">
+        <SessionNotFound />
+      </PageLayout>
+    );
+  }
 
   // Also wait for the previous-performance hints, so they don't pop in and
   // push the sets down after the page has rendered.
@@ -119,12 +131,24 @@ function SessionPage() {
     >
       <Card>
         <Stack>
-          <div className="text-left">
-            <Title order={3}>{session.name}</Title>
-            <Text size="sm" c="dimmed">
-              {formatDateTime(session.date)}
-            </Text>
-          </div>
+          <Group justify="space-between" align="flex-start" wrap="nowrap">
+            <div className="min-w-0 text-left">
+              <Title order={3}>{session.name}</Title>
+              <Text size="sm" c="dimmed">
+                {formatDateTime(session.date)}
+              </Text>
+            </div>
+            {sessionEditable && (
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                aria-label="Delete session"
+                onClick={openDeleteConfirm}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            )}
+          </Group>
 
           <Divider />
 
@@ -170,6 +194,14 @@ function SessionPage() {
             onCreateCustomExercise={handleCreateCustomExercise}
           />
         </Modal>
+
+        <DeleteSessionModal
+          session={session}
+          opened={deleteConfirmOpened}
+          deleting={deleting}
+          onClose={closeDeleteConfirm}
+          onConfirm={confirmDelete}
+        />
       </Card>
     </PageLayout>
   );

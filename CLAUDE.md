@@ -53,7 +53,24 @@ kit) for something the stack above already handles.
   Delete components once nothing imports them — don't leave dead files behind.
 - Keep presentational components (`src/components/`) free of direct DB mutation logic —
   pass data in via props and surface user actions through `on*`/`onDelete*` callback
-  props so parents (routes) own the behavior.
+  props; the route passes those on to handlers from hooks.
+- **Keep logic in custom hooks; routes only wire them to the UI.** Route
+  components read params, call hooks and render; event handlers, async flows,
+  DB calls and the state those flows need (e.g. a confirmation's open flag and
+  a "deleting" flag) belong in a hook under `src/hooks/`, which returns
+  ready-to-use handlers. When a handler ends with a page-specific step (close
+  a modal, append to a form), take it as a callback option instead of leaving
+  the handler in the route, so the hook can be reused. Examples:
+  - `useWorkoutSession(sessionId)` owns session deletion: confirmation state,
+    `deleting`, and `confirmDelete` (deletes, then goes back).
+  - `useExercise({ sessionId, onAdded: close })` returns
+    `handleSelectExercise`, and `useCustomExercises({ onCreated:
+    handleSelectExercise })` returns `handleCreateCustomExercise`, which saves
+    the custom exercise and then hands it on. Chaining callbacks like this
+    keeps "create, then add" in one code path.
+
+  Small UI-only state that no other page needs (e.g. which set row is being
+  edited) can stay in the component.
 - Event handlers are named `on<Thing>` or `handle<Thing>` (`onEditExercise`,
   `handleSubmit`). Keep that convention.
 - While live queries are `undefined`, render a **skeleton shaped like the real

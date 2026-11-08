@@ -1,9 +1,20 @@
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type CustomExercise } from "../../store/db";
+import { type LibraryExercise } from "../../data/exerciseCatalog";
+import { db, exerciseKindOf, type CustomExercise } from "../../store/db";
 
 export type CustomExerciseDraft = Omit<CustomExercise, "id" | "createdAt">;
 
-export function useCustomExercises() {
+interface Options {
+  /**
+   * Called with a newly created custom exercise, so the caller can use it
+   * right away (e.g. add it to the session or template being edited).
+   */
+  onCreated?: (
+    exercise: Pick<LibraryExercise, "name" | "kind">,
+  ) => void | Promise<void>;
+}
+
+export function useCustomExercises({ onCreated }: Options = {}) {
   const customExercises = useLiveQuery(
     () => db.customExercises.orderBy("name").toArray(),
     [],
@@ -17,8 +28,17 @@ export function useCustomExercises() {
     });
   };
 
+  /** Saves a custom exercise to the library, then passes it to `onCreated`. */
+  const handleCreateCustomExercise = async (draft: CustomExerciseDraft) => {
+    await addCustomExercise(draft);
+    await onCreated?.({
+      name: draft.name.trim(),
+      kind: exerciseKindOf(draft),
+    });
+  };
+
   return {
     customExercises,
-    addCustomExercise,
+    handleCreateCustomExercise,
   };
 }

@@ -1,3 +1,4 @@
+import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { db, type ExerciseKind } from "../../store/db";
 
 interface NewExercise {
@@ -7,7 +8,14 @@ interface NewExercise {
   exerciseTemplateId?: number;
 }
 
-export function useExercise() {
+interface Options {
+  /** Session that `handleSelectExercise` adds exercises to. */
+  sessionId?: number;
+  /** Called after `handleSelectExercise` has added an exercise. */
+  onAdded?: () => void;
+}
+
+export function useExercise({ sessionId, onAdded }: Options = {}) {
   /**
    * Adds an exercise to a session. Strength exercises start with one empty set;
    * cardio is logged on the exercise itself, so it gets none. Safe to call
@@ -47,8 +55,21 @@ export function useExercise() {
       await db.exerciseLogs.delete(exerciseLogId);
     });
 
+  /** Adds an exercise picked from the library to `sessionId`. */
+  const handleSelectExercise = async (
+    exercise: Pick<LibraryExercise, "name" | "kind">,
+  ) => {
+    if (sessionId == null) {
+      return;
+    }
+
+    await addExercise({ name: exercise.name, kind: exercise.kind }, sessionId);
+    onAdded?.();
+  };
+
   return {
     addExercise,
     deleteExercise,
+    handleSelectExercise,
   };
 }
