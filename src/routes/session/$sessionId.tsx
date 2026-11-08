@@ -11,7 +11,13 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure, useToggle } from "@mantine/hooks";
-import { IconEdit, IconEditOff, IconPlus, IconTrash } from "@tabler/icons-react";
+import {
+  IconDeviceFloppy,
+  IconEdit,
+  IconEditOff,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Fragment, useState } from "react";
@@ -19,6 +25,7 @@ import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
 import { DeleteSessionModal } from "../../components/workoutSession/DeleteSessionModal";
 import { ExerciseEditor } from "../../components/workoutSession/ExerciseEditor";
 import { PageLayout } from "../../components/shared/PageLayout";
+import { SaveAsTemplateModal } from "../../components/workoutSession/SaveAsTemplateModal";
 import { SessionNotFound } from "../../components/workoutSession/SessionNotFound";
 import { SessionSkeleton } from "../../components/workoutSession/SessionSkeleton";
 import { useCustomExercises } from "../../hooks/exercise/useCustomExercises";
@@ -54,6 +61,10 @@ function SessionPage() {
     closeDeleteConfirm,
     deleting,
     confirmDelete,
+    saveTemplateOpened,
+    openSaveTemplate,
+    closeSaveTemplate,
+    saveAsTemplate,
   } = useWorkoutSession(numericSessionId);
   const findExercise = useExerciseLookup();
   const [sessionMode, toggleSessionMode] = useToggle([
@@ -111,6 +122,13 @@ function SessionPage() {
     );
   }
 
+  // Quick workouts are started without a template and built up as you go, so
+  // they always offer "Add exercise" and can be saved as a template.
+  const isQuickWorkout = session.workoutTemplateId == null;
+  const canSaveAsTemplate = isQuickWorkout && exerciseLogs.length > 0;
+  const canAddExercise =
+    sessionEditable || isQuickWorkout || exerciseLogs.length === 0;
+
   const editToggle = (
     <Button
       variant={sessionEditable ? "filled" : "default"}
@@ -138,19 +156,37 @@ function SessionPage() {
                 {formatDateTime(session.date)}
               </Text>
             </div>
-            {sessionEditable && (
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                aria-label="Delete session"
-                onClick={openDeleteConfirm}
-              >
-                <IconTrash size={18} />
-              </ActionIcon>
-            )}
+            <Group gap="xs" wrap="nowrap">
+              {canSaveAsTemplate && (
+                <Button
+                  variant="default"
+                  size="xs"
+                  leftSection={<IconDeviceFloppy size={16} />}
+                  onClick={openSaveTemplate}
+                >
+                  Save as template
+                </Button>
+              )}
+              {sessionEditable && (
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  aria-label="Delete session"
+                  onClick={openDeleteConfirm}
+                >
+                  <IconTrash size={18} />
+                </ActionIcon>
+              )}
+            </Group>
           </Group>
 
           <Divider />
+
+          {exerciseLogs.length === 0 && (
+            <Text c="dimmed" className="text-left">
+              No exercises yet. Add one to start logging.
+            </Text>
+          )}
 
           {exerciseLogs.map((exercise, index) => (
             <Fragment key={exercise.id}>
@@ -170,7 +206,7 @@ function SessionPage() {
             </Fragment>
           ))}
 
-          {sessionEditable && (
+          {canAddExercise && (
             <Button
               variant="light"
               leftSection={<IconPlus size={18} />}
@@ -201,6 +237,14 @@ function SessionPage() {
           deleting={deleting}
           onClose={closeDeleteConfirm}
           onConfirm={confirmDelete}
+        />
+
+        <SaveAsTemplateModal
+          opened={saveTemplateOpened}
+          defaultName={session.name}
+          exerciseLogs={exerciseLogs}
+          onClose={closeSaveTemplate}
+          onSave={saveAsTemplate}
         />
       </Card>
     </PageLayout>

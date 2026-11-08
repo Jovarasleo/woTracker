@@ -7,7 +7,7 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { IconBarbell, IconPlus } from "@tabler/icons-react";
+import { IconBarbell, IconBolt, IconPlus } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { TemplateCard } from "./TemplateCard";
@@ -16,13 +16,22 @@ import type { TemplateSummary } from "../../hooks/home/useHomeOverview";
 interface Props {
   templates: TemplateSummary[];
   onDeleteTemplate: (templateId: number) => Promise<void>;
+  /** Starts a session without a template. */
+  onStartQuickWorkout: () => void;
+  /** True while the quick workout is being created. */
+  startingQuickWorkout: boolean;
 }
 
 /**
  * Responsive grid of workout templates for the home page, with an empty state
  * and the delete-confirmation modal.
  */
-export function TemplatesOverview({ templates, onDeleteTemplate }: Props) {
+export function TemplatesOverview({
+  templates,
+  onDeleteTemplate,
+  onStartQuickWorkout,
+  startingQuickWorkout,
+}: Props) {
   const navigate = useNavigate();
   const [pendingDelete, setPendingDelete] = useState<TemplateSummary | null>(
     null,
@@ -54,6 +63,18 @@ export function TemplatesOverview({ templates, onDeleteTemplate }: Props) {
             {templates.length}
           </Badge>
         )}
+        {templates.length > 0 && (
+          <Button
+            variant="default"
+            size="xs"
+            className="ml-auto"
+            leftSection={<IconBolt size={16} />}
+            loading={startingQuickWorkout}
+            onClick={onStartQuickWorkout}
+          >
+            Quick workout
+          </Button>
+        )}
       </div>
 
       {templates.length === 0 ? (
@@ -69,17 +90,28 @@ export function TemplatesOverview({ templates, onDeleteTemplate }: Props) {
           <div>
             <Text fw={600}>No workouts yet</Text>
             <Text size="sm" c="dimmed">
-              Create a workout template to start logging sessions.
+              Create a workout template to start logging sessions, or jump
+              straight into a quick workout.
             </Text>
           </div>
-          <Button
-            component={Link}
-            tabIndex={0}
-            to="/workout/newTemplate"
-            leftSection={<IconPlus size={18} />}
-          >
-            Create workout
-          </Button>
+          <div className="flex flex-wrap justify-center gap-3 mt-5">
+            <Button
+              component={Link}
+              tabIndex={0}
+              to="/workout/newTemplate"
+              leftSection={<IconPlus size={18} />}
+            >
+              Create workout
+            </Button>
+            <Button
+              variant="default"
+              leftSection={<IconBolt size={18} />}
+              loading={startingQuickWorkout}
+              onClick={onStartQuickWorkout}
+            >
+              Quick workout
+            </Button>
+          </div>
         </Paper>
       ) : (
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">

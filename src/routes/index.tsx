@@ -8,6 +8,7 @@ import { SessionsOverview } from "../components/workoutSession/SessionsOverview"
 import { StatsOverview } from "../components/stats/StatsOverview";
 import { TemplatesOverview } from "../components/workoutTemplate/TemplatesOverview";
 import { loadHomeOverview, useHomeOverview } from "../hooks/home/useHomeOverview";
+import { useQuickWorkout } from "../hooks/workoutSession/useQuickWorkout";
 import { greetingFor } from "../utils/sessionStats";
 
 interface IndexSearch {
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { overview, deleteTemplate } = useHomeOverview(Route.useLoaderData());
+  const { startQuickWorkout, starting } = useQuickWorkout();
   const now = dayjs();
 
   return (
@@ -78,6 +80,8 @@ function Index() {
           <TemplatesOverview
             templates={overview.templates}
             onDeleteTemplate={deleteTemplate}
+            onStartQuickWorkout={startQuickWorkout}
+            startingQuickWorkout={starting}
           />
         </div>
         <aside className="min-w-0 lg:sticky lg:top-6 lg:self-start">
