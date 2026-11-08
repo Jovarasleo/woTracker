@@ -22,6 +22,7 @@ import {
   useCustomExercises,
   type CustomExerciseDraft,
 } from "../../hooks/exercise/useCustomExercises";
+import { useExerciseLookup } from "../../hooks/exercise/useExerciseLookup";
 import { useExercise } from "../../hooks/workoutSession/useExercise";
 import {
   previousPerformanceKey,
@@ -40,6 +41,7 @@ function SessionPage() {
   const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const { customExercises, addCustomExercise } = useCustomExercises();
+  const findExercise = useExerciseLookup();
   const [sessionMode, toggleSessionMode] = useToggle([
     "default",
     "edit",
@@ -134,6 +136,7 @@ function SessionPage() {
                 previous={previousPerformance.get(
                   previousPerformanceKey(exercise),
                 )}
+                details={findExercise(exercise.name)}
                 sessionId={numericSessionId}
                 editable={activeExerciseId === exercise.id}
                 sessionEditable={sessionEditable}

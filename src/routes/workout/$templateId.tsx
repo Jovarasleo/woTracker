@@ -18,8 +18,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import { CardioBadge } from "../../components/exercise/CardioBadge";
+import { ExerciseName } from "../../components/exercise/ExerciseName";
 import { PageLayout } from "../../components/shared/PageLayout";
 import { WorkoutSkeleton } from "../../components/workoutTemplate/WorkoutSkeleton";
+import { useExerciseLookup } from "../../hooks/exercise/useExerciseLookup";
 import { useExercise } from "../../hooks/workoutSession/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
 import { formatDate } from "../../utils/dates";
@@ -33,6 +35,7 @@ function WorkoutPage() {
   const { templateId } = Route.useParams();
   const numericTemplateId = Number(templateId);
   const { addExercise } = useExercise();
+  const findExercise = useExerciseLookup();
   const [starting, setStarting] = useState(false);
 
   const template = useLiveQuery(
@@ -188,7 +191,11 @@ function WorkoutPage() {
                 >
                   {index + 1}
                 </Text>
-                <Text fw={500}>{exercise.name}</Text>
+                <ExerciseName
+                  name={exercise.name}
+                  details={findExercise(exercise.name)}
+                  fw={500}
+                />
                 <CardioBadge kind={exerciseKindOf(exercise)} />
               </Group>
             ))}

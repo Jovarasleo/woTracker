@@ -13,6 +13,8 @@ import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
 import { SetRowSkeleton } from "./SetRowSkeleton";
 import { useExerciseLogEditor } from "../../hooks/workoutSession/useExerciseLogEditor";
 import { type PreviousPerformance } from "../../hooks/workoutSession/usePreviousPerformance";
+import { ExerciseName } from "../exercise/ExerciseName";
+import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { exerciseKindOf, type ExerciseLog } from "../../store/db";
 
 interface Props {
@@ -24,11 +26,14 @@ interface Props {
   onDeleteExercise: (exerciseId: number) => void;
   /** What was logged the last time this exercise was done, shown as a hint. */
   previous?: PreviousPerformance;
+  /** Library entry for this exercise, opened from its name. */
+  details?: LibraryExercise;
 }
 
 export function ExerciseEditor({
   exerciseLog,
   previous,
+  details,
   editable,
   sessionEditable,
   onEditExercise,
@@ -77,9 +82,7 @@ export function ExerciseEditor({
     <Stack gap="xs">
       <Group justify="space-between" wrap="nowrap" className="min-h-7 mb-2">
         <div className="min-w-0">
-          <Text fw={600} className="text-left">
-            {exerciseLog.name}
-          </Text>
+          <ExerciseName name={exerciseLog.name} details={details} fw={600} />
           {previous && <PreviousPerformanceHint previous={previous} />}
         </div>
         {sessionEditable && (
