@@ -25,6 +25,7 @@ import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
 import { DeleteSessionModal } from "../../components/workoutSession/DeleteSessionModal";
 import { ExerciseEditor } from "../../components/workoutSession/ExerciseEditor";
 import { PageLayout } from "../../components/shared/PageLayout";
+import { RestTimerButton } from "../../components/workoutSession/RestTimerButton";
 import { SaveAsTemplateModal } from "../../components/workoutSession/SaveAsTemplateModal";
 import { UndoNotifications } from "../../components/shared/UndoNotifications";
 import { SessionNotFound } from "../../components/workoutSession/SessionNotFound";
@@ -37,6 +38,7 @@ import {
   previousPerformanceKey,
   usePreviousPerformance,
 } from "../../hooks/workoutSession/usePreviousPerformance";
+import { useRestTimer } from "../../hooks/workoutSession/useRestTimer";
 import { useWorkoutSession } from "../../hooks/workoutSession/useWorkoutSession";
 import { db } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
@@ -71,6 +73,8 @@ function SessionPage() {
     saveAsTemplate,
   } = useWorkoutSession(numericSessionId);
   const findExercise = useExerciseLookup();
+  const { remainingSeconds, finished, startRest, addRest, stopRest } =
+    useRestTimer();
   const [sessionMode, toggleSessionMode] = useToggle([
     "default",
     "edit",
@@ -120,7 +124,14 @@ function SessionPage() {
   // push the sets down after the page has rendered.
   if (!session || !exerciseLogs || !previousPerformance) {
     return (
-      <PageLayout action={<Skeleton height={36} width={80} radius="md" />}>
+      <PageLayout
+        action={
+          <Group gap="xs" wrap="nowrap">
+            <Skeleton height={36} width={80} radius="md" />
+            <Skeleton height={36} width={80} radius="md" />
+          </Group>
+        }
+      >
         <SessionSkeleton />
       </PageLayout>
     );
@@ -149,7 +160,18 @@ function SessionPage() {
     <PageLayout
       title={session.name}
       subtitle={formatDateTime(session.date)}
-      action={editToggle}
+      action={
+        <Group gap="xs" wrap="nowrap">
+          <RestTimerButton
+            remainingSeconds={remainingSeconds}
+            finished={finished}
+            onStart={startRest}
+            onAdd={addRest}
+            onStop={stopRest}
+          />
+          {editToggle}
+        </Group>
+      }
     >
       <Card>
         <Stack>
