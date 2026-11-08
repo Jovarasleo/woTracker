@@ -2,12 +2,12 @@ import { ActionIcon, Button, Text, Title } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import dayjs from "dayjs";
-import { BackupMenu } from "../components/BackupMenu";
-import { DevTools } from "../components/DevTools";
-import { SessionsOverview } from "../components/SessionsOverview";
-import { StatsOverview } from "../components/StatsOverview";
-import { TemplatesOverview } from "../components/TemplatesOverview";
-import { loadHomeOverview, useHomeOverview } from "../hooks/useHomeOverview";
+import { BackupMenu } from "../components/backup/BackupMenu";
+import { DevTools } from "../components/dev/DevTools";
+import { SessionsOverview } from "../components/workoutSession/SessionsOverview";
+import { StatsOverview } from "../components/stats/StatsOverview";
+import { TemplatesOverview } from "../components/workoutTemplate/TemplatesOverview";
+import { loadHomeOverview, useHomeOverview } from "../hooks/home/useHomeOverview";
 import { greetingFor } from "../utils/sessionStats";
 
 interface IndexSearch {

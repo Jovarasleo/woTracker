@@ -14,22 +14,22 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ExerciseCreator } from "../../components/ExerciseCreator";
-import { PageLayout } from "../../components/PageLayout";
-import { TemplateExerciseList } from "../../components/TemplateExerciseList";
-import { TemplateFormSkeleton } from "../../components/TemplateFormSkeleton";
+import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
+import { PageLayout } from "../../components/shared/PageLayout";
+import { TemplateExerciseList } from "../../components/workoutTemplate/TemplateExerciseList";
+import { TemplateFormSkeleton } from "../../components/workoutTemplate/TemplateFormSkeleton";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
-import { useGoBack } from "../../hooks/useGoBack";
+import { useGoBack } from "../../hooks/shared/useGoBack";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
-} from "../../hooks/useCustomExercises";
-import { useTemplateEditor } from "../../hooks/useTemplateEditor";
+} from "../../hooks/exercise/useCustomExercises";
+import { useTemplateEditor } from "../../hooks/workoutTemplate/useTemplateEditor";
 import {
   useWorkoutTemplateForm,
   WORKOUT_NAME_MAX_LENGTH,
   type WorkoutTemplateFormValues,
-} from "../../hooks/useWorkoutTemplateForm";
+} from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
 import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
 import { db, exerciseKindOf } from "../../store/db";
 import { INDICATOR_COLORS } from "../../utils/colors";

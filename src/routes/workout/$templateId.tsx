@@ -17,10 +17,10 @@ import {
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
-import { CardioBadge } from "../../components/CardioBadge";
-import { PageLayout } from "../../components/PageLayout";
-import { WorkoutSkeleton } from "../../components/WorkoutSkeleton";
-import { useExercise } from "../../hooks/useExercise";
+import { CardioBadge } from "../../components/exercise/CardioBadge";
+import { PageLayout } from "../../components/shared/PageLayout";
+import { WorkoutSkeleton } from "../../components/workoutTemplate/WorkoutSkeleton";
+import { useExercise } from "../../hooks/workoutSession/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
 import { formatDate } from "../../utils/dates";
 

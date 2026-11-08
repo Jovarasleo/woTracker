@@ -14,20 +14,20 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ExerciseCreator } from "../../components/ExerciseCreator";
-import { PageLayout } from "../../components/PageLayout";
-import { TemplateExerciseList } from "../../components/TemplateExerciseList";
+import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
+import { PageLayout } from "../../components/shared/PageLayout";
+import { TemplateExerciseList } from "../../components/workoutTemplate/TemplateExerciseList";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
-import { useGoBack } from "../../hooks/useGoBack";
+import { useGoBack } from "../../hooks/shared/useGoBack";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
-} from "../../hooks/useCustomExercises";
+} from "../../hooks/exercise/useCustomExercises";
 import {
   useWorkoutTemplateForm,
   WORKOUT_NAME_MAX_LENGTH,
   type WorkoutTemplateFormValues,
-} from "../../hooks/useWorkoutTemplateForm";
+} from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
 import { db, exerciseKindOf } from "../../store/db";
 import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
 

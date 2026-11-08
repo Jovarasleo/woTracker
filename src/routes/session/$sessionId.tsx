@@ -13,20 +13,20 @@ import { IconEdit, IconEditOff, IconPlus } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Fragment, useState } from "react";
-import { ExerciseCreator } from "../../components/ExerciseCreator";
-import { ExerciseEditor } from "../../components/ExerciseEditor";
-import { PageLayout } from "../../components/PageLayout";
-import { SessionSkeleton } from "../../components/SessionSkeleton";
+import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
+import { ExerciseEditor } from "../../components/workoutSession/ExerciseEditor";
+import { PageLayout } from "../../components/shared/PageLayout";
+import { SessionSkeleton } from "../../components/workoutSession/SessionSkeleton";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import {
   useCustomExercises,
   type CustomExerciseDraft,
-} from "../../hooks/useCustomExercises";
-import { useExercise } from "../../hooks/useExercise";
+} from "../../hooks/exercise/useCustomExercises";
+import { useExercise } from "../../hooks/workoutSession/useExercise";
 import {
   previousPerformanceKey,
   usePreviousPerformance,
-} from "../../hooks/usePreviousPerformance";
+} from "../../hooks/workoutSession/usePreviousPerformance";
 import { db, exerciseKindOf } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
 

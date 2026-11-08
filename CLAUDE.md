@@ -43,6 +43,12 @@ kit) for something the stack above already handles.
 - Write **function components**, never class components.
 - Use **named exports** for reusable components (`export function ExerciseEditor(...)`);
   do not add `default` exports.
+- Group components by feature under `src/components/`: `workoutTemplate/`
+  (template cards, list, form/page skeletons), `workoutSession/` (session
+  editing and history), `exercise/` (library picker, custom exercise form),
+  `stats/`, `backup/`, `dev/`, and `shared/` for app-wide building blocks
+  (`PageLayout`, `TextSkeleton`). Put a feature's skeleton next to the component
+  it mirrors. Don't add files directly to `src/components/`.
 - One component per file; name the file after the component (`TemplateCard.tsx`).
   Delete components once nothing imports them — don't leave dead files behind.
 - Keep presentational components (`src/components/`) free of direct DB mutation logic —
@@ -71,7 +77,10 @@ kit) for something the stack above already handles.
 - Group **multi-table writes in a `db.transaction("rw", ...)`** (see
   `workout/new.tsx`) so related rows commit atomically.
 - Put mutation logic in **custom hooks** under `src/hooks/` (`useExercise`,
-  `useExerciseLogEditor`) rather than inlining DB calls in components.
+  `useExerciseLogEditor`) rather than inlining DB calls in components. Hooks use
+  the same feature folders as components (`hooks/workoutTemplate/`,
+  `hooks/workoutSession/`, `hooks/exercise/`, `hooks/backup/`, `hooks/shared/`),
+  plus `hooks/home/` for the home page's combined overview query.
 - When updating the schema, add a **new `db.version(n).stores({...})`** migration — do
   not edit an existing version block.
 - Exercises are either **strength** (sets of weight × reps in `setLogs`) or
