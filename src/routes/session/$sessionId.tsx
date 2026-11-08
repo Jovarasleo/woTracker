@@ -125,6 +125,7 @@ function SessionPage() {
   if (!session || !exerciseLogs || !previousPerformance) {
     return (
       <PageLayout
+        title={null}
         action={
           <Group gap="xs" wrap="nowrap">
             <Skeleton height={36} width={80} radius="md" />
@@ -157,9 +158,9 @@ function SessionPage() {
   );
 
   return (
+    // No title in the bar: the card below starts with the name and date.
     <PageLayout
-      title={session.name}
-      subtitle={formatDateTime(session.date)}
+      title={null}
       action={
         <Group gap="xs" wrap="nowrap">
           <RestTimerButton

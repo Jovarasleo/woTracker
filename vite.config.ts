@@ -19,6 +19,9 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true,
         cleanupOutdatedCaches: true,
+        // Notification tap handler (public/notification-click.js), so a
+        // "Rest over" notification brings the app back to the front.
+        importScripts: ["notification-click.js"],
         // App files are already precached by hash. Only cache the external
         // exercise images at runtime; a catch-all rule here would also cache
         // index.html and old hashed chunks in a cache that is never cleaned up.

@@ -10,9 +10,11 @@ const CONTENT_WIDTH = "max-w-xl";
 interface Props {
   /**
    * Shown in the bar, so the page stays identifiable while scrolled. Omit it
-   * while the page's data is loading to show a title + subtitle placeholder.
+   * while the page's data is loading to show a title + subtitle placeholder;
+   * pass `null` for no title at all (e.g. when the page content already
+   * starts with it and repeating it would crowd the bar).
    */
-  title?: string;
+  title?: string | null;
   subtitle?: string;
   /** The page's main action (e.g. an Edit button), shown on the right. */
   action?: ReactNode;
@@ -52,12 +54,13 @@ export function PageLayout({ title, subtitle, action, children }: Props) {
             <IconArrowLeft size={22} />
           </ActionIcon>
           <div className="min-w-0 flex-1 text-left">
-            {title === undefined ? (
+            {title === undefined && (
               <>
                 <TextSkeleton width="45%" />
                 <TextSkeleton width="30%" size="xs" />
               </>
-            ) : (
+            )}
+            {title != null && (
               <>
                 <Text fw={600} truncate>
                   {title}
