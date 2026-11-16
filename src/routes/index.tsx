@@ -2,8 +2,8 @@ import { ActionIcon, Button, Text, Title } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import dayjs from "dayjs";
-import { BackupMenu } from "../components/backup/BackupMenu";
 import { DevTools } from "../components/dev/DevTools";
+import { SidePanel } from "../components/shared/SidePanel";
 import { SessionsOverview } from "../components/workoutSession/SessionsOverview";
 import { StatsOverview } from "../components/stats/StatsOverview";
 import { TemplatesOverview } from "../components/workoutTemplate/TemplatesOverview";
@@ -50,7 +50,6 @@ function Index() {
           </Title>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <BackupMenu />
           <Button
             component={Link}
             tabIndex={0}
@@ -71,6 +70,7 @@ function Index() {
           >
             <IconPlus size={20} />
           </ActionIcon>
+          <SidePanel />
         </div>
       </header>
 

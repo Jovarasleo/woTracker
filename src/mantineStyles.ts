@@ -32,11 +32,13 @@ import "@mantine/core/styles/FloatingIndicator.css";
 // Components used directly by the app.
 import "@mantine/core/styles/ActionIcon.css";
 import "@mantine/core/styles/Badge.css";
+import "@mantine/core/styles/Burger.css";
 import "@mantine/core/styles/Button.css";
 import "@mantine/core/styles/Card.css";
 import "@mantine/core/styles/ColorPicker.css";
 import "@mantine/core/styles/ColorSwatch.css";
 import "@mantine/core/styles/Divider.css";
+import "@mantine/core/styles/Drawer.css";
 import "@mantine/core/styles/Group.css";
 import "@mantine/core/styles/Image.css";
 import "@mantine/core/styles/Indicator.css";

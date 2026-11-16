@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Button,
   FileButton,
   Group,
@@ -101,15 +100,16 @@ export function BackupMenu() {
   return (
     <>
       {/* keepMounted keeps the file input alive while the system picker is open */}
-      <Menu position="bottom-end" keepMounted>
+      <Menu position="bottom-start" width="target" keepMounted>
         <Menu.Target>
-          <ActionIcon
+          <Button
             variant="default"
-            size="input-md"
-            aria-label="Backup and restore"
+            fullWidth
+            justify="flex-start"
+            leftSection={<IconDatabase size={18} />}
           >
-            <IconDatabase size={20} />
-          </ActionIcon>
+            Backup and restore
+          </Button>
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Label>Backup</Menu.Label>
