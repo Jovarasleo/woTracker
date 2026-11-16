@@ -1,6 +1,7 @@
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { db, type ExerciseKind } from "../../store/db";
 import { type UndoAction } from "../shared/useUndo";
+import { t } from "../../i18n/translations";
 
 interface NewExercise {
   name: string;
@@ -79,7 +80,7 @@ export function useExercise({ sessionId, onAdded, onDeleted }: Options = {}) {
     }
 
     onDeleted?.({
-      message: `${removed.exerciseLog.name} removed`,
+      message: t.session.exerciseRemoved(removed.exerciseLog.name),
       undo: () =>
         db.transaction("rw", db.exerciseLogs, db.setLogs, async () => {
           await db.exerciseLogs.put(removed.exerciseLog);

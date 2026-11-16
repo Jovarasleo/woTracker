@@ -4,6 +4,7 @@ import type { WorkoutSession } from "../../store/db";
 import { sessionIndicatorColor } from "../../utils/colors";
 import { formatDateTime } from "../../utils/dates";
 import { formatRelativeDay } from "../../utils/sessionStats";
+import { t } from "../../i18n/translations";
 
 interface Props {
   /** Sessions to show, newest first. */
@@ -21,7 +22,7 @@ export function RecentSessions({
   return (
     <Paper withBorder radius="lg" p="md">
       <Title order={4} mb="xs">
-        Recent sessions
+        {t.sessionHistory.recentSessions}
       </Title>
       <ul className="-mx-2 flex flex-col">
         {sessions.map((session) => (

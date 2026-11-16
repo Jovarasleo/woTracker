@@ -1,5 +1,6 @@
 import { Button, Notification } from "@mantine/core";
 import { type UndoOffer } from "../../hooks/shared/useUndo";
+import { t } from "../../i18n/translations";
 
 interface Props {
   /** Oldest first; the newest is shown at the bottom, nearest the thumb. */
@@ -28,7 +29,7 @@ export function UndoNotifications({ offers, onUndo, onDismiss }: Props) {
           key={offer.id}
           withBorder
           onClose={() => onDismiss(offer.id)}
-          closeButtonProps={{ "aria-label": "Dismiss" }}
+          closeButtonProps={{ "aria-label": t.common.dismiss }}
         >
           <div className="flex items-center justify-between gap-3">
             <span>{offer.message}</span>
@@ -37,7 +38,7 @@ export function UndoNotifications({ offers, onUndo, onDismiss }: Props) {
               size="xs"
               onClick={() => onUndo(offer.id)}
             >
-              Undo
+              {t.common.undo}
             </Button>
           </div>
         </Notification>

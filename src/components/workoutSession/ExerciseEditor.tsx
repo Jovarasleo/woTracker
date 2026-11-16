@@ -17,6 +17,7 @@ import { type PreviousPerformance } from "../../hooks/workoutSession/usePrevious
 import { ExerciseName } from "../exercise/ExerciseName";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { exerciseKindOf, type ExerciseLog } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 interface Props {
   exerciseLog: ExerciseLog;
@@ -94,7 +95,7 @@ export function ExerciseEditor({
           <ActionIcon
             variant="subtle"
             color="red"
-            aria-label="Remove exercise"
+            aria-label={t.common.removeExercise}
             onClick={() => onDeleteExercise(exerciseLog.id)}
           >
             <IconTrash size={18} />
@@ -116,10 +117,10 @@ export function ExerciseEditor({
             <Group gap="xs" wrap="nowrap" className="-mb-1">
               <div className="w-5 shrink-0" />
               <Text size="sm" fw={500} className="flex-1 text-left">
-                Weight
+                {t.sets.weight}
               </Text>
               <Text size="sm" fw={500} className="flex-1 text-left">
-                Reps
+                {t.sets.reps}
               </Text>
               <div className="w-8.5 shrink-0" />
               {sessionEditable && <div className="w-8.5 shrink-0" />}
@@ -142,7 +143,7 @@ export function ExerciseEditor({
                   min={0}
                   disabled={disabled}
                   onChange={(weight) => updateSetWeight(Number(weight), set.id)}
-                  placeholder="Weight"
+                  placeholder={t.sets.weight}
                   inputMode="decimal"
                 />
                 <NumberInput
@@ -151,13 +152,13 @@ export function ExerciseEditor({
                   min={0}
                   disabled={disabled}
                   onChange={(reps) => updateSetReps(Number(reps), set.id)}
-                  placeholder="Reps"
+                  placeholder={t.sets.reps}
                   inputMode="numeric"
                 />
                 <ActionIcon
                   variant="subtle"
                   size="lg"
-                  aria-label={disabled ? "Edit set" : "Confirm set"}
+                  aria-label={disabled ? t.sets.editSet : t.sets.confirmSet}
                   onClick={() => onSetEditable(exerciseLog.id, set.id)}
                 >
                   {disabled ? <IconEdit size={18} /> : <IconCheck size={18} />}
@@ -169,8 +170,8 @@ export function ExerciseEditor({
                     size="lg"
                     aria-label={
                       canDeleteSet
-                        ? "Remove set"
-                        : "Can't remove the only set; remove the exercise instead"
+                        ? t.sets.removeSet
+                        : t.sets.cantRemoveOnlySet
                     }
                     disabled={!canDeleteSet}
                     onClick={() => deleteSet(set.id)}
@@ -190,7 +191,7 @@ export function ExerciseEditor({
             disabled={!sets}
             onClick={() => addActiveSet()}
           >
-            Set
+            {t.sets.addSet}
           </Button>
         </>
       )}

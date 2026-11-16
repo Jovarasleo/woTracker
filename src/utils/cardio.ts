@@ -1,4 +1,5 @@
 import type { CardioMetrics } from "../store/db";
+import { t } from "../i18n/translations";
 
 /**
  * Copies only the cardio fields off a record (e.g. an `ExerciseLog`). The one
@@ -34,7 +35,7 @@ export function formatPace({
   const minutes = Math.floor(secondsPerKm / 60);
   const seconds = String(secondsPerKm % 60).padStart(2, "0");
 
-  return `${minutes}:${seconds}/km`;
+  return t.cardio.paceValue(minutes, seconds);
 }
 
 /**
@@ -43,12 +44,16 @@ export function formatPace({
  */
 export function summarizeCardio(metrics: CardioMetrics): string {
   return [
-    metrics.durationMinutes ? `${metrics.durationMinutes} min` : null,
-    metrics.distanceKm ? `${metrics.distanceKm} km` : null,
+    metrics.durationMinutes
+      ? t.cardio.summary.duration(metrics.durationMinutes)
+      : null,
+    metrics.distanceKm ? t.cardio.summary.distance(metrics.distanceKm) : null,
     formatPace(metrics),
-    metrics.calories ? `${metrics.calories} kcal` : null,
-    metrics.avgHeartRate ? `${metrics.avgHeartRate} bpm` : null,
-    metrics.rpe ? `RPE ${metrics.rpe}` : null,
+    metrics.calories ? t.cardio.summary.calories(metrics.calories) : null,
+    metrics.avgHeartRate
+      ? t.cardio.summary.heartRate(metrics.avgHeartRate)
+      : null,
+    metrics.rpe ? t.cardio.summary.rpe(metrics.rpe) : null,
   ]
     .filter(Boolean)
     .join(" · ");

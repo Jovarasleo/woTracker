@@ -12,15 +12,16 @@ import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { type CustomExerciseDraft } from "../../hooks/exercise/useCustomExercises";
 import { type ExerciseKind } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 const KIND_OPTIONS: { label: string; value: ExerciseKind }[] = [
-  { label: "Strength", value: "strength" },
-  { label: "Cardio", value: "cardio" },
+  { label: t.common.strength, value: "strength" },
+  { label: t.common.cardio, value: "cardio" },
 ];
 
 const KIND_DESCRIPTIONS: Record<ExerciseKind, string> = {
-  strength: "Logged as sets of weight × reps",
-  cardio: "Logged as duration and distance",
+  strength: t.exercise.form.strengthDescription,
+  cardio: t.exercise.form.cardioDescription,
 };
 
 interface Props {
@@ -45,7 +46,7 @@ export function CustomExerciseForm({
   const trimmedName = name.trim();
   const nameError =
     trimmedName && isNameTaken(trimmedName)
-      ? "An exercise with this name is already in the library"
+      ? t.exercise.form.nameTaken
       : null;
   const canSubmit = Boolean(trimmedName) && !nameError;
 
@@ -66,14 +67,14 @@ export function CustomExerciseForm({
   return (
     <Stack>
       <TextInput
-        label="Exercise name"
+        label={t.exercise.form.name}
         required
         value={name}
         error={nameError}
         onChange={(e) => setName(e.currentTarget.value)}
       />
 
-      <Input.Wrapper label="Type" description={KIND_DESCRIPTIONS[kind]}>
+      <Input.Wrapper label={t.exercise.form.type} description={KIND_DESCRIPTIONS[kind]}>
         <SegmentedControl
           fullWidth
           mt={4}
@@ -86,8 +87,8 @@ export function CustomExerciseForm({
       </Input.Wrapper>
 
       <Select
-        label="Primary muscle"
-        placeholder="Optional"
+        label={t.exercise.form.primaryMuscle}
+        placeholder={t.exercise.form.optional}
         data={muscleOptions}
         value={primaryMuscle}
         onChange={setPrimaryMuscle}
@@ -97,19 +98,19 @@ export function CustomExerciseForm({
       />
 
       <TextInput
-        label="Equipment"
+        label={t.exercise.form.equipment}
         placeholder={
           kind === "cardio"
-            ? "Optional, e.g. treadmill"
-            : "Optional, e.g. dumbbell"
+            ? t.exercise.form.equipmentCardioPlaceholder
+            : t.exercise.form.equipmentStrengthPlaceholder
         }
         value={equipment}
         onChange={(e) => setEquipment(e.currentTarget.value)}
       />
 
       <Textarea
-        label="Description"
-        placeholder="Optional notes on how to perform it"
+        label={t.exercise.form.description}
+        placeholder={t.exercise.form.descriptionPlaceholder}
         autosize
         minRows={3}
         value={description}
@@ -122,7 +123,7 @@ export function CustomExerciseForm({
           disabled={!canSubmit}
           onClick={handleSubmit}
         >
-          Create & add
+          {t.exercise.form.submit}
         </Button>
       </Group>
     </Stack>

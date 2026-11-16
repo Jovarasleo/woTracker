@@ -3,6 +3,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 import { TextSkeleton } from "./TextSkeleton";
 import { useGoBack } from "../../hooks/shared/useGoBack";
+import { t } from "../../i18n/translations";
 
 /** Shared max width of sub-page content and its bar. */
 const CONTENT_WIDTH = "max-w-xl";
@@ -48,7 +49,7 @@ export function PageLayout({ title, subtitle, action, children }: Props) {
             variant="subtle"
             color="gray"
             size="xl"
-            aria-label="Back"
+            aria-label={t.common.back}
             onClick={goBack}
           >
             <IconArrowLeft size={22} />

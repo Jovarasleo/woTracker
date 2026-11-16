@@ -1,3 +1,4 @@
+import { t } from "../i18n/translations";
 /**
  * System notifications for the rest timer, shown through the service worker
  * (Android Chrome only allows notifications from there). Without a backend
@@ -42,14 +43,14 @@ export async function showRestOverNotification(pattern: number[]) {
   }
 
   const options: VibratingNotificationOptions = {
-    body: "Time for your next set.",
+    body: t.restTimer.notificationBody,
     tag: REST_TAG,
     renotify: true,
     vibrate: pattern,
     icon: "/icons/pwa-192x192-v2.png",
     data: { url: location.href },
   };
-  await registration.showNotification("Rest over", options);
+  await registration.showNotification(t.restTimer.restOver, options);
   return true;
 }
 

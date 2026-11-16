@@ -27,6 +27,7 @@ import {
 } from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
 import { db } from "../../store/db";
 import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
+import { t } from "../../i18n/translations";
 
 export const Route = createFileRoute("/workout/newTemplate")({
   component: NewWorkoutTemplate,
@@ -95,12 +96,12 @@ function NewWorkoutTemplate() {
   };
 
   return (
-    <PageLayout title="New workout">
+    <PageLayout title={t.templateForm.newTitle}>
       <Card component="form" noValidate onSubmit={onSubmit(saveTemplate)}>
         <Stack>
           <TextInput
             {...register("name", nameRules)}
-            label="Workout name"
+            label={t.common.workoutName}
             withAsterisk
             maxLength={WORKOUT_NAME_MAX_LENGTH}
             error={errors.name?.message}
@@ -120,7 +121,7 @@ function NewWorkoutTemplate() {
             leftSection={<IconPlus size={18} />}
             onClick={openPicker}
           >
-            Add exercise
+            {t.common.addExercise}
           </Button>
 
           <Modal
@@ -128,7 +129,7 @@ function NewWorkoutTemplate() {
             size="lg"
             opened={pickerOpened}
             onClose={closePicker}
-            title="Add exercise to this template"
+            title={t.templateForm.addExerciseTitle}
           >
             <ExerciseCreator
               customExercises={customExercises}
@@ -138,8 +139,8 @@ function NewWorkoutTemplate() {
           </Modal>
 
           <Input.Wrapper
-            label="Indicator color"
-            description="Shown as a colored tag for this workout"
+            label={t.templateForm.indicatorColor}
+            description={t.templateForm.indicatorColorDescription}
           >
             <Group gap="sm" align="center" className="mt-1 mb-2">
               <ColorSwatch color={indicatorColor} size={28} />
@@ -160,10 +161,10 @@ function NewWorkoutTemplate() {
 
           <Group justify="flex-end">
             <Button variant="default" onClick={goBack} disabled={isSubmitting}>
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button type="submit" loading={isSubmitting}>
-              Save
+              {t.common.save}
             </Button>
           </Group>
         </Stack>

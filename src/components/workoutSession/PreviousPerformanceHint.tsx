@@ -3,6 +3,7 @@ import { IconHistory } from "@tabler/icons-react";
 import type { PreviousPerformance } from "../../hooks/workoutSession/usePreviousPerformance";
 import { summarizeCardio } from "../../utils/cardio";
 import { formatDate, formatFullDate } from "../../utils/dates";
+import { t } from "../../i18n/translations";
 
 /** "60×8 · 55×10" for strength, "30 min · 5 km · 6:00/km · …" for cardio. */
 function summarizePrevious(previous: PreviousPerformance) {
@@ -29,7 +30,7 @@ export function PreviousPerformanceHint({ previous }: Props) {
     <Tooltip
       label={
         <>
-          <div>Last time: {formatFullDate(previous.date)}</div>
+          <div>{t.sets.lastTimeOn(formatFullDate(previous.date))}</div>
           <div>{summary}</div>
         </>
       }
@@ -43,7 +44,7 @@ export function PreviousPerformanceHint({ previous }: Props) {
         c="dimmed"
         className="flex min-w-0 items-center gap-1 text-left"
       >
-        <IconHistory size={12} className="shrink-0" aria-label="Last time" />
+        <IconHistory size={12} className="shrink-0" aria-label={t.sets.lastTime} />
         <span className="truncate">
           <span className="mr-2">{formatDate(previous.date)}</span>
           {summary}

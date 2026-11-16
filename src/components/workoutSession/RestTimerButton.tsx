@@ -5,6 +5,7 @@ import {
   IconPlayerStop,
   IconPlus,
 } from "@tabler/icons-react";
+import { t } from "../../i18n/translations";
 
 /** Rest lengths offered when starting the timer, in seconds. */
 const REST_OPTIONS = [60, 90, 120, 180] as const;
@@ -41,8 +42,8 @@ export function RestTimerButton({
   const label = running
     ? formatSeconds(remainingSeconds)
     : finished
-      ? "Rest over"
-      : "Rest";
+      ? t.restTimer.restOver
+      : t.restTimer.rest;
 
   return (
     <Menu position="top-end" withinPortal>
@@ -55,10 +56,10 @@ export function RestTimerButton({
           }
           aria-label={
             running
-              ? `Rest timer, ${formatSeconds(remainingSeconds)} left`
+              ? t.restTimer.runningLabel(formatSeconds(remainingSeconds))
               : finished
-                ? "Rest over, start another rest timer"
-                : "Start rest timer"
+                ? t.restTimer.finishedLabel
+                : t.restTimer.startLabel
           }
           className="tabular-nums"
         >
@@ -75,7 +76,7 @@ export function RestTimerButton({
                 leftSection={<IconPlus size={16} />}
                 onClick={() => onAdd(seconds)}
               >
-                {seconds} s
+                {t.restTimer.addSeconds(seconds)}
               </Menu.Item>
             ))}
             <Menu.Divider />
@@ -84,12 +85,12 @@ export function RestTimerButton({
               leftSection={<IconPlayerStop size={16} />}
               onClick={onStop}
             >
-              Stop
+              {t.restTimer.stop}
             </Menu.Item>
           </>
         ) : (
           <>
-            <Menu.Label>Rest for</Menu.Label>
+            <Menu.Label>{t.restTimer.restFor}</Menu.Label>
             {REST_OPTIONS.map((seconds) => (
               <Menu.Item key={seconds} onClick={() => onStart(seconds)}>
                 {formatSeconds(seconds)}

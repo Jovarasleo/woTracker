@@ -42,6 +42,7 @@ import { useRestTimer } from "../../hooks/workoutSession/useRestTimer";
 import { useWorkoutSession } from "../../hooks/workoutSession/useWorkoutSession";
 import { db } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
+import { t } from "../../i18n/translations";
 
 export const Route = createFileRoute("/session/$sessionId")({
   component: SessionPage,
@@ -114,7 +115,7 @@ function SessionPage() {
 
   if (session === null) {
     return (
-      <PageLayout title="Session not found">
+      <PageLayout title={t.session.notFoundTitle}>
         <SessionNotFound />
       </PageLayout>
     );
@@ -153,7 +154,7 @@ function SessionPage() {
       }
       onClick={() => toggleSessionMode()}
     >
-      {sessionEditable ? "Done" : "Edit"}
+      {sessionEditable ? t.common.done : t.common.edit}
     </Button>
   );
 
@@ -191,14 +192,14 @@ function SessionPage() {
                   leftSection={<IconDeviceFloppy size={16} />}
                   onClick={openSaveTemplate}
                 >
-                  Save as template
+                  {t.session.saveAsTemplate}
                 </Button>
               )}
               {sessionEditable && (
                 <ActionIcon
                   variant="subtle"
                   color="red"
-                  aria-label="Delete session"
+                  aria-label={t.session.deleteSession}
                   onClick={openDeleteConfirm}
                 >
                   <IconTrash size={18} />
@@ -211,7 +212,7 @@ function SessionPage() {
 
           {exerciseLogs.length === 0 && (
             <Text c="dimmed" className="text-left">
-              No exercises yet. Add one to start logging.
+              {t.session.noExercises}
             </Text>
           )}
 
@@ -240,7 +241,7 @@ function SessionPage() {
               leftSection={<IconPlus size={18} />}
               onClick={open}
             >
-              Add exercise
+              {t.common.addExercise}
             </Button>
           )}
         </Stack>
@@ -250,7 +251,7 @@ function SessionPage() {
           size="lg"
           opened={opened}
           onClose={close}
-          title="Add exercise to this session"
+          title={t.session.addExerciseTitle}
         >
           <ExerciseCreator
             customExercises={customExercises}

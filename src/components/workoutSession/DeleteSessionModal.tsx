@@ -1,6 +1,7 @@
 import { Button, Modal, Text } from "@mantine/core";
 import { type WorkoutSession } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
+import { t } from "../../i18n/translations";
 
 interface Props {
   session: WorkoutSession;
@@ -20,17 +21,19 @@ export function DeleteSessionModal({
   onConfirm,
 }: Props) {
   return (
-    <Modal centered opened={opened} onClose={onClose} title="Delete session?">
+    <Modal centered opened={opened} onClose={onClose} title={t.session.deleteTitle}>
       <Text size="sm" mb="md">
-        <b>{session.name}</b> from {formatDateTime(session.date)} and all its
-        logged sets will be removed. This can't be undone.
+        {t.session.deleteWarning(
+          <b>{session.name}</b>,
+          formatDateTime(session.date),
+        )}
       </Text>
       <div className="flex justify-end gap-3">
         <Button variant="default" onClick={onClose} disabled={deleting}>
-          Cancel
+          {t.common.cancel}
         </Button>
         <Button color="red" loading={deleting} onClick={onConfirm}>
-          Delete
+          {t.common.delete}
         </Button>
       </div>
     </Modal>

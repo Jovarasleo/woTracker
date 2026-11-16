@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { RecentSessions } from "./RecentSessions";
 import { SessionCalendar } from "./SessionCalendar";
 import type { WorkoutSession } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 interface Props {
   /** All sessions, newest first. */
@@ -34,9 +35,9 @@ export function SessionsOverview({ sessions, templateColorById }: Props) {
   if (!sessions.length) {
     return (
       <Paper withBorder radius="lg" p="md">
-        <Title order={4}>History</Title>
+        <Title order={4}>{t.sessionHistory.heading}</Title>
         <Text size="sm" c="dimmed" mt={4}>
-          Sessions you log will show up here and on the calendar.
+          {t.sessionHistory.emptyText}
         </Text>
       </Paper>
     );
@@ -44,7 +45,7 @@ export function SessionsOverview({ sessions, templateColorById }: Props) {
 
   return (
     <section
-      aria-label="Session history"
+      aria-label={t.sessionHistory.sectionLabel}
       className="grid grid-cols-1 items-start gap-3 md:grid-cols-2 lg:grid-cols-1"
     >
       <Paper withBorder radius="lg" p="md">

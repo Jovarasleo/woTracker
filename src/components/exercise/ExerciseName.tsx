@@ -8,6 +8,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { ExerciseOverview } from "./ExerciseOverview";
+import { t } from "../../i18n/translations";
 
 interface Props {
   name: string;
@@ -37,7 +38,7 @@ export function ExerciseName({ name, details, fw }: Props) {
       <UnstyledButton
         className="text-left"
         aria-haspopup="dialog"
-        aria-label={`${name} — show exercise details`}
+        aria-label={t.exercise.showDetails(name)}
         onClick={open}
       >
         <Text span fw={fw}>

@@ -1,6 +1,7 @@
 import { Modal } from "@mantine/core";
 import { SaveAsTemplateForm } from "./SaveAsTemplateForm";
 import { exerciseKindOf, type ExerciseLog } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 interface Props {
   opened: boolean;
@@ -22,7 +23,7 @@ export function SaveAsTemplateModal({
   onSave,
 }: Props) {
   return (
-    <Modal centered opened={opened} onClose={onClose} title="Save as template">
+    <Modal centered opened={opened} onClose={onClose} title={t.session.saveAsTemplate}>
       <SaveAsTemplateForm
         defaultName={defaultName}
         exercises={exerciseLogs.map((log) => ({

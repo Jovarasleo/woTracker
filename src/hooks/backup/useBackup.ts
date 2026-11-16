@@ -1,4 +1,5 @@
 import { db, type BackupFile } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 const BACKUP_APP_ID = "woTracker";
 
@@ -77,22 +78,20 @@ export function useBackup() {
     try {
       data = JSON.parse(await file.text());
     } catch {
-      throw new Error("This file is not valid JSON.");
+      throw new Error(t.backup.errors.invalidJson);
     }
 
     if (!isRecord(data) || !isRecord(data.tables)) {
-      throw new Error("This file is not a woTracker backup.");
+      throw new Error(t.backup.errors.notABackup);
     }
 
     if (data.app !== undefined && data.app !== BACKUP_APP_ID) {
-      throw new Error("This backup was made by a different app.");
+      throw new Error(t.backup.errors.otherApp);
     }
 
     const dbVersion = typeof data.dbVersion === "number" ? data.dbVersion : 0;
     if (toDexieVersion(dbVersion) > db.verno) {
-      throw new Error(
-        "This backup was made by a newer version of the app. Update the app and try again.",
-      );
+      throw new Error(t.backup.errors.newerVersion);
     }
 
     const knownTables = new Set(db.tables.map((table) => table.name));
@@ -104,14 +103,14 @@ export function useBackup() {
       }
 
       if (!Array.isArray(rows) || !rows.every(isRecord)) {
-        throw new Error(`Table "${name}" in this backup is malformed.`);
+        throw new Error(t.backup.errors.malformedTable(name));
       }
 
       tables[name] = rows;
     }
 
     if (Object.keys(tables).length === 0) {
-      throw new Error("This backup contains no woTracker data.");
+      throw new Error(t.backup.errors.noData);
     }
 
     return {

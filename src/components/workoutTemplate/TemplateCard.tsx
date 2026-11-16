@@ -10,6 +10,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import type { TemplateSummary } from "../../hooks/home/useHomeOverview";
 import { formatRelativeDay } from "../../utils/sessionStats";
+import { t } from "../../i18n/translations";
 
 interface Props {
   summary: TemplateSummary;
@@ -45,13 +46,13 @@ export function TemplateCard({ summary, onEdit, onDelete }: Props) {
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             <Text size="sm" c="dimmed" className="flex items-center gap-1">
               <IconList size={14} />
-              {exerciseCount} {exerciseCount === 1 ? "exercise" : "exercises"}
+              {t.common.exerciseCount(exerciseCount)}
             </Text>
             <Text size="sm" c="dimmed" className="flex items-center gap-1">
               <IconClock size={14} />
               {lastSessionDate
                 ? formatRelativeDay(lastSessionDate)
-                : "Not done yet"}
+                : t.templates.notDoneYet}
             </Text>
           </div>
         </div>
@@ -62,21 +63,21 @@ export function TemplateCard({ summary, onEdit, onDelete }: Props) {
               variant="subtle"
               color="gray"
               className="z-10"
-              aria-label={`${template.name} options`}
+              aria-label={t.templates.options(template.name)}
             >
               <IconDotsVertical size={18} stroke={1.75} />
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item leftSection={<IconPencil size={16} />} onClick={onEdit}>
-              Edit
+              {t.common.edit}
             </Menu.Item>
             <Menu.Item
               color="red"
               leftSection={<IconTrash size={16} />}
               onClick={onDelete}
             >
-              Delete
+              {t.common.delete}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
@@ -89,7 +90,7 @@ export function TemplateCard({ summary, onEdit, onDelete }: Props) {
         mt="md"
         className="flex items-center gap-1"
       >
-        Open workout
+        {t.templates.openWorkout}
         <IconChevronRight
           size={16}
           className="transition-transform group-hover:translate-x-0.5"

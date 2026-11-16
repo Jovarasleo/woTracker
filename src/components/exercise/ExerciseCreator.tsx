@@ -33,6 +33,7 @@ import { CardioBadge } from "./CardioBadge";
 import { CustomExerciseForm } from "./CustomExerciseForm";
 import { ExerciseDetails } from "./ExerciseDetails";
 import { ExerciseRowSkeleton } from "./ExerciseRowSkeleton";
+import { t } from "../../i18n/translations";
 
 const MAX_VISIBLE_RESULTS = 50;
 /** Name widths of the placeholder rows shown while the library loads. */
@@ -99,10 +100,10 @@ export function ExerciseCreator({
     >
       <Tabs.List grow className="mb-4">
         <Tabs.Tab value="library" leftSection={<IconSearch size={16} />}>
-          Library
+          {t.exercise.library}
         </Tabs.Tab>
         <Tabs.Tab value="custom" leftSection={<IconPlus size={16} />}>
-          Custom
+          {t.common.custom}
         </Tabs.Tab>
       </Tabs.List>
 
@@ -111,7 +112,7 @@ export function ExerciseCreator({
           <Group gap="xs" wrap="nowrap">
             <TextInput
               className="flex-1"
-              placeholder="Search exercises"
+              placeholder={t.exercise.search}
               leftSection={<IconSearch size={16} />}
               value={query}
               onChange={(e) => setQuery(e.currentTarget.value)}
@@ -119,7 +120,7 @@ export function ExerciseCreator({
             />
             <Select
               className="w-36"
-              placeholder="All muscles"
+              placeholder={t.exercise.allMuscles}
               data={muscleOptions}
               value={muscle}
               onChange={setMuscle}
@@ -180,7 +181,7 @@ export function ExerciseCreator({
                   <CardioBadge kind={exercise.kind} />
                   {exercise.source === "custom" && (
                     <Badge size="xs" variant="light">
-                      Custom
+                      {t.common.custom}
                     </Badge>
                   )}
                   <IconChevronRight size={16} className="shrink-0 opacity-50" />
@@ -191,22 +192,21 @@ export function ExerciseCreator({
 
           {results.length > MAX_VISIBLE_RESULTS && (
             <Text size="xs" c="dimmed">
-              Showing {MAX_VISIBLE_RESULTS} of {results.length} — refine your
-              search to see more
+              {t.exercise.showingSome(MAX_VISIBLE_RESULTS, results.length)}
             </Text>
           )}
 
           {!loading && results.length === 0 && (
             <Stack gap="xs" align="center" className="py-4">
               <Text size="sm" c="dimmed">
-                No exercises found
+                {t.exercise.noneFound}
               </Text>
               <Button
                 variant="light"
                 leftSection={<IconPlus size={18} />}
                 onClick={() => setTab("custom")}
               >
-                Create custom exercise
+                {t.exercise.createCustom}
               </Button>
             </Stack>
           )}

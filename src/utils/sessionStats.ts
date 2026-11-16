@@ -1,6 +1,7 @@
 import dayjs, { type Dayjs } from "dayjs";
 import type { WorkoutSession } from "../store/db";
 import { formatDate } from "./dates";
+import { t } from "../i18n/translations";
 
 export interface SessionStats {
   thisWeek: number;
@@ -80,23 +81,23 @@ export function formatRelativeDay(date: string, now: Dayjs = dayjs()): string {
   const days = now.startOf("day").diff(dayjs(date).startOf("day"), "day");
 
   if (days <= 0) {
-    return "Today";
+    return t.relativeDay.today;
   }
 
   if (days === 1) {
-    return "Yesterday";
+    return t.relativeDay.yesterday;
   }
 
   if (days < 7) {
-    return `${days} days ago`;
+    return t.relativeDay.daysAgo(days);
   }
 
   if (days < 14) {
-    return "Last week";
+    return t.relativeDay.lastWeek;
   }
 
   if (days < 30) {
-    return `${Math.floor(days / 7)} weeks ago`;
+    return t.relativeDay.weeksAgo(Math.floor(days / 7));
   }
 
   return formatDate(date);
@@ -106,16 +107,16 @@ export function formatRelativeDay(date: string, now: Dayjs = dayjs()): string {
 export function greetingFor(now: Dayjs = dayjs()): string {
   const hour = now.hour();
   if (hour < 5) {
-    return "Late night session?";
+    return t.home.greeting.lateNight;
   }
 
   if (hour < 12) {
-    return "Good morning";
+    return t.home.greeting.morning;
   }
 
   if (hour < 18) {
-    return "Good afternoon";
+    return t.home.greeting.afternoon;
   }
 
-  return "Good evening";
+  return t.home.greeting.evening;
 }

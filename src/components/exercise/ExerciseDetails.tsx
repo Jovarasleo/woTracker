@@ -2,6 +2,7 @@ import { Button, Group, Stack, Title } from "@mantine/core";
 import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { ExerciseOverview } from "./ExerciseOverview";
+import { t } from "../../i18n/translations";
 
 interface Props {
   exercise: LibraryExercise;
@@ -24,13 +25,13 @@ export function ExerciseDetails({ exercise, onBack, onAdd }: Props) {
           leftSection={<IconArrowLeft size={18} />}
           onClick={onBack}
         >
-          Back
+          {t.common.back}
         </Button>
         <Button
           leftSection={<IconPlus size={18} />}
           onClick={() => onAdd(exercise)}
         >
-          Add
+          {t.common.add}
         </Button>
       </Group>
     </Stack>

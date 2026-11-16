@@ -159,6 +159,13 @@ kit) for something the stack above already handles.
   for repeated "add" actions inside content (Add exercise, + Set);
   `variant="subtle"` only for icon buttons.
 - Use **sentence case** for all labels and buttons ("Add exercise", "Workout name").
+- **No hardcoded UI text.** Every user-visible string (labels, placeholders,
+  `aria-label`s, validation and error messages, notifications) lives in
+  `src/i18n/translations.ts` and is read through `t` (`t.common.cancel`).
+  Text that includes values is a function (`t.common.exerciseCount(3)`);
+  put the whole sentence in the function rather than gluing fragments
+  together in the component, so other languages can reorder it. Reuse
+  `t.common` keys for words that repeat across pages.
 - Sub-pages (anything below home) are wrapped in **`PageLayout`**: it provides the
   back button/title bar (bottom on phones, top from `sm`) and the shared content
   width — don't set page widths yourself.

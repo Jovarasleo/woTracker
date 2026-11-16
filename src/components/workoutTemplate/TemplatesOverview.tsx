@@ -12,6 +12,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { TemplateCard } from "./TemplateCard";
 import type { TemplateSummary } from "../../hooks/home/useHomeOverview";
+import { t } from "../../i18n/translations";
 
 interface Props {
   templates: TemplateSummary[];
@@ -56,7 +57,7 @@ export function TemplatesOverview({
     <section aria-labelledby="templates-heading">
       <div className="mb-3 flex items-center gap-2">
         <Title order={3} id="templates-heading">
-          Workouts
+          {t.templates.heading}
         </Title>
         {templates.length > 0 && (
           <Badge variant="light" color="gray" radius="sm">
@@ -72,7 +73,7 @@ export function TemplatesOverview({
             loading={startingQuickWorkout}
             onClick={onStartQuickWorkout}
           >
-            Quick workout
+            {t.templates.quickWorkout}
           </Button>
         )}
       </div>
@@ -88,10 +89,9 @@ export function TemplatesOverview({
             <IconBarbell size={30} />
           </ThemeIcon>
           <div>
-            <Text fw={600}>No workouts yet</Text>
+            <Text fw={600}>{t.templates.emptyTitle}</Text>
             <Text size="sm" c="dimmed">
-              Create a workout template to start logging sessions, or jump
-              straight into a quick workout.
+              {t.templates.emptyText}
             </Text>
           </div>
           <div className="flex flex-wrap justify-center gap-3 mt-5">
@@ -101,7 +101,7 @@ export function TemplatesOverview({
               to="/workout/newTemplate"
               leftSection={<IconPlus size={18} />}
             >
-              Create workout
+              {t.templates.createWorkout}
             </Button>
             <Button
               variant="default"
@@ -109,7 +109,7 @@ export function TemplatesOverview({
               loading={startingQuickWorkout}
               onClick={onStartQuickWorkout}
             >
-              Quick workout
+              {t.templates.quickWorkout}
             </Button>
           </div>
         </Paper>
@@ -136,11 +136,10 @@ export function TemplatesOverview({
         centered
         opened={pendingDelete !== null}
         onClose={() => !deleting && setPendingDelete(null)}
-        title="Delete workout template?"
+        title={t.templates.deleteTitle}
       >
         <Text size="sm" mb="md">
-          <b>{pendingDelete?.template.name}</b> and its exercise list will be
-          removed. Sessions you already logged are kept.
+          {t.templates.deleteWarning(<b>{pendingDelete?.template.name}</b>)}
         </Text>
         <div className="flex justify-end gap-3">
           <Button
@@ -148,10 +147,10 @@ export function TemplatesOverview({
             onClick={() => setPendingDelete(null)}
             disabled={deleting}
           >
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button color="red" loading={deleting} onClick={handleConfirmDelete}>
-            Delete
+            {t.common.delete}
           </Button>
         </div>
       </Modal>

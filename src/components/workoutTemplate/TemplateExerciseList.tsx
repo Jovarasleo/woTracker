@@ -15,6 +15,7 @@ import type {
 } from "react-hook-form";
 import { CardioBadge } from "../exercise/CardioBadge";
 import type { WorkoutTemplateFormValues } from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
+import { t } from "../../i18n/translations";
 
 interface Props {
   fields: FieldArrayWithId<WorkoutTemplateFormValues, "exercises">[];
@@ -46,7 +47,7 @@ export function TemplateExerciseList({
 
   return (
     <Input.Wrapper
-      label="Exercises"
+      label={t.common.exercises}
       withAsterisk
       error={errors?.message ?? errors?.root?.message}
       classNames={{ label: "block text-left", error: "text-left" }}
@@ -54,7 +55,7 @@ export function TemplateExerciseList({
       <Stack gap="xs" mt={4} mb={errors?.message ? 4 : 0}>
         {fields.length === 0 && (
           <Text size="sm" c="dimmed" className="text-left">
-            No exercises yet.
+            {t.templateForm.noExercises}
           </Text>
         )}
 
@@ -63,14 +64,14 @@ export function TemplateExerciseList({
             <TextInput
               {...register(`exercises.${index}.name`, nameRules)}
               className="grow"
-              aria-label={`Exercise ${index + 1}`}
-              placeholder={`Exercise ${index + 1}`}
+              aria-label={t.templateForm.exerciseNumber(index + 1)}
+              placeholder={t.templateForm.exerciseNumber(index + 1)}
               error={errors?.[index]?.name?.message}
               rightSection={<CardioBadge kind={field.kind} />}
               rightSectionWidth={field.kind === "cardio" ? 64 : undefined}
             />
             <Tooltip
-              label="A workout needs at least one exercise"
+              label={t.templateForm.needsOneExercise}
               disabled={canRemove}
             >
               {/* Wrapper so the tooltip still works on a disabled button */}
@@ -78,7 +79,7 @@ export function TemplateExerciseList({
                 <ActionIcon
                   variant="subtle"
                   color="red"
-                  aria-label="Remove exercise"
+                  aria-label={t.common.removeExercise}
                   disabled={!canRemove}
                   onClick={() => onRemove(index)}
                 >

@@ -8,21 +8,11 @@ import {
 import { StatTile } from "./StatTile";
 import type { WorkoutSession } from "../../store/db";
 import { computeSessionStats } from "../../utils/sessionStats";
+import { t } from "../../i18n/translations";
 
 interface Props {
   sessions: WorkoutSession[];
 }
-
-const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"] as const;
-const WEEKDAY_NAMES = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-] as const;
 
 /** Row of training metrics: this week (with day dots), month, streak, total. */
 export function StatsOverview({ sessions }: Props) {
@@ -31,18 +21,21 @@ export function StatsOverview({ sessions }: Props) {
 
   return (
     <section
-      aria-label="Training stats"
+      aria-label={t.stats.sectionLabel}
       className="grid grid-cols-2 sm:grid-cols-4 gap-3"
     >
       <StatTile
-        label="This week"
+        label={t.stats.thisWeek}
         value={stats.thisWeek}
         color="blue"
         icon={<IconCalendarWeek size={iconSize} />}
       >
         <div className="mt-2 flex gap-1" aria-hidden>
           {stats.weekDays.map((trained, index) => (
-            <Tooltip key={WEEKDAY_NAMES[index]} label={WEEKDAY_NAMES[index]}>
+            <Tooltip
+              key={t.stats.weekdayNames[index]}
+              label={t.stats.weekdayNames[index]}
+            >
               <span
                 className={`flex h-5 flex-1 items-center justify-center rounded text-[10px] font-semibold ${
                   trained
@@ -50,40 +43,40 @@ export function StatsOverview({ sessions }: Props) {
                     : "bg-white/5 text-gray-500"
                 }`}
               >
-                {WEEKDAY_LABELS[index]}
+                {t.stats.weekdayLetters[index]}
               </span>
             </Tooltip>
           ))}
         </div>
       </StatTile>
       <StatTile
-        label="This month"
+        label={t.stats.thisMonth}
         value={stats.thisMonth}
         color="teal"
         icon={<IconCalendarMonth size={iconSize} />}
       >
         <Text size="xs" c="dimmed" mt="xs">
-          sessions logged
+          {t.stats.sessionsLogged}
         </Text>
       </StatTile>
       <StatTile
-        label="Week streak"
+        label={t.stats.weekStreak}
         value={stats.weekStreak}
         color="orange"
         icon={<IconFlame size={iconSize} />}
       >
         <Text size="xs" c="dimmed" mt="xs">
-          {stats.weekStreak === 1 ? "week" : "weeks"} in a row
+          {t.stats.weeksInARow(stats.weekStreak)}
         </Text>
       </StatTile>
       <StatTile
-        label="All time"
+        label={t.stats.allTime}
         value={stats.total}
         color="grape"
         icon={<IconTrophy size={iconSize} />}
       >
         <Text size="xs" c="dimmed" mt="xs">
-          total sessions
+          {t.stats.totalSessions}
         </Text>
       </StatTile>
     </section>

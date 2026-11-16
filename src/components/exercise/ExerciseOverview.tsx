@@ -8,6 +8,7 @@ import {
   Text,
 } from "@mantine/core";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
+import { t } from "../../i18n/translations";
 
 interface Props {
   exercise: LibraryExercise;
@@ -16,8 +17,9 @@ interface Props {
 /** Tags, pictures, muscles and how-to of a library or custom exercise. */
 export function ExerciseOverview({ exercise }: Props) {
   const tags = [
-    exercise.source === "custom" ? "custom" : null,
-    exercise.category ?? (exercise.kind === "cardio" ? "cardio" : null),
+    exercise.source === "custom" ? t.common.custom : null,
+    exercise.category ??
+      (exercise.kind === "cardio" ? t.common.cardio : null),
     exercise.level,
     exercise.equipment,
   ].filter((tag): tag is string => Boolean(tag));
@@ -40,7 +42,7 @@ export function ExerciseOverview({ exercise }: Props) {
             <Image
               key={url}
               src={url}
-              alt={`${exercise.name} — step ${index + 1}`}
+              alt={t.exercise.imageAlt(exercise.name, index + 1)}
               radius="sm"
               loading="lazy"
             />
@@ -51,7 +53,7 @@ export function ExerciseOverview({ exercise }: Props) {
       {exercise.primaryMuscles.length > 0 && (
         <Text size="sm" className="text-left capitalize">
           <Text span c="dimmed" size="sm">
-            Muscles:{" "}
+            {t.exercise.muscles}{" "}
           </Text>
           {[...exercise.primaryMuscles, ...exercise.secondaryMuscles].join(
             ", ",

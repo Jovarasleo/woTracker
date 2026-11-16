@@ -2,6 +2,7 @@ import { Card, Divider, Skeleton, Stack } from "@mantine/core";
 import { Fragment } from "react";
 import { SetRowSkeleton } from "./SetRowSkeleton";
 import { TextSkeleton } from "../shared/TextSkeleton";
+import { t } from "../../i18n/translations";
 
 const PLACEHOLDER_EXERCISES = 2;
 
@@ -11,7 +12,7 @@ const PLACEHOLDER_EXERCISES = 2;
  */
 export function SessionSkeleton() {
   return (
-    <Card aria-busy aria-label="Loading session">
+    <Card aria-busy aria-label={t.session.loading}>
       <Stack>
         <div>
           <TextSkeleton order={3} width="55%" />

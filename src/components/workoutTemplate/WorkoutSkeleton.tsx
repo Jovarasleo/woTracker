@@ -1,5 +1,6 @@
 import { Card, Group, Skeleton, Stack } from "@mantine/core";
 import { TextSkeleton } from "../shared/TextSkeleton";
+import { t } from "../../i18n/translations";
 
 const PLACEHOLDER_EXERCISES = 4;
 
@@ -9,7 +10,7 @@ const PLACEHOLDER_EXERCISES = 4;
  */
 export function WorkoutSkeleton() {
   return (
-    <Stack gap="md" aria-busy aria-label="Loading workout">
+    <Stack gap="md" aria-busy aria-label={t.workout.loading}>
       <Card>
         <Group gap="sm" align="center" wrap="nowrap">
           <Skeleton height={32} width={32} circle />

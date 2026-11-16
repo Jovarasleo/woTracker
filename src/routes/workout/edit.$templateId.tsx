@@ -30,6 +30,7 @@ import {
 import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
 import { db, exerciseKindOf } from "../../store/db";
 import { INDICATOR_COLORS } from "../../utils/colors";
+import { t } from "../../i18n/translations";
 
 export const Route = createFileRoute("/workout/edit/$templateId")({
   component: EditTemplatePage,
@@ -129,12 +130,12 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
   };
 
   return (
-    <PageLayout title="Edit workout" subtitle={template.name}>
+    <PageLayout title={t.templateForm.editTitle} subtitle={template.name}>
       <Card component="form" noValidate onSubmit={onSubmit(handleSave)}>
         <Stack>
           <TextInput
             {...register("name", nameRules)}
-            label="Workout name"
+            label={t.common.workoutName}
             withAsterisk
             maxLength={WORKOUT_NAME_MAX_LENGTH}
             error={errors.name?.message}
@@ -154,7 +155,7 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
             leftSection={<IconPlus size={18} />}
             onClick={openPicker}
           >
-            Add exercise
+            {t.common.addExercise}
           </Button>
 
           <Modal
@@ -162,7 +163,7 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
             size="lg"
             opened={pickerOpened}
             onClose={closePicker}
-            title="Add exercise to this template"
+            title={t.templateForm.addExerciseTitle}
           >
             <ExerciseCreator
               customExercises={customExercises}
@@ -172,8 +173,8 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
           </Modal>
 
           <Input.Wrapper
-            label="Indicator color"
-            description="Shown as a colored tag for this workout"
+            label={t.templateForm.indicatorColor}
+            description={t.templateForm.indicatorColorDescription}
           >
             <Group gap="sm" align="center" className="mt-1 mb-2">
               <ColorSwatch color={indicatorColor} size={28} />
@@ -194,10 +195,10 @@ function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {
 
           <Group justify="flex-end">
             <Button variant="default" onClick={handleCancel}>
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button type="submit" loading={isSubmitting}>
-              Save
+              {t.common.save}
             </Button>
           </Group>
         </Stack>

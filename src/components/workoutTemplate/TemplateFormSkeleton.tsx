@@ -1,5 +1,6 @@
 import { Card, Group, Skeleton, Stack } from "@mantine/core";
 import { TextSkeleton } from "../shared/TextSkeleton";
+import { t } from "../../i18n/translations";
 
 const PLACEHOLDER_EXERCISES = 3;
 
@@ -9,7 +10,7 @@ const PLACEHOLDER_EXERCISES = 3;
  */
 export function TemplateFormSkeleton() {
   return (
-    <Card aria-busy aria-label="Loading workout">
+    <Card aria-busy aria-label={t.workout.loading}>
       <Stack>
         <div>
           <TextSkeleton size="sm" width={110} />

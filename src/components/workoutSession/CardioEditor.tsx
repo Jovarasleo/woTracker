@@ -2,6 +2,7 @@ import { ActionIcon, Group, NumberInput, Text } from "@mantine/core";
 import { IconCheck, IconEdit } from "@tabler/icons-react";
 import { type CardioMetrics } from "../../store/db";
 import { formatPace } from "../../utils/cardio";
+import { t } from "../../i18n/translations";
 
 interface Props {
   metrics: CardioMetrics;
@@ -22,22 +23,22 @@ interface FieldConfig {
 const MAIN_FIELDS: FieldConfig[] = [
   {
     key: "durationMinutes",
-    label: "Duration (min)",
+    label: t.cardio.duration,
     decimalScale: 1,
     min: 0,
   },
   {
     key: "distanceKm",
-    label: "Distance (km)",
+    label: t.cardio.distance,
     decimalScale: 2,
     min: 0,
   },
 ];
 
 const EXTRA_FIELDS: FieldConfig[] = [
-  { key: "calories", label: "kcal", min: 0 },
-  { key: "avgHeartRate", label: "HR (bpm)", min: 0, max: 250 },
-  { key: "rpe", label: "RPE (1–10)", min: 1, max: 10 },
+  { key: "calories", label: t.cardio.calories, min: 0 },
+  { key: "avgHeartRate", label: t.cardio.heartRate, min: 0, max: 250 },
+  { key: "rpe", label: t.cardio.rpe, min: 1, max: 10 },
 ];
 
 /** Empty input clears the value instead of saving 0. */
@@ -84,7 +85,7 @@ export function CardioEditor({
           variant="subtle"
           size="lg"
           mb={2}
-          aria-label={disabled ? "Edit cardio" : "Confirm cardio"}
+          aria-label={disabled ? t.cardio.edit : t.cardio.confirm}
           onClick={onToggleEdit}
         >
           {disabled ? <IconEdit size={18} /> : <IconCheck size={18} />}
@@ -98,7 +99,7 @@ export function CardioEditor({
 
       {pace && (
         <Text size="xs" c="dimmed" className="text-left">
-          Pace {pace}
+          {t.cardio.pace(pace)}
         </Text>
       )}
     </>

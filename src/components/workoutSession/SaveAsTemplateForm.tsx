@@ -4,6 +4,7 @@ import {
   WORKOUT_NAME_MAX_LENGTH,
   type TemplateExerciseValue,
 } from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
+import { t } from "../../i18n/translations";
 
 interface Props {
   defaultName: string;
@@ -25,19 +26,17 @@ export function SaveAsTemplateForm({
   const { register, onSubmit, errors, isSubmitting, nameRules } =
     useWorkoutTemplateForm({ name: defaultName, exercises });
 
-  const exerciseCount = `${exercises.length} ${
-    exercises.length === 1 ? "exercise" : "exercises"
-  }`;
-
   return (
     <form noValidate onSubmit={onSubmit(({ name }) => onSave(name))}>
       <Stack>
         <Text size="sm">
-          Saves this session's {exerciseCount} as a workout you can start again.
+          {t.session.saveAsTemplateText(
+            t.common.exerciseCount(exercises.length),
+          )}
         </Text>
         <TextInput
           {...register("name", nameRules)}
-          label="Workout name"
+          label={t.common.workoutName}
           withAsterisk
           maxLength={WORKOUT_NAME_MAX_LENGTH}
           error={errors.name?.message}
@@ -45,10 +44,10 @@ export function SaveAsTemplateForm({
         />
         <div className="flex justify-end gap-3">
           <Button variant="default" onClick={onCancel} disabled={isSubmitting}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button type="submit" loading={isSubmitting}>
-            Save
+            {t.common.save}
           </Button>
         </div>
       </Stack>

@@ -7,6 +7,7 @@ import {
   type SubmitHandler,
 } from "react-hook-form";
 import { db, type ExerciseKind } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 export const WORKOUT_NAME_MAX_LENGTH = 50;
 
@@ -23,14 +24,12 @@ export interface WorkoutTemplateFormValues {
   exercises: TemplateExerciseValue[];
 }
 
-const NO_EXERCISES_MESSAGE = "Add at least one exercise";
-
 const exerciseNameRules: RegisterOptions<
   WorkoutTemplateFormValues,
   `exercises.${number}.name`
 > = {
   setValueAs: (value: string) => value.trim(),
-  required: "Exercise name is required",
+  required: t.templateForm.errors.exerciseNameRequired,
 };
 
 /**
@@ -96,7 +95,7 @@ export function useWorkoutTemplateForm(
       if (!hasExercises) {
         setError("exercises", {
           type: "required",
-          message: NO_EXERCISES_MESSAGE,
+          message: t.templateForm.errors.noExercises,
         });
       }
     };
@@ -111,15 +110,15 @@ export function useWorkoutTemplateForm(
 
   const nameRules: RegisterOptions<WorkoutTemplateFormValues, "name"> = {
     setValueAs: (value: string) => value.trim(),
-    required: "Workout name is required",
+    required: t.templateForm.errors.nameRequired,
     maxLength: {
       value: WORKOUT_NAME_MAX_LENGTH,
-      message: `Keep it under ${WORKOUT_NAME_MAX_LENGTH} characters`,
+      message: t.templateForm.errors.nameTooLong(WORKOUT_NAME_MAX_LENGTH),
     },
     validate: {
       unique: (name) =>
         !otherNames?.includes(name.toLowerCase()) ||
-        "A workout with this name already exists",
+        t.templateForm.errors.nameTaken,
     },
   };
 

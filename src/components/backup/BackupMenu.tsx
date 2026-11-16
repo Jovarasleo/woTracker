@@ -13,12 +13,13 @@ import { useRef, useState } from "react";
 import { countBackupRows, useBackup } from "../../hooks/backup/useBackup";
 import { type BackupFile } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
+import { t } from "../../i18n/translations";
 
 type Feedback = { type: "success" | "error"; message: string };
 
 function formatCounts(counts: Record<string, number>) {
   return Object.entries(counts)
-    .map(([table, count]) => `${table}: ${count}`)
+    .map(([table, count]) => t.backup.tableCount(table, count))
     .join(", ");
 }
 
@@ -47,12 +48,12 @@ export function BackupMenu() {
       const counts = await exportBackup();
       setFeedback({
         type: "success",
-        message: `Backup downloaded (${formatCounts(counts)}).`,
+        message: t.backup.exported(formatCounts(counts)),
       });
     } catch (error) {
       setFeedback({
         type: "error",
-        message: `Export failed: ${String(error)}`,
+        message: t.backup.exportFailed(String(error)),
       });
     }
   };
@@ -83,13 +84,12 @@ export function BackupMenu() {
       await restoreBackup(pendingBackup);
       setFeedback({
         type: "success",
-        message:
-          "Backup restored. Your previous data was downloaded as wotracker-before-import.",
+        message: t.backup.restored,
       });
     } catch (error) {
       setFeedback({
         type: "error",
-        message: `Import failed, no data was changed: ${String(error)}`,
+        message: t.backup.importFailed(String(error)),
       });
     } finally {
       setPendingBackup(null);
@@ -108,16 +108,16 @@ export function BackupMenu() {
             justify="flex-start"
             leftSection={<IconDatabase size={18} />}
           >
-            Backup and restore
+            {t.backup.menuButton}
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Label>Backup</Menu.Label>
+          <Menu.Label>{t.backup.menuLabel}</Menu.Label>
           <Menu.Item
             leftSection={<IconDownload size={16} />}
             onClick={handleExport}
           >
-            Export data
+            {t.backup.export}
           </Menu.Item>
           <FileButton
             resetRef={resetFileRef}
@@ -126,7 +126,7 @@ export function BackupMenu() {
           >
             {(props) => (
               <Menu.Item leftSection={<IconUpload size={16} />} {...props}>
-                Import data
+                {t.backup.import}
               </Menu.Item>
             )}
           </FileButton>
@@ -137,33 +137,35 @@ export function BackupMenu() {
         centered
         opened={pendingBackup !== null || feedback !== null}
         onClose={closeModal}
-        title={pendingBackup ? "Restore backup?" : "Backup"}
+        title={
+          pendingBackup ? t.backup.restoreTitle : t.backup.feedbackTitle
+        }
       >
         {pendingBackup ? (
           <Stack>
             <Text size="sm">
-              This replaces <b>all</b> current workouts, sessions and sets with
-              the backup from{" "}
-              {pendingBackup.exportedAt === "unknown"
-                ? "an unknown date"
-                : formatDateTime(pendingBackup.exportedAt)}
-              . Your current data is downloaded as a file first.
+              {t.backup.restoreWarning(
+                (text) => <b>{text}</b>,
+                pendingBackup.exportedAt === "unknown"
+                  ? t.backup.unknownDate
+                  : formatDateTime(pendingBackup.exportedAt),
+              )}
             </Text>
             <List size="sm" className="list-disc">
               {Object.entries(countBackupRows(pendingBackup)).map(
                 ([table, count]) => (
                   <List.Item key={table}>
-                    {table}: {count}
+                    {t.backup.tableCount(table, count)}
                   </List.Item>
                 ),
               )}
             </List>
             <Group justify="flex-end">
               <Button variant="default" onClick={closeModal} disabled={busy}>
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button color="red" loading={busy} onClick={handleConfirmImport}>
-                Replace data
+                {t.backup.replaceData}
               </Button>
             </Group>
           </Stack>
@@ -173,7 +175,7 @@ export function BackupMenu() {
               {feedback?.message}
             </Text>
             <Group justify="flex-end">
-              <Button onClick={closeModal}>OK</Button>
+              <Button onClick={closeModal}>{t.common.ok}</Button>
             </Group>
           </Stack>
         )}

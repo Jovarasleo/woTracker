@@ -1,6 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type CardioMetrics, type ExerciseLog } from "../../store/db";
 import { type UndoAction } from "../shared/useUndo";
+import { t } from "../../i18n/translations";
 
 interface Options {
   /** Called after a set is deleted, with how to restore it. */
@@ -70,9 +71,7 @@ export function useExerciseLogEditor(
     const position = (sets?.findIndex((s) => s.id === setId) ?? -1) + 1;
 
     onDeleted?.({
-      message: position
-        ? `${exercise.name} · set ${position} removed`
-        : `${exercise.name} · set removed`,
+      message: t.session.setRemoved(exercise.name, position),
       undo: () => db.setLogs.put(set),
     });
   };

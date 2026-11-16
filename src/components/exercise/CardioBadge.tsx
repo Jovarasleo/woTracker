@@ -1,5 +1,6 @@
 import { Badge } from "@mantine/core";
 import { type ExerciseKind } from "../../store/db";
+import { t } from "../../i18n/translations";
 
 interface Props {
   kind: ExerciseKind;
@@ -13,7 +14,7 @@ export function CardioBadge({ kind }: Props) {
 
   return (
     <Badge size="xs" variant="light" color="teal" className="shrink-0">
-      Cardio
+      {t.common.cardio}
     </Badge>
   );
 }

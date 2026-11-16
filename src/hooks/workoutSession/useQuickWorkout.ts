@@ -2,9 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { db } from "../../store/db";
 import { randomIndicatorColor } from "../../utils/colors";
-
-/** Name of a session started without a template, until it is saved as one. */
-export const QUICK_WORKOUT_NAME = "Quick workout";
+import { t } from "../../i18n/translations";
 
 /** Starts an empty session that isn't based on a template, and opens it. */
 export function useQuickWorkout() {
@@ -20,7 +18,7 @@ export function useQuickWorkout() {
     setStarting(true);
     try {
       const sessionId = await db.workoutSessions.add({
-        name: QUICK_WORKOUT_NAME,
+        name: t.session.quickWorkoutName,
         date: new Date().toISOString(),
         indicatorColor: randomIndicatorColor(),
       });

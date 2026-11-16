@@ -10,6 +10,7 @@ import { TemplatesOverview } from "../components/workoutTemplate/TemplatesOvervi
 import { loadHomeOverview, useHomeOverview } from "../hooks/home/useHomeOverview";
 import { useQuickWorkout } from "../hooks/workoutSession/useQuickWorkout";
 import { greetingFor } from "../utils/sessionStats";
+import { t } from "../i18n/translations";
 
 interface IndexSearch {
   /** Calendar month currently displayed, in `YYYY-MM` format. */
@@ -58,14 +59,14 @@ function Index() {
             leftSection={<IconPlus size={18} />}
             visibleFrom="sm"
           >
-            New workout
+            {t.home.newWorkout}
           </Button>
           <ActionIcon
             component={Link}
             tabIndex={0}
             to="/workout/newTemplate"
             size="input-md"
-            aria-label="New workout"
+            aria-label={t.home.newWorkout}
             hiddenFrom="sm"
           >
             <IconPlus size={20} />

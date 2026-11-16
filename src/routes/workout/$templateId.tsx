@@ -25,6 +25,7 @@ import { useExerciseLookup } from "../../hooks/exercise/useExerciseLookup";
 import { useExercise } from "../../hooks/workoutSession/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
 import { formatDate } from "../../utils/dates";
+import { t } from "../../i18n/translations";
 
 export const Route = createFileRoute("/workout/$templateId")({
   component: WorkoutPage,
@@ -120,9 +121,7 @@ function WorkoutPage() {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )[0];
 
-  const exerciseCountLabel = `${exerciseTemplates.length} ${
-    exerciseTemplates.length === 1 ? "exercise" : "exercises"
-  }`;
+  const exerciseCountLabel = t.common.exerciseCount(exerciseTemplates.length);
 
   return (
     <PageLayout
@@ -139,7 +138,7 @@ function WorkoutPage() {
             })
           }
         >
-          Edit
+          {t.common.edit}
         </Button>
       }
     >
@@ -159,13 +158,12 @@ function WorkoutPage() {
             <IconCalendarEvent size={16} className="text-gray-400" />
             <Text size="sm" c="dimmed">
               {lastSession
-                ? `Last performed ${formatDate(lastSession.date)}`
-                : "Not performed yet"}
+                ? t.workout.lastPerformed(formatDate(lastSession.date))
+                : t.workout.notPerformedYet}
             </Text>
             {sessions.length > 0 && (
               <Badge variant="light" color={template.indicatorColor}>
-                {sessions.length}{" "}
-                {sessions.length === 1 ? "session" : "sessions"}
+                {t.workout.sessionCount(sessions.length)}
               </Badge>
             )}
           </Group>
@@ -173,7 +171,7 @@ function WorkoutPage() {
 
         <Card padding="md">
           <Title order={4} mb="sm">
-            Exercises
+            {t.common.exercises}
           </Title>
           <Stack gap={0}>
             {exerciseTemplates.map((exercise, index) => (
@@ -210,7 +208,7 @@ function WorkoutPage() {
           loading={starting}
           onClick={startSession}
         >
-          Start session
+          {t.workout.startSession}
         </Button>
       </Stack>
     </PageLayout>
