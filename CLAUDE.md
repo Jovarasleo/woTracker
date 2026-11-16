@@ -94,7 +94,9 @@ kit) for something the stack above already handles.
 ## Data & Persistence (Dexie)
 
 - **All reads and writes go through `db` from `src/store/db.ts`.** Do not touch
-  IndexedDB or `localStorage` directly.
+  IndexedDB or `localStorage` directly. The one exception is the UI language
+  (`src/i18n/translations.ts`), which must be read synchronously before the
+  first render.
 - Read reactive data with **`useLiveQuery`** so the UI updates automatically. Pass a
   correct dependency array (e.g. `[numericSessionId]`) just like React hooks.
 - Every DB operation is **`async`/`await`**. Mutation helpers return the new record id
@@ -160,8 +162,12 @@ kit) for something the stack above already handles.
   `variant="subtle"` only for icon buttons.
 - Use **sentence case** for all labels and buttons ("Add exercise", "Workout name").
 - **No hardcoded UI text.** Every user-visible string (labels, placeholders,
-  `aria-label`s, validation and error messages, notifications) lives in
-  `src/i18n/translations.ts` and is read through `t` (`t.common.cancel`).
+  `aria-label`s, validation and error messages, notifications) lives in the
+  language files under `src/i18n/` (`en.ts` defines the `Translations` shape,
+  `lt.ts` must match it — add every new key to both) and is read through `t`
+  from `src/i18n/translations.ts` (`t.common.cancel`). Read `t` at render
+  time, never copy its strings into module-level constants, or they won't
+  change with the language.
   Text that includes values is a function (`t.common.exerciseCount(3)`);
   put the whole sentence in the function rather than gluing fragments
   together in the component, so other languages can reorder it. Reuse

@@ -24,13 +24,15 @@ export interface WorkoutTemplateFormValues {
   exercises: TemplateExerciseValue[];
 }
 
-const exerciseNameRules: RegisterOptions<
+// A function, so the message reads `t` at render time (in the current
+// language).
+const exerciseNameRules = (): RegisterOptions<
   WorkoutTemplateFormValues,
   `exercises.${number}.name`
-> = {
+> => ({
   setValueAs: (value: string) => value.trim(),
   required: t.templateForm.errors.exerciseNameRequired,
-};
+});
 
 /**
  * react-hook-form setup shared by the create and edit template pages.
@@ -128,7 +130,7 @@ export function useWorkoutTemplateForm(
     errors,
     isSubmitting,
     nameRules,
-    exerciseNameRules,
+    exerciseNameRules: exerciseNameRules(),
     exerciseFields,
     appendExercise,
     removeExercise,

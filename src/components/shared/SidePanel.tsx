@@ -1,10 +1,20 @@
-import { Burger, Drawer, Stack } from "@mantine/core";
+import { Burger, Drawer, Input, SegmentedControl, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { BackupMenu } from "../backup/BackupMenu";
-import { t } from "../../i18n/translations";
+import { useLanguage } from "../../hooks/shared/useLanguage";
+import { LANGUAGES, t } from "../../i18n/translations";
 
 export function SidePanel() {
   const [opened, { toggle, close }] = useDisclosure(false);
+  const { language, setLanguage } = useLanguage();
+
+  const handleLanguageChange = (value: string) => {
+    const option = LANGUAGES.find((candidate) => candidate.value === value);
+
+    if (option) {
+      setLanguage(option.value);
+    }
+  };
 
   return (
     <>
@@ -22,6 +32,15 @@ export function SidePanel() {
       >
         <Stack>
           <BackupMenu />
+          <Input.Wrapper label={t.sidePanel.language}>
+            <SegmentedControl
+              fullWidth
+              mt={4}
+              data={LANGUAGES}
+              value={language}
+              onChange={handleLanguageChange}
+            />
+          </Input.Wrapper>
         </Stack>
       </Drawer>
     </>

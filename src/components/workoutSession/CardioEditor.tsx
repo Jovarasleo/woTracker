@@ -20,7 +20,8 @@ interface FieldConfig {
   max?: number;
 }
 
-const MAIN_FIELDS: FieldConfig[] = [
+// Functions, so the labels read `t` at render time (in the current language).
+const mainFields = (): FieldConfig[] => [
   {
     key: "durationMinutes",
     label: t.cardio.duration,
@@ -35,7 +36,7 @@ const MAIN_FIELDS: FieldConfig[] = [
   },
 ];
 
-const EXTRA_FIELDS: FieldConfig[] = [
+const extraFields = (): FieldConfig[] => [
   { key: "calories", label: t.cardio.calories, min: 0 },
   { key: "avgHeartRate", label: t.cardio.heartRate, min: 0, max: 250 },
   { key: "rpe", label: t.cardio.rpe, min: 1, max: 10 },
@@ -80,7 +81,7 @@ export function CardioEditor({
   return (
     <>
       <Group gap="xs" wrap="nowrap" align="flex-end">
-        {MAIN_FIELDS.map(renderField)}
+        {mainFields().map(renderField)}
         <ActionIcon
           variant="subtle"
           size="lg"
@@ -93,7 +94,7 @@ export function CardioEditor({
       </Group>
 
       <Group gap="xs" wrap="nowrap" align="flex-end">
-        {EXTRA_FIELDS.map(renderField)}
+        {extraFields().map(renderField)}
         <div className="w-8.5 shrink-0" />
       </Group>
 

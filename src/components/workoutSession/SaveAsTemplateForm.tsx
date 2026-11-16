@@ -30,9 +30,7 @@ export function SaveAsTemplateForm({
     <form noValidate onSubmit={onSubmit(({ name }) => onSave(name))}>
       <Stack>
         <Text size="sm">
-          {t.session.saveAsTemplateText(
-            t.common.exerciseCount(exercises.length),
-          )}
+          {t.session.saveAsTemplateText(exercises.length)}
         </Text>
         <TextInput
           {...register("name", nameRules)}

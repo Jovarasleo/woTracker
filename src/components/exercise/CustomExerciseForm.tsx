@@ -14,15 +14,16 @@ import { type CustomExerciseDraft } from "../../hooks/exercise/useCustomExercise
 import { type ExerciseKind } from "../../store/db";
 import { t } from "../../i18n/translations";
 
-const KIND_OPTIONS: { label: string; value: ExerciseKind }[] = [
+// Functions, so they read `t` at render time (in the current language).
+const kindOptions = (): { label: string; value: ExerciseKind }[] => [
   { label: t.common.strength, value: "strength" },
   { label: t.common.cardio, value: "cardio" },
 ];
 
-const KIND_DESCRIPTIONS: Record<ExerciseKind, string> = {
+const kindDescriptions = (): Record<ExerciseKind, string> => ({
   strength: t.exercise.form.strengthDescription,
   cardio: t.exercise.form.cardioDescription,
-};
+});
 
 interface Props {
   initialName: string;
@@ -74,11 +75,14 @@ export function CustomExerciseForm({
         onChange={(e) => setName(e.currentTarget.value)}
       />
 
-      <Input.Wrapper label={t.exercise.form.type} description={KIND_DESCRIPTIONS[kind]}>
+      <Input.Wrapper
+        label={t.exercise.form.type}
+        description={kindDescriptions()[kind]}
+      >
         <SegmentedControl
           fullWidth
           mt={4}
-          data={KIND_OPTIONS}
+          data={kindOptions()}
           value={kind}
           onChange={(value) =>
             setKind(value === "cardio" ? "cardio" : "strength")
