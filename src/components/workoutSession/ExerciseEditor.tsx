@@ -27,6 +27,21 @@ const focusOnAttach = (input: HTMLInputElement | null) => {
   input?.focus();
 };
 
+/**
+ * Clears the selection and focus of an input inside `container` before it is
+ * disabled; a disabled input that still has focus keeps its text highlighted.
+ */
+const releaseInput = (container: HTMLElement | null) => {
+  const focused = document.activeElement;
+
+  if (!(focused instanceof HTMLInputElement) || !container?.contains(focused)) {
+    return;
+  }
+
+  focused.setSelectionRange(focused.value.length, focused.value.length);
+  focused.blur();
+};
+
 /** While editing, show 0 as empty so clearing a field doesn't put 0 back. */
 const showValue = (value: number, disabled: boolean) =>
   !disabled && value === 0 ? "" : value;
@@ -68,6 +83,14 @@ export function ExerciseEditor({
   const cardioLocked = !cardioEditing || !editable;
   const editingSet = editable && activeSetId !== null;
   const addSetButtonRef = useRef<HTMLButtonElement>(null);
+  const activeRepsRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  const stopEditingSet = () => {
+    releaseInput(editorRef.current);
+    setActiveSetId(null);
+  };
+
   const activeRowRef = useClickOutside<HTMLDivElement>(
     (event) => {
       // "+ Set" counts as inside: otherwise the tap that ends editing
@@ -76,7 +99,7 @@ export function ExerciseEditor({
         return;
       }
 
-      setActiveSetId(null);
+      stopEditingSet();
     },
     null,
     undefined,
@@ -85,7 +108,7 @@ export function ExerciseEditor({
 
   const onSetEditable = (exerciseId: number, setId: number) => {
     if (setId === activeSetId) {
-      setActiveSetId(null);
+      stopEditingSet();
       return;
     }
 
@@ -93,18 +116,26 @@ export function ExerciseEditor({
     setActiveSetId(setId);
   };
 
+  const focusRepsOnEnter = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    event.preventDefault();
+    activeRepsRef.current?.focus();
+  };
+
   const finishSetOnEnter = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== "Enter") {
       return;
     }
 
-    event.currentTarget.blur();
-    setActiveSetId(null);
+    stopEditingSet();
   };
 
   const onDeleteSet = (setId: number) => {
     if (setId === activeSetId) {
-      setActiveSetId(null);
+      stopEditingSet();
     }
 
     deleteSet(setId);
@@ -126,7 +157,7 @@ export function ExerciseEditor({
   };
 
   return (
-    <Stack gap="xs">
+    <Stack ref={editorRef} gap="xs">
       <Group justify="space-between" wrap="nowrap" className="min-h-7 mb-2">
         <div className="min-w-0">
           <ExerciseName name={exerciseLog.name} details={details} fw={600} />
@@ -194,8 +225,10 @@ export function ExerciseEditor({
                   placeholder={t.sets.weight}
                   inputMode="decimal"
                   enterKeyHint="next"
+                  onKeyDown={focusRepsOnEnter}
                 />
                 <NumberInput
+                  ref={disabled ? undefined : activeRepsRef}
                   className="flex-1"
                   value={showValue(set.reps, disabled)}
                   min={0}

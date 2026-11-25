@@ -37,9 +37,13 @@ export function PreviousPerformanceHint({ previous }: Props) {
       <Text
         size="xs"
         c="dimmed"
-        className="flex min-w-0 items-center gap-1 text-left"
+        className="flex min-w-0 items-center gap-1 text-left select-none"
       >
-        <IconHistory size={12} className="shrink-0" aria-label={t.sets.lastTime} />
+        <IconHistory
+          size={12}
+          className="shrink-0"
+          aria-label={t.sets.lastTime}
+        />
         <span className="truncate">
           <span className="mr-2">{formatDate(previous.date)}</span>
           {summary}
