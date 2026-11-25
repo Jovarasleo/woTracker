@@ -197,14 +197,21 @@ kit) for something the stack above already handles.
 - `camelCase` for variables/functions, `PascalCase` for components/types/interfaces.
 - Keep imports grouped: external packages first, then local modules (`../store/db`,
   `../hooks/...`).
-- **Comment sparingly.** Code should explain itself through clear names and small
-  functions, so don't add comments that restate what the code does
-  (`// Select the value on focus` above `onFocus={selectAll}`), and don't add doc
-  comments to every helper or prop. Comment only what a reader couldn't easily
-  work out from the code: a non-obvious *why*, a workaround for a library or
-  browser quirk, or a subtle constraint (e.g. why a callback ref is defined at
-  module level). If a comment seems needed to explain *what* the code does,
-  rename or restructure the code first.
+- **Comments are rare — the default is none.** Code should explain itself
+  through clear names and small functions. Before adding a comment, ask whether
+  a reader who knows React, TypeScript and the libraries above would get it
+  wrong without it; if not, leave it out. When unsure, leave it out.
+  - Don't add doc comments to components, hooks, props, interfaces or helpers
+    as a matter of course — the name and type are the documentation.
+  - Don't restate what the code does (`// Select the value on focus` above
+    `onFocus={selectAll}`) or describe standard library/framework behavior
+    (`/** The form only mounts while open */` on a Mantine `Modal`).
+  - Do comment a non-obvious *why*, a workaround for a library or browser
+    quirk (e.g. the `useFieldArray` rules note), or a constraint that would
+    break things if "cleaned up" (e.g. why a callback ref is defined at module
+    level). Keep it to one or two lines.
+  - If a comment seems needed to explain *what* the code does, rename or
+    restructure the code instead.
 - Prefer small, pure helper functions and early returns over deeply nested conditionals.
 - **Every `if` uses braces**, including one-line early returns, and is **followed by
   an empty line** before the next statement (no blank line needed when the `if` is the

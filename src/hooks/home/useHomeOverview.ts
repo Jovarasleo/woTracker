@@ -7,8 +7,14 @@ export interface TemplateSummary {
   lastSessionDate?: string;
 }
 
+export interface UnfinishedSession {
+  session: WorkoutSession;
+  exerciseCount: number;
+}
+
 export interface HomeOverview {
   templates: TemplateSummary[];
+  unfinished?: UnfinishedSession;
   /** All sessions, newest first. */
   sessions: WorkoutSession[];
   templateColorById: Map<number, string>;
@@ -31,6 +37,15 @@ export async function loadHomeOverview(): Promise<HomeOverview> {
   ]);
 
   sessions.sort(byNewestDate);
+
+  const unfinishedSession = sessions.find((session) => !session.finishedAt);
+  const unfinished = unfinishedSession && {
+    session: unfinishedSession,
+    exerciseCount: await db.exerciseLogs
+      .where("sessionId")
+      .equals(unfinishedSession.id)
+      .count(),
+  };
 
   const exerciseCountByTemplate = new Map(
     templates.map((template) => [
@@ -59,6 +74,7 @@ export async function loadHomeOverview(): Promise<HomeOverview> {
       exerciseCount: exerciseCountByTemplate.get(template.id) ?? 0,
       lastSessionDate: lastSessionByTemplate.get(template.id),
     })),
+    unfinished,
     sessions,
     templateColorById: new Map(
       templates.map((template) => [template.id, template.indicatorColor]),

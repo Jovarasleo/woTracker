@@ -4,9 +4,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { DevTools } from "../components/dev/DevTools";
 import { SidePanel } from "../components/shared/SidePanel";
+import { ActiveSessionBanner } from "../components/workoutSession/ActiveSessionBanner";
 import { SessionsOverview } from "../components/workoutSession/SessionsOverview";
 import { StatsOverview } from "../components/stats/StatsOverview";
 import { TemplatesOverview } from "../components/workoutTemplate/TemplatesOverview";
+import { useActiveSession } from "../hooks/home/useActiveSession";
 import { loadHomeOverview, useHomeOverview } from "../hooks/home/useHomeOverview";
 import { useQuickWorkout } from "../hooks/workoutSession/useQuickWorkout";
 import { greetingFor } from "../utils/sessionStats";
@@ -35,6 +37,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { overview, deleteTemplate } = useHomeOverview(Route.useLoaderData());
   const { startQuickWorkout, starting } = useQuickWorkout();
+  const activeSession = useActiveSession(overview.unfinished);
   const now = dayjs();
 
   return (
@@ -74,6 +77,15 @@ function Index() {
           <SidePanel />
         </div>
       </header>
+
+      {activeSession && (
+        <ActiveSessionBanner
+          session={activeSession.session}
+          exerciseCount={activeSession.exerciseCount}
+          elapsedMinutes={activeSession.elapsedMinutes}
+          templateColorById={overview.templateColorById}
+        />
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex min-w-0 flex-col gap-6">

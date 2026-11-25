@@ -30,10 +30,23 @@ export const en = {
     workoutName: "Workout name",
     exerciseCount: (count: number) =>
       plural(count, "exercise", "exercises"),
+    duration: (minutes: number) => {
+      const hours = Math.floor(minutes / 60);
+      const rest = minutes % 60;
+
+      if (!hours) {
+        return `${rest} min`;
+      }
+
+      return rest ? `${hours} h ${rest} min` : `${hours} h`;
+    },
   },
 
   home: {
     newWorkout: "New workout",
+    workoutInProgress: "Workout in progress",
+    activeSessionSummary: (duration: string, exerciseCount: number) =>
+      `${duration} · ${plural(exerciseCount, "exercise", "exercises")}`,
     greeting: {
       lateNight: "Late night session?",
       morning: "Good morning",
@@ -167,6 +180,16 @@ export const en = {
     loading: "Loading session",
     notFoundTitle: "Session not found",
     notFound: "This session doesn't exist. It may have been deleted.",
+    finishWorkout: "Finish workout",
+    resumeWorkout: "Resume workout",
+    finishedAfter: (duration: string) => `Finished · ${duration}`,
+    editFinishTime: "Edit finish time",
+    finishTime: "Finish time",
+    startedAt: (time: string) => `Started at ${time}`,
+    errors: {
+      finishTimeRequired: "Enter a finish time",
+      finishTimeInFuture: "Finish time can't be in the future",
+    },
     saveAsTemplate: "Save as template",
     saveAsTemplateText: (exerciseCount: number) =>
       `Saves this session's ${plural(exerciseCount, "exercise", "exercises")} as a workout you can start again.`,

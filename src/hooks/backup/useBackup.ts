@@ -35,11 +35,12 @@ function backupFileName(prefix: string) {
 
 /**
  * Normalizes the version stored in a backup to a Dexie schema version. Files
- * made by the app store `db.verno` (e.g. 9); files made with raw IndexedDB
- * store the native version, which Dexie multiplies by 10 (e.g. 90).
+ * made by the app (marked with `app`) store `db.verno`; files made with raw
+ * IndexedDB store the native version, which is Dexie's multiplied by 10. The
+ * marker decides, not the size of the number: Dexie version 10 is as valid as 9.
  */
-function toDexieVersion(version: number) {
-  return version >= 10 ? version / 10 : version;
+function toDexieVersion(version: number, madeByApp: boolean) {
+  return madeByApp ? version : version / 10;
 }
 
 /**
@@ -89,7 +90,7 @@ export function useBackup() {
     }
 
     const dbVersion = typeof data.dbVersion === "number" ? data.dbVersion : 0;
-    if (toDexieVersion(dbVersion) > db.verno) {
+    if (toDexieVersion(dbVersion, data.app === BACKUP_APP_ID) > db.verno) {
       throw new Error(t.backup.errors.newerVersion);
     }
 

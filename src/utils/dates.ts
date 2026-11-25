@@ -22,6 +22,10 @@ export function formatDateTime(date: string): string {
   );
 }
 
+export function formatTime(date: string): string {
+  return dayjs(date).format("HH:mm");
+}
+
 /** "Thursday, November 6, 2026" — for tooltips and confirmations. */
 export function formatFullDate(date: string): string {
   return dayjs(date).format("dddd, MMMM D, YYYY");

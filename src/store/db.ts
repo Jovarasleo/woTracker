@@ -26,6 +26,8 @@ export interface WorkoutSession {
   notes?: string;
   workoutTemplateId?: number; // template this session was created from (may dangle if template deleted)
   indicatorColor: string; // copied from the template at creation
+  finishedAt?: string; // unset on sessions logged before "Finish workout" existed
+  pausedMinutes?: number; // time between finishing and resuming, left out of the duration
 }
 
 export interface ExerciseTemplate {

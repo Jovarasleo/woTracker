@@ -11,7 +11,6 @@ interface Props {
   onSave: (name: string) => Promise<void>;
 }
 
-/** The form only mounts while open, so it starts from the current values. */
 export function SaveAsTemplateModal({
   opened,
   defaultName,

@@ -43,10 +43,23 @@ export const lt: Translations = {
     workoutName: "Treniruotės pavadinimas",
     exerciseCount: (count: number) =>
       plural(count, "pratimas", "pratimai", "pratimų"),
+    duration: (minutes: number) => {
+      const hours = Math.floor(minutes / 60);
+      const rest = minutes % 60;
+
+      if (!hours) {
+        return `${rest} min`;
+      }
+
+      return rest ? `${hours} val. ${rest} min` : `${hours} val.`;
+    },
   },
 
   home: {
     newWorkout: "Nauja treniruotė",
+    workoutInProgress: "Vyksta treniruotė",
+    activeSessionSummary: (duration: string, exerciseCount: number) =>
+      `${duration} · ${plural(exerciseCount, "pratimas", "pratimai", "pratimų")}`,
     greeting: {
       lateNight: "Vėlyva treniruotė?",
       morning: "Labas rytas",
@@ -177,6 +190,16 @@ export const lt: Translations = {
     loading: "Įkeliama sesija",
     notFoundTitle: "Sesija nerasta",
     notFound: "Šios sesijos nėra. Galbūt ji buvo ištrinta.",
+    finishWorkout: "Baigti treniruotę",
+    resumeWorkout: "Tęsti treniruotę",
+    finishedAfter: (duration: string) => `Baigta · ${duration}`,
+    editFinishTime: "Keisti pabaigos laiką",
+    finishTime: "Pabaigos laikas",
+    startedAt: (time: string) => `Pradėta ${time}`,
+    errors: {
+      finishTimeRequired: "Įveskite pabaigos laiką",
+      finishTimeInFuture: "Pabaigos laikas negali būti ateityje",
+    },
     saveAsTemplate: "Išsaugoti kaip šabloną",
     saveAsTemplateText: (exerciseCount: number) =>
       `Šios sesijos pratimai (${exerciseCount}) bus išsaugoti kaip treniruotė, kurią galėsite pradėti iš naujo.`,

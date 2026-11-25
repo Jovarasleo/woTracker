@@ -1,6 +1,8 @@
 import { useDisclosure } from "@mantine/hooks";
+import dayjs from "dayjs";
 import { useState } from "react";
 import { db } from "../../store/db";
+import { minutesBetween } from "../../utils/sessionStatus";
 import { useGoBack } from "../shared/useGoBack";
 
 const deleteSession = (sessionId: number) =>
@@ -76,11 +78,19 @@ const saveSessionAsTemplate = (sessionId: number, name: string) =>
     },
   );
 
-export function useWorkoutSession(sessionId: number) {
+interface Options {
+  onFinished?: () => void;
+}
+
+export function useWorkoutSession(
+  sessionId: number,
+  { onFinished }: Options = {},
+) {
   const goBack = useGoBack();
   const [deleteConfirmOpened, deleteConfirm] = useDisclosure(false);
   const [deleting, setDeleting] = useState(false);
   const [saveTemplateOpened, saveTemplateDialog] = useDisclosure(false);
+  const [finishTimeOpened, finishTimeDialog] = useDisclosure(false);
 
   // Can't be dismissed while the delete is running.
   const closeDeleteConfirm = () => {
@@ -105,7 +115,41 @@ export function useWorkoutSession(sessionId: number) {
     saveTemplateDialog.close();
   };
 
+  const finishSession = async () => {
+    await db.workoutSessions.update(sessionId, {
+      finishedAt: new Date().toISOString(),
+    });
+    onFinished?.();
+  };
+
+  const resumeSession = () =>
+    db.transaction("rw", db.workoutSessions, async () => {
+      const session = await db.workoutSessions.get(sessionId);
+
+      if (!session?.finishedAt) {
+        return;
+      }
+
+      await db.workoutSessions.update(sessionId, {
+        finishedAt: undefined,
+        pausedMinutes:
+          (session.pausedMinutes ?? 0) +
+          minutesBetween(session.finishedAt, dayjs()),
+      });
+    });
+
+  const saveFinishedAt = async (finishedAt: string) => {
+    await db.workoutSessions.update(sessionId, { finishedAt });
+    finishTimeDialog.close();
+  };
+
   return {
+    finishSession,
+    resumeSession,
+    finishTimeOpened,
+    openFinishTime: finishTimeDialog.open,
+    closeFinishTime: finishTimeDialog.close,
+    saveFinishedAt,
     deleteConfirmOpened,
     openDeleteConfirm: deleteConfirm.open,
     closeDeleteConfirm,

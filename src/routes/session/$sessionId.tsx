@@ -9,21 +9,27 @@ import {
   Stack,
   Text,
   Title,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure, useToggle } from "@mantine/hooks";
 import {
   IconDeviceFloppy,
   IconEdit,
   IconEditOff,
+  IconFlag,
+  IconPencil,
+  IconPlayerPlay,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+import dayjs from "dayjs";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Fragment, useState } from "react";
 import { ExerciseCreator } from "../../components/exercise/ExerciseCreator";
 import { DeleteSessionModal } from "../../components/workoutSession/DeleteSessionModal";
 import { ExerciseEditor } from "../../components/workoutSession/ExerciseEditor";
+import { FinishTimeModal } from "../../components/workoutSession/FinishTimeModal";
 import { PageLayout } from "../../components/shared/PageLayout";
 import { RestTimerButton } from "../../components/workoutSession/RestTimerButton";
 import { SaveAsTemplateModal } from "../../components/workoutSession/SaveAsTemplateModal";
@@ -42,6 +48,11 @@ import { useRestTimer } from "../../hooks/workoutSession/useRestTimer";
 import { useWorkoutSession } from "../../hooks/workoutSession/useWorkoutSession";
 import { db } from "../../store/db";
 import { formatDateTime } from "../../utils/dates";
+import {
+  isSessionActive,
+  isWithinActiveWindow,
+  workoutMinutes,
+} from "../../utils/sessionStatus";
 import { t } from "../../i18n/translations";
 
 export const Route = createFileRoute("/session/$sessionId")({
@@ -59,6 +70,8 @@ function SessionPage() {
     onAdded: close,
     onDeleted: offerUndo,
   });
+  const { remainingSeconds, finished, startRest, addRest, stopRest } =
+    useRestTimer();
   const { customExercises, handleCreateCustomExercise } = useCustomExercises({
     onCreated: handleSelectExercise,
   });
@@ -72,10 +85,14 @@ function SessionPage() {
     openSaveTemplate,
     closeSaveTemplate,
     saveAsTemplate,
-  } = useWorkoutSession(numericSessionId);
+    finishSession,
+    resumeSession,
+    finishTimeOpened,
+    openFinishTime,
+    closeFinishTime,
+    saveFinishedAt,
+  } = useWorkoutSession(numericSessionId, { onFinished: stopRest });
   const findExercise = useExerciseLookup();
-  const { remainingSeconds, finished, startRest, addRest, stopRest } =
-    useRestTimer();
   const [sessionMode, toggleSessionMode] = useToggle([
     "default",
     "edit",
@@ -145,6 +162,12 @@ function SessionPage() {
   const canSaveAsTemplate = isQuickWorkout && exerciseLogs.length > 0;
   const canAddExercise =
     sessionEditable || isQuickWorkout || exerciseLogs.length === 0;
+  const now = dayjs();
+  const canFinish = !sessionEditable && isSessionActive(session, now);
+  const canResume =
+    !sessionEditable &&
+    session.finishedAt != null &&
+    isWithinActiveWindow(session, now);
 
   const editToggle = (
     <Button
@@ -183,6 +206,25 @@ function SessionPage() {
               <Text size="sm" c="dimmed">
                 {formatDateTime(session.date)}
               </Text>
+              {session.finishedAt && (
+                <UnstyledButton
+                  onClick={openFinishTime}
+                  className="flex items-center gap-1"
+                >
+                  <Text size="sm" c="dimmed">
+                    {t.session.finishedAfter(
+                      t.common.duration(
+                        workoutMinutes(session, session.finishedAt),
+                      ),
+                    )}
+                  </Text>
+                  <IconPencil
+                    size={14}
+                    className="text-gray-500"
+                    aria-label={t.session.editFinishTime}
+                  />
+                </UnstyledButton>
+              )}
             </div>
             <Group gap="xs" wrap="nowrap">
               {canSaveAsTemplate && (
@@ -244,6 +286,25 @@ function SessionPage() {
               {t.common.addExercise}
             </Button>
           )}
+
+          {canFinish && (
+            <Button
+              leftSection={<IconFlag size={18} />}
+              onClick={() => finishSession()}
+            >
+              {t.session.finishWorkout}
+            </Button>
+          )}
+
+          {canResume && (
+            <Button
+              variant="default"
+              leftSection={<IconPlayerPlay size={18} />}
+              onClick={() => resumeSession()}
+            >
+              {t.session.resumeWorkout}
+            </Button>
+          )}
         </Stack>
 
         <Modal
@@ -266,6 +327,13 @@ function SessionPage() {
           deleting={deleting}
           onClose={closeDeleteConfirm}
           onConfirm={confirmDelete}
+        />
+
+        <FinishTimeModal
+          session={session}
+          opened={finishTimeOpened}
+          onClose={closeFinishTime}
+          onSave={saveFinishedAt}
         />
 
         <SaveAsTemplateModal
