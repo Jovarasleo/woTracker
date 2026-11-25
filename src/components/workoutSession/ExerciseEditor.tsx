@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
-import { type FocusEvent, useState } from "react";
+import { type FocusEvent, useRef, useState } from "react";
 import { CardioEditor } from "./CardioEditor";
 import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
 import { SetRowSkeleton } from "./SetRowSkeleton";
@@ -67,8 +67,17 @@ export function ExerciseEditor({
   const isCardio = exerciseKindOf(exerciseLog) === "cardio";
   const cardioLocked = !cardioEditing || !editable;
   const editingSet = editable && activeSetId !== null;
+  const addSetButtonRef = useRef<HTMLButtonElement>(null);
   const activeRowRef = useClickOutside<HTMLDivElement>(
-    () => setActiveSetId(null),
+    (event) => {
+      // "+ Set" counts as inside: otherwise the tap that ends editing
+      // re-enables the button before the click lands, and adds a set.
+      if (addSetButtonRef.current?.contains(event.target as Node)) {
+        return;
+      }
+
+      setActiveSetId(null);
+    },
     null,
     undefined,
     editingSet,
@@ -213,6 +222,7 @@ export function ExerciseEditor({
           })}
 
           <Button
+            ref={addSetButtonRef}
             variant="light"
             size="sm"
             className="self-end mt-3"
