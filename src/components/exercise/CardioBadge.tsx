@@ -6,7 +6,6 @@ interface Props {
   kind: ExerciseKind;
 }
 
-/** Small "Cardio" tag next to an exercise name; renders nothing for strength. */
 export function CardioBadge({ kind }: Props) {
   if (kind !== "cardio") {
     return null;

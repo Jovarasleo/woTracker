@@ -38,11 +38,8 @@ interface Props {
   sessionEditable: boolean;
   onEditExercise: (exerciseId: number) => void;
   onDeleteExercise: (exerciseId: number) => void;
-  /** Called after a set is deleted, so the page can offer to undo it. */
   onSetDeleted: (action: UndoAction) => void;
-  /** What was logged the last time this exercise was done, shown as a hint. */
   previous?: PreviousPerformance;
-  /** Library entry for this exercise, opened from its name. */
   details?: LibraryExercise;
 }
 
@@ -68,7 +65,6 @@ export function ExerciseEditor({
     updateCardio,
   } = useExerciseLogEditor(exerciseLog, { onDeleted: onSetDeleted });
   const isCardio = exerciseKindOf(exerciseLog) === "cardio";
-  // Locked unless this exercise is the active one and its edit toggle is on.
   const cardioLocked = !cardioEditing || !editable;
   const editingSet = editable && activeSetId !== null;
   const activeRowRef = useClickOutside<HTMLDivElement>(

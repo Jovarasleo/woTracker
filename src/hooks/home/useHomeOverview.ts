@@ -4,7 +4,6 @@ import { db, type WorkoutSession, type WorkoutTemplate } from "../../store/db";
 export interface TemplateSummary {
   template: WorkoutTemplate;
   exerciseCount: number;
-  /** Date of the most recent session started from this template. */
   lastSessionDate?: string;
 }
 
@@ -67,10 +66,6 @@ export async function loadHomeOverview(): Promise<HomeOverview> {
   };
 }
 
-/**
- * Live home page data, seeded with `initialOverview` from the route loader so
- * the first render already has content, plus the template delete action.
- */
 export function useHomeOverview(initialOverview: HomeOverview) {
   const overview = useLiveQuery(loadHomeOverview, [], initialOverview);
 

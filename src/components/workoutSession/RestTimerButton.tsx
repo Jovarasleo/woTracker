@@ -7,15 +7,11 @@ import {
 } from "@tabler/icons-react";
 import { t } from "../../i18n/translations";
 
-/** Rest lengths offered when starting the timer, in seconds. */
 const REST_OPTIONS = [60, 90, 120, 180] as const;
-/** Time that can be added while it runs, in seconds. */
 const EXTEND_OPTIONS = [15, 30] as const;
 
 interface Props {
-  /** Seconds left while running, `null` when idle. */
   remainingSeconds: number | null;
-  /** The rest just ran out. */
   finished: boolean;
   onStart: (seconds: number) => void;
   onAdd: (seconds: number) => void;
@@ -26,10 +22,6 @@ interface Props {
 const formatSeconds = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
-/**
- * Rest timer control for the session's navigation bar. Idle: pick a rest
- * length. Running: shows the countdown; the menu adds time or stops it.
- */
 export function RestTimerButton({
   remainingSeconds,
   finished,

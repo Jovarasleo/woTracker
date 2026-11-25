@@ -7,11 +7,8 @@ import {
 } from "@mantine/core";
 
 interface Props {
-  /** Width of the placeholder bar, e.g. `"60%"` or `120`. */
   width: number | string;
-  /** `Text` size the placeholder stands in for. */
   size?: MantineSize;
-  /** Stand in for a `Title` of this order instead of `Text`. */
   order?: TitleOrder;
 }
 

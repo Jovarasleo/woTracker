@@ -18,11 +18,6 @@ interface Props {
   previous: PreviousPerformance;
 }
 
-/**
- * One dimmed line with what was logged the last time this exercise was done,
- * e.g. "Nov 2 · 60×8 · 60×8 · 55×10". The tooltip has the full date and the
- * full summary, in case the line is truncated on narrow screens.
- */
 export function PreviousPerformanceHint({ previous }: Props) {
   const summary = summarizePrevious(previous);
 

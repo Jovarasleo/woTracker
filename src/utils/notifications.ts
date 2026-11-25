@@ -54,7 +54,6 @@ export async function showRestOverNotification(pattern: number[]) {
   return true;
 }
 
-/** Removes a "Rest over" notification that is no longer needed. */
 export async function closeRestOverNotification() {
   if (!notificationsSupported()) {
     return;

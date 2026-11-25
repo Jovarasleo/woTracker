@@ -4,7 +4,6 @@ import { db } from "../../store/db";
 import { randomIndicatorColor } from "../../utils/colors";
 import { t } from "../../i18n/translations";
 
-/** Starts an empty session that isn't based on a template, and opens it. */
 export function useQuickWorkout() {
   const navigate = useNavigate();
   const [starting, setStarting] = useState(false);

@@ -6,10 +6,6 @@ interface Props {
   nameWidth: string;
 }
 
-/**
- * Placeholder with the same size as one result row in `ExerciseCreator`
- * (picture, name, muscles · equipment).
- */
 export function ExerciseRowSkeleton({ nameWidth }: Props) {
   return (
     <div className="flex items-center gap-3 p-2" aria-hidden>

@@ -6,10 +6,6 @@ import { t } from "../../i18n/translations";
 
 const PLACEHOLDER_EXERCISES = 2;
 
-/**
- * Placeholder for the session page's card while it loads: the same title,
- * divider and exercise blocks (name, set row, "+ Set" button) as the real one.
- */
 export function SessionSkeleton() {
   return (
     <Card aria-busy aria-label={t.session.loading}>

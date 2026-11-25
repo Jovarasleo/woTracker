@@ -18,7 +18,6 @@ export interface TemplateExerciseValue {
   kind: ExerciseKind;
 }
 
-/** Values of the create and edit workout template forms. */
 export interface WorkoutTemplateFormValues {
   name: string;
   exercises: TemplateExerciseValue[];

@@ -4,7 +4,6 @@ import {
   type CatalogExercise,
 } from "../../data/exerciseCatalog";
 
-// Returns the built-in exercise library, or `undefined` while it is loading.
 export function useExerciseCatalog() {
   const [catalog, setCatalog] = useState<CatalogExercise[]>();
 

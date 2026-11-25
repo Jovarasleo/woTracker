@@ -4,10 +4,6 @@ import { t } from "../../i18n/translations";
 
 const PLACEHOLDER_EXERCISES = 3;
 
-/**
- * Placeholder for the workout template form (edit page) while it loads: name
- * input, exercise inputs, "Add exercise", the color picker and the footer.
- */
 export function TemplateFormSkeleton() {
   return (
     <Card aria-busy aria-label={t.workout.loading}>

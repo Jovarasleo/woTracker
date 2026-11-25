@@ -12,16 +12,10 @@ import { t } from "../../i18n/translations";
 
 interface Props {
   name: string;
-  /** Library entry for this exercise; without one the name is plain text. */
   details?: LibraryExercise;
   fw?: MantineFontWeight | number;
 }
 
-/**
- * An exercise's name. When there is a description, pictures or instructions
- * for it, a small info icon follows the name and tapping either opens a quick
- * overview in a modal, so the user never leaves the page they are on.
- */
 export function ExerciseName({ name, details, fw }: Props) {
   const [opened, { open, close }] = useDisclosure(false);
 

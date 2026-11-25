@@ -19,7 +19,6 @@ const MAX_LATE_VIBRATION_MS = 5000;
  * late; still notify then, but not for a rest that ended long ago.
  */
 const MAX_LATE_NOTIFICATION_MS = 2 * 60_000;
-/** How long "Rest over" stays up before the timer goes back to idle. */
 const FINISHED_DISPLAY_MS = 10_000;
 
 const vibrate = () => {
@@ -57,11 +56,8 @@ const signalRestOver = (lateMs: number) => {
  */
 
 interface RestTimerState {
-  /** When the rest ends (ms timestamp), `null` when no rest is running. */
   endsAt: number | null;
-  /** Time of the last tick, used for the countdown. */
   now: number;
-  /** The rest just ran out ("Rest over" is showing). */
   finished: boolean;
 }
 

@@ -5,7 +5,6 @@ import { TextSkeleton } from "./TextSkeleton";
 import { useGoBack } from "../../hooks/shared/useGoBack";
 import { t } from "../../i18n/translations";
 
-/** Shared max width of sub-page content and its bar. */
 const CONTENT_WIDTH = "max-w-xl";
 
 interface Props {
@@ -17,19 +16,11 @@ interface Props {
    */
   title?: string | null;
   subtitle?: string;
-  /** The page's main action (e.g. an Edit button), shown on the right. */
   action?: ReactNode;
   children: ReactNode;
 }
 
-/**
- * Page wrapper with a navigation bar holding a back button, the page title and
- * an optional action. On phones the bar is fixed to the bottom of the screen
- * (within thumb reach, clear of the iPhone home indicator); from `sm` up it
- * sticks to the top instead. Installed apps have no browser back button, so
- * pages below the home screen need this. Also sets the shared content width,
- * so every sub-page lines up with its bar.
- */
+/** Installed apps have no browser back button, so every sub-page needs this bar. */
 export function PageLayout({ title, subtitle, action, children }: Props) {
   const goBack = useGoBack();
 

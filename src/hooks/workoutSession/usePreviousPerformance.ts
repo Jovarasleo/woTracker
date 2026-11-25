@@ -10,9 +10,7 @@ import {
 } from "../../store/db";
 import { hasCardioMetrics, pickCardioMetrics } from "../../utils/cardio";
 
-/** What was logged the last time an exercise was done. */
 export type PreviousPerformance = {
-  /** Date of the session it was logged in. */
   date: string;
 } & (
   | { kind: "strength"; sets: SetLog[] }
@@ -83,7 +81,6 @@ export function usePreviousPerformance(
       ),
     );
 
-    // Only exercises from earlier sessions are candidates.
     const candidates = namedLogs.flatMap((log) => {
       const date = earlierSessionDateById.get(log.sessionId);
       return date ? [{ log, date }] : [];

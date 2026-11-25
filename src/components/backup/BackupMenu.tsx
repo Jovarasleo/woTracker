@@ -23,10 +23,6 @@ function formatCounts(counts: Record<string, number>) {
     .join(", ");
 }
 
-/**
- * Header menu for exporting all app data to a JSON file and restoring it from
- * one. Import always asks for confirmation before replacing data.
- */
 export function BackupMenu() {
   const { exportBackup, parseBackupFile, restoreBackup } = useBackup();
   const [pendingBackup, setPendingBackup] = useState<BackupFile | null>(null);

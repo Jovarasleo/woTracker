@@ -6,7 +6,6 @@ import { sessionIndicatorColor } from "../../utils/colors";
 
 interface Props {
   sessions: WorkoutSession[];
-  /** Current indicator color of each template, keyed by template id. */
   templateColorById: Map<number, string>;
   /** Currently displayed month in `YYYY-MM` format (controlled). */
   month: string;
@@ -35,7 +34,6 @@ const groupLatestSessionByDay = (
       .map((session) => [dayjs(session.date).format(DAY_FORMAT), session]),
   );
 
-/** Collects the set of months (`YYYY-MM`) that contain at least one session. */
 const collectSessionMonths = (sessions: WorkoutSession[]): Set<string> =>
   new Set(
     sessions.map((session) => dayjs(session.date).format(MONTH_KEY_FORMAT)),

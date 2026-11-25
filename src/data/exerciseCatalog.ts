@@ -20,7 +20,6 @@ export interface CatalogExercise {
   images: string[]; // paths relative to CATALOG_IMAGE_BASE_URL
 }
 
-// Common shape for catalog and user-created exercises, used by the picker UI.
 export interface LibraryExercise {
   key: string;
   source: "catalog" | "custom";

@@ -15,12 +15,7 @@ interface Props {
 const routeApi = getRouteApi("/");
 const RECENT_SESSION_COUNT = 5;
 
-/**
- * Session history for the home page: the calendar and the latest sessions.
- * Owns the `?month=` route-query logic that keeps the displayed month in the
- * URL (so going back from a session reopens the month it was launched from).
- * Side by side on tablets, stacked in the sidebar on desktop.
- */
+/** Keeps the displayed month in `?month=`, so going back from a session reopens it. */
 export function SessionsOverview({ sessions, templateColorById }: Props) {
   const navigate = useNavigate();
   const { month } = routeApi.useSearch();

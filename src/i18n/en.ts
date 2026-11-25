@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import { rich } from "./rich";
 
-/** "1 set" / "3 sets". */
 const plural = (count: number, one: string, other: string) =>
   `${count} ${count === 1 ? one : other}`;
 

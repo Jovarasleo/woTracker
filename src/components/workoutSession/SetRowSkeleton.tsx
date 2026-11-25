@@ -1,9 +1,5 @@
 import { Group, Skeleton } from "@mantine/core";
 
-/**
- * Placeholder with the same size as one strength set row in `ExerciseEditor`
- * (set number, weight and reps inputs, edit button).
- */
 export function SetRowSkeleton() {
   return (
     <Group gap="xs" wrap="nowrap" align="center" aria-hidden>

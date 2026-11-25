@@ -19,7 +19,6 @@ export const INDICATOR_COLORS = [
   "#fd7e14",
 ] as const;
 
-/** Picks a random color from the indicator palette. */
 export function randomIndicatorColor(): string {
   return INDICATOR_COLORS[Math.floor(Math.random() * INDICATOR_COLORS.length)];
 }

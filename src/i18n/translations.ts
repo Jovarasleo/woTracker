@@ -22,7 +22,6 @@ export type Language = "en" | "lt";
 
 const TRANSLATIONS: Record<Language, Translations> = { en, lt };
 
-/** Options for the language switch, each named in its own language. */
 export const LANGUAGES: { value: Language; label: string }[] = [
   { value: "en", label: "English" },
   { value: "lt", label: "Lietuvių" },
@@ -48,7 +47,6 @@ function readStoredLanguage(): Language {
   }
 }
 
-/** Points dates (dayjs, the calendar) and the page's `lang` at `next`. */
 function applyLanguage(next: Language) {
   dayjs.locale(next);
   document.documentElement.lang = next;
@@ -57,7 +55,6 @@ function applyLanguage(next: Language) {
 let language = readStoredLanguage();
 applyLanguage(language);
 
-/** The active language's text. */
 export let t: Translations = TRANSLATIONS[language];
 
 const listeners = new Set<() => void>();
@@ -71,7 +68,6 @@ export const subscribeLanguage = (listener: () => void) => {
   };
 };
 
-/** Switches the UI language and remembers it for the next visit. */
 export function setLanguage(next: Language) {
   if (next === language) {
     return;

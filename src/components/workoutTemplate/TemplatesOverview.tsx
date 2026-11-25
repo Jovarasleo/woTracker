@@ -17,16 +17,10 @@ import { t } from "../../i18n/translations";
 interface Props {
   templates: TemplateSummary[];
   onDeleteTemplate: (templateId: number) => Promise<void>;
-  /** Starts a session without a template. */
   onStartQuickWorkout: () => void;
-  /** True while the quick workout is being created. */
   startingQuickWorkout: boolean;
 }
 
-/**
- * Responsive grid of workout templates for the home page, with an empty state
- * and the delete-confirmation modal.
- */
 export function TemplatesOverview({
   templates,
   onDeleteTemplate,

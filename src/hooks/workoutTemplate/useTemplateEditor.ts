@@ -15,7 +15,6 @@ export function useTemplateEditor(
 ) {
   const [indicatorColor, setIndicatorColor] = useState(template.indicatorColor);
 
-  /** Persists validated, trimmed form values. */
   const save = async (values: WorkoutTemplateFormValues) => {
     const keptIds = new Set(
       values.exercises.flatMap((exercise) =>

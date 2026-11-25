@@ -14,7 +14,6 @@ interface Props {
   exercise: LibraryExercise;
 }
 
-/** Tags, pictures, muscles and how-to of a library or custom exercise. */
 export function ExerciseOverview({ exercise }: Props) {
   const tags = [
     exercise.source === "custom" ? t.common.custom : null,

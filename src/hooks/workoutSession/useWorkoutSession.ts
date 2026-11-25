@@ -3,7 +3,6 @@ import { useState } from "react";
 import { db } from "../../store/db";
 import { useGoBack } from "../shared/useGoBack";
 
-/** Deletes a session together with its exercises and their sets. */
 const deleteSession = (sessionId: number) =>
   db.transaction(
     "rw",
@@ -77,12 +76,6 @@ const saveSessionAsTemplate = (sessionId: number, name: string) =>
     },
   );
 
-/**
- * Actions on a whole session, each with its confirmation step:
- * - delete: confirmation state, `deleting`, and `confirmDelete`, which
- *   deletes the session and then leaves its page;
- * - save as template: dialog state and `saveAsTemplate(name)`.
- */
 export function useWorkoutSession(sessionId: number) {
   const goBack = useGoBack();
   const [deleteConfirmOpened, deleteConfirm] = useDisclosure(false);

@@ -30,11 +30,6 @@ interface Props {
   onRemove: (index: number) => void;
 }
 
-/**
- * Editable exercise list of a workout template form: one name input per
- * exercise (tagged when cardio) with a remove button, plus the list-level
- * error (e.g. "Add at least one exercise").
- */
 export function TemplateExerciseList({
   fields,
   register,

@@ -4,10 +4,6 @@ import { t } from "../../i18n/translations";
 
 const PLACEHOLDER_EXERCISES = 4;
 
-/**
- * Placeholder for the workout (template) page while it loads: the summary card,
- * the exercise list and the "Start session" button, at their real sizes.
- */
 export function WorkoutSkeleton() {
   return (
     <Stack gap="md" aria-busy aria-label={t.workout.loading}>

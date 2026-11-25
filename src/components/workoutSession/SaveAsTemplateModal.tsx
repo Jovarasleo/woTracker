@@ -11,10 +11,7 @@ interface Props {
   onSave: (name: string) => Promise<void>;
 }
 
-/**
- * Dialog for saving a session (e.g. a quick workout) as a workout template.
- * The form only mounts while open, so it starts from the current values.
- */
+/** The form only mounts while open, so it starts from the current values. */
 export function SaveAsTemplateModal({
   opened,
   defaultName,

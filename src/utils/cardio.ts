@@ -15,7 +15,6 @@ export function pickCardioMetrics({
   return { durationMinutes, distanceKm, calories, avgHeartRate, rpe };
 }
 
-/** True when at least one cardio value was entered. */
 export function hasCardioMetrics(metrics: CardioMetrics): boolean {
   return Object.values(pickCardioMetrics(metrics)).some(
     (value) => (value ?? 0) > 0,

@@ -76,7 +76,6 @@ export function computeSessionStats(
   };
 }
 
-/** Short human label for how long ago `date` was ("Today", "3 days ago"). */
 export function formatRelativeDay(date: string, now: Dayjs = dayjs()): string {
   const days = now.startOf("day").diff(dayjs(date).startOf("day"), "day");
 
@@ -103,7 +102,6 @@ export function formatRelativeDay(date: string, now: Dayjs = dayjs()): string {
   return formatDate(date);
 }
 
-/** Time-of-day greeting for the home header. */
 export function greetingFor(now: Dayjs = dayjs()): string {
   const hour = now.hour();
   if (hour < 5) {

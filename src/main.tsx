@@ -6,7 +6,6 @@ import { registerSW } from "virtual:pwa-register";
 import "./mantineStyles";
 import "./index.css";
 
-// Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 import { theme } from "./theme";
 import { syncFaviconWithVisibility } from "./utils/favicon";
@@ -16,7 +15,6 @@ const router = createRouter({
   scrollRestoration: true,
 });
 
-// Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;

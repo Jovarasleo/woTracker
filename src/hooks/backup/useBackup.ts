@@ -72,7 +72,6 @@ export function useBackup() {
     return countBackupRows(backup);
   };
 
-  // Reads and validates a backup file without touching the database.
   const parseBackupFile = async (file: File): Promise<BackupFile> => {
     let data: unknown;
     try {
@@ -123,7 +122,6 @@ export function useBackup() {
   };
 
   const restoreBackup = async (backup: BackupFile) => {
-    // Safety net: keep a copy of what is about to be replaced.
     await exportBackup("wotracker-before-import");
 
     await db.transaction("rw", db.tables, async () => {

@@ -1,14 +1,5 @@
 import { db } from "../store/db";
 
-/**
- * Development-only data tooling.
- *
- * `seedDevData` populates IndexedDB with 7 workout templates and a year of
- * completed sessions; `clearAllData` wipes every table. These helpers are only
- * reachable from the dev-only `DevTools` UI (gated behind `import.meta.env.DEV`)
- * and are dynamically imported so they stay out of production bundles.
- */
-
 interface SeedExercise {
   name: string;
   /** Starting working weight in kg (0 = bodyweight / added-weight movement). */
@@ -19,7 +10,6 @@ interface SeedExercise {
   repRange: [number, number];
 }
 
-/** Cardio entry: logged as a duration and distance instead of sets. */
 interface SeedCardioExercise {
   name: string;
   kind: "cardio";
@@ -31,7 +21,6 @@ interface SeedCardioExercise {
 
 interface SeedWorkout {
   name: string;
-  /** Hex indicator color for the template. */
   color: string;
   exercises: (SeedExercise | SeedCardioExercise)[];
 }
@@ -196,7 +185,6 @@ function generateSessionDates(rng: () => number): GeneratedSession[] {
   nextGap.setDate(nextGap.getDate() + randInt(rng, 60, 90));
 
   while (cursor <= today) {
-    // Give each session a realistic time of day.
     const dated = new Date(cursor);
     dated.setHours(randInt(rng, 7, 20), randInt(rng, 0, 59), 0, 0);
 
@@ -233,11 +221,6 @@ export interface SeedSummary {
   sets: number;
 }
 
-/**
- * Populates the database with workout templates and a year of completed
- * sessions. Safe to run repeatedly — call `clearAllData` first if you want a
- * clean slate.
- */
 export async function seedDevData(): Promise<SeedSummary> {
   const rng = createRng(20260101);
   const sessionPlan = generateSessionDates(rng);
@@ -348,7 +331,6 @@ export async function seedDevData(): Promise<SeedSummary> {
   };
 }
 
-/** Removes every record from all tables. */
 export async function clearAllData(): Promise<void> {
   await db.transaction(
     "rw",

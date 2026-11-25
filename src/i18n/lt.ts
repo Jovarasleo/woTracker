@@ -18,11 +18,9 @@ const nounForm = (count: number, one: string, few: string, many: string) => {
   return lastDigit >= 2 && !teen ? few : many;
 };
 
-/** "1 pratimas" / "3 pratimai" / "10 pratimų". */
 const plural = (count: number, one: string, few: string, many: string) =>
   `${count} ${nounForm(count, one, few, many)}`;
 
-/** Lithuanian UI text. Typed as `Translations`, so no key can be missing. */
 export const lt: Translations = {
   common: {
     add: "Pridėti",

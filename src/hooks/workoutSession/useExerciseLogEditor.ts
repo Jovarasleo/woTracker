@@ -4,7 +4,6 @@ import { type UndoAction } from "../shared/useUndo";
 import { t } from "../../i18n/translations";
 
 interface Options {
-  /** Called after a set is deleted, with how to restore it. */
   onDeleted?: (action: UndoAction) => void;
 }
 
@@ -37,13 +36,8 @@ export function useExerciseLogEditor(
     return setId;
   };
 
-  /** A strength exercise always keeps at least one set. */
   const canDeleteSet = (sets?.length ?? 0) > 1;
 
-  /**
-   * Deletes a set, unless it is the exercise's last one (remove the exercise
-   * instead). Undo puts the same row (same id and number) back.
-   */
   const deleteSet = async (setId: number) => {
     // Checked against the stored rows, in one transaction with the delete, so
     // quick repeated taps can't remove the last set either.
@@ -92,7 +86,6 @@ export function useExerciseLogEditor(
     await db.setLogs.update(setId, { reps });
   };
 
-  /** Saves one or more of a cardio exercise's values. */
   const updateCardio = async (changes: CardioMetrics) => {
     await db.exerciseLogs.update(exercise.id, changes);
   };

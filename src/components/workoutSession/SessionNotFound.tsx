@@ -3,7 +3,6 @@ import { IconHome } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { t } from "../../i18n/translations";
 
-/** Shown when a session page's id has no session, e.g. after it was deleted. */
 export function SessionNotFound() {
   return (
     <Card>

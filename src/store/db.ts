@@ -36,7 +36,6 @@ export interface ExerciseTemplate {
   kind?: ExerciseKind; // copied into the session's exercise log
 }
 
-/** Values logged for a cardio exercise; every field is optional. */
 export interface CardioMetrics {
   durationMinutes?: number;
   distanceKm?: number;
@@ -73,7 +72,6 @@ export interface CustomExercise {
   createdAt: string;
 }
 
-/** Contents of an exported backup file (see useBackup). */
 export interface BackupFile {
   app?: string;
   exportedAt: string;

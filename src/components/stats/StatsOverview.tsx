@@ -14,7 +14,6 @@ interface Props {
   sessions: WorkoutSession[];
 }
 
-/** Row of training metrics: this week (with day dots), month, streak, total. */
 export function StatsOverview({ sessions }: Props) {
   const stats = computeSessionStats(sessions);
   const iconSize = 18;

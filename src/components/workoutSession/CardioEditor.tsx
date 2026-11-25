@@ -13,7 +13,6 @@ interface Props {
 
 interface FieldConfig {
   key: keyof CardioMetrics;
-  /** Visible label, which is also the accessible name. */
   label: string;
   decimalScale?: number;
   min: number;
@@ -46,11 +45,6 @@ const extraFields = (): FieldConfig[] => [
 const toOptionalNumber = (value: number | string) =>
   value === "" ? undefined : Number(value);
 
-/**
- * Inputs for a cardio exercise: duration and distance (with the calculated
- * pace), then calories, average heart rate and RPE. Locked until the edit
- * button is pressed, like a strength set row.
- */
 export function CardioEditor({
   metrics,
   disabled,

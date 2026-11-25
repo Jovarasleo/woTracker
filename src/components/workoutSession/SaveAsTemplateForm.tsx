@@ -8,21 +8,18 @@ import { t } from "../../i18n/translations";
 
 interface Props {
   defaultName: string;
-  /** The session's exercises, which become the template's. */
   exercises: TemplateExerciseValue[];
   onCancel: () => void;
   /** Called with a valid, trimmed, unique name. */
   onSave: (name: string) => Promise<void>;
 }
 
-/** Asks for the name of a template made from a session. */
 export function SaveAsTemplateForm({
   defaultName,
   exercises,
   onCancel,
   onSave,
 }: Props) {
-  // Same name rules as the template pages (required, length, unique).
   const { register, onSubmit, errors, isSubmitting, nameRules } =
     useWorkoutTemplateForm({ name: defaultName, exercises });
 

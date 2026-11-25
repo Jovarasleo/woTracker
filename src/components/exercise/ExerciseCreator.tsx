@@ -36,7 +36,6 @@ import { ExerciseRowSkeleton } from "./ExerciseRowSkeleton";
 import { t } from "../../i18n/translations";
 
 const MAX_VISIBLE_RESULTS = 50;
-/** Name widths of the placeholder rows shown while the library loads. */
 const PLACEHOLDER_NAME_WIDTHS = ["55%", "40%", "65%", "45%", "50%", "35%"];
 
 interface Props {
@@ -45,10 +44,6 @@ interface Props {
   onCreateCustomExercise: (draft: CustomExerciseDraft) => void;
 }
 
-/**
- * Lets the user pick an exercise from the built-in library (with description
- * and example pictures) or their own custom exercises, or create a new one.
- */
 export function ExerciseCreator({
   customExercises,
   onSelectExercise,
@@ -61,8 +56,6 @@ export function ExerciseCreator({
   const [selected, setSelected] = useState<LibraryExercise | null>(null);
   const deferredQuery = useDeferredValue(query);
 
-  // Tabs, search and the custom form don't need the data, so they render right
-  // away; only the result list shows placeholders while it loads.
   const loading = !catalog || !customExercises;
   const library = [
     ...(customExercises ?? []).map(fromCustomExercise),

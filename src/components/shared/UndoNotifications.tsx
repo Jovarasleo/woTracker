@@ -9,11 +9,6 @@ interface Props {
   onDismiss: (id: number) => void;
 }
 
-/**
- * Stack of "Set removed · Undo" messages, one per recent delete. On phones it
- * sits just above the bottom navigation bar of `PageLayout`; from `sm` up at
- * the bottom edge.
- */
 export function UndoNotifications({ offers, onUndo, onDismiss }: Props) {
   if (!offers.length) {
     return null;

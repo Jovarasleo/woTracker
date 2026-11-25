@@ -11,11 +11,8 @@ interface NewExercise {
 }
 
 interface Options {
-  /** Session that `handleSelectExercise` adds exercises to. */
   sessionId?: number;
-  /** Called after `handleSelectExercise` has added an exercise. */
   onAdded?: () => void;
-  /** Called after `deleteExercise`, with how to restore the exercise. */
   onDeleted?: (action: UndoAction) => void;
 }
 
@@ -89,7 +86,6 @@ export function useExercise({ sessionId, onAdded, onDeleted }: Options = {}) {
     });
   };
 
-  /** Adds an exercise picked from the library to `sessionId`. */
   const handleSelectExercise = async (
     exercise: Pick<LibraryExercise, "name" | "kind">,
   ) => {

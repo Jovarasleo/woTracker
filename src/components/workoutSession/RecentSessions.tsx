@@ -13,7 +13,6 @@ interface Props {
   onSelectSession: (sessionId: number) => void;
 }
 
-/** List of the latest sessions with color, date and relative time. */
 export function RecentSessions({
   sessions,
   templateColorById,

@@ -6,11 +6,9 @@ interface Props {
   value: number | string;
   icon: ReactNode;
   color: string;
-  /** Extra content under the value, e.g. a caption or mini chart. */
   children?: ReactNode;
 }
 
-/** Compact metric card used in the home page stats row. */
 export function StatTile({ label, value, icon, color, children }: Props) {
   return (
     <Paper withBorder radius="lg" p="md" className="h-full">
