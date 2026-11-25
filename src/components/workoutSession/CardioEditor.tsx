@@ -73,6 +73,7 @@ export function CardioEditor({
       decimalScale={field.decimalScale}
       hideControls
       disabled={disabled}
+      onFocus={(event) => event.currentTarget.select()}
       placeholder="–"
       onChange={(value) => onChange({ [field.key]: toOptionalNumber(value) })}
     />

@@ -6,8 +6,9 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { useClickOutside } from "@mantine/hooks";
 import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { type FocusEvent, useState } from "react";
 import { CardioEditor } from "./CardioEditor";
 import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
 import { SetRowSkeleton } from "./SetRowSkeleton";
@@ -18,6 +19,17 @@ import { ExerciseName } from "../exercise/ExerciseName";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
 import { exerciseKindOf, type ExerciseLog } from "../../store/db";
 import { t } from "../../i18n/translations";
+
+const selectAll = (event: FocusEvent<HTMLInputElement>) =>
+  event.currentTarget.select();
+
+const focusOnAttach = (input: HTMLInputElement | null) => {
+  input?.focus();
+};
+
+/** While editing, show 0 as empty so clearing a field doesn't put 0 back. */
+const showValue = (value: number, disabled: boolean) =>
+  !disabled && value === 0 ? "" : value;
 
 interface Props {
   exerciseLog: ExerciseLog;
@@ -58,6 +70,13 @@ export function ExerciseEditor({
   const isCardio = exerciseKindOf(exerciseLog) === "cardio";
   // Locked unless this exercise is the active one and its edit toggle is on.
   const cardioLocked = !cardioEditing || !editable;
+  const editingSet = editable && activeSetId !== null;
+  const activeRowRef = useClickOutside<HTMLDivElement>(
+    () => setActiveSetId(null),
+    null,
+    undefined,
+    editingSet,
+  );
 
   const onSetEditable = (exerciseId: number, setId: number) => {
     if (setId === activeSetId) {
@@ -67,6 +86,14 @@ export function ExerciseEditor({
 
     onEditExercise(exerciseId);
     setActiveSetId(setId);
+  };
+
+  const onDeleteSet = (setId: number) => {
+    if (setId === activeSetId) {
+      setActiveSetId(null);
+    }
+
+    deleteSet(setId);
   };
 
   const toggleCardioEditing = () => {
@@ -112,7 +139,6 @@ export function ExerciseEditor({
         />
       ) : (
         <>
-          {/* Sets still loading: new exercises start with one set. */}
           {(!sets || sets.length > 0) && (
             <Group gap="xs" wrap="nowrap" className="-mb-1">
               <div className="w-5 shrink-0" />
@@ -133,24 +159,33 @@ export function ExerciseEditor({
             const disabled = activeSetId !== set.id || !editable;
 
             return (
-              <Group key={set.id} gap="xs" wrap="nowrap" align="center">
+              <Group
+                key={set.id}
+                ref={disabled ? undefined : activeRowRef}
+                gap="xs"
+                wrap="nowrap"
+                align="center"
+              >
                 <Text size="sm" c="dimmed" className="w-5 shrink-0">
                   {index + 1}
                 </Text>
                 <NumberInput
+                  ref={disabled ? undefined : focusOnAttach}
                   className="flex-1"
-                  value={set.weight}
+                  value={showValue(set.weight, disabled)}
                   min={0}
                   disabled={disabled}
+                  onFocus={selectAll}
                   onChange={(weight) => updateSetWeight(Number(weight), set.id)}
                   placeholder={t.sets.weight}
                   inputMode="decimal"
                 />
                 <NumberInput
                   className="flex-1"
-                  value={set.reps}
+                  value={showValue(set.reps, disabled)}
                   min={0}
                   disabled={disabled}
+                  onFocus={selectAll}
                   onChange={(reps) => updateSetReps(Number(reps), set.id)}
                   placeholder={t.sets.reps}
                   inputMode="numeric"
@@ -169,12 +204,10 @@ export function ExerciseEditor({
                     color="red"
                     size="lg"
                     aria-label={
-                      canDeleteSet
-                        ? t.sets.removeSet
-                        : t.sets.cantRemoveOnlySet
+                      canDeleteSet ? t.sets.removeSet : t.sets.cantRemoveOnlySet
                     }
                     disabled={!canDeleteSet}
-                    onClick={() => deleteSet(set.id)}
+                    onClick={() => onDeleteSet(set.id)}
                   >
                     <IconTrash size={18} />
                   </ActionIcon>
@@ -188,7 +221,7 @@ export function ExerciseEditor({
             size="sm"
             className="self-end mt-3"
             leftSection={<IconPlus size={16} />}
-            disabled={!sets}
+            disabled={!sets || editingSet}
             onClick={() => addActiveSet()}
           >
             {t.sets.addSet}

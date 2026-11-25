@@ -77,6 +77,17 @@ kit) for something the stack above already handles.
   several deletes in a row can each be undone. Deleting a whole record
   (session, template) asks for confirmation instead.
 
+  **Don't reach for `useEffect` to react to your own state changes.** If
+  something should happen because the user did something (focus an input,
+  reset a field, save), do it in that event handler or in a callback ref —
+  not in an effect that watches the state the handler set. Derive values
+  during render instead of syncing them into state with an effect. Effects
+  are only for syncing with outside systems (timers, subscriptions, browser
+  APIs). Example: to focus a set's weight input when it's unlocked, pass a
+  module-level callback ref (`ref={disabled ? undefined : focusOnAttach}`);
+  React calls it when the input becomes the active one, and its stable
+  identity means re-renders don't refocus.
+
   Small UI-only state that no other page needs (e.g. which set row is being
   edited) can stay in the component.
 - Event handlers are named `on<Thing>` or `handle<Thing>` (`onEditExercise`,
@@ -186,6 +197,14 @@ kit) for something the stack above already handles.
 - `camelCase` for variables/functions, `PascalCase` for components/types/interfaces.
 - Keep imports grouped: external packages first, then local modules (`../store/db`,
   `../hooks/...`).
+- **Comment sparingly.** Code should explain itself through clear names and small
+  functions, so don't add comments that restate what the code does
+  (`// Select the value on focus` above `onFocus={selectAll}`), and don't add doc
+  comments to every helper or prop. Comment only what a reader couldn't easily
+  work out from the code: a non-obvious *why*, a workaround for a library or
+  browser quirk, or a subtle constraint (e.g. why a callback ref is defined at
+  module level). If a comment seems needed to explain *what* the code does,
+  rename or restructure the code first.
 - Prefer small, pure helper functions and early returns over deeply nested conditionals.
 - **Every `if` uses braces**, including one-line early returns, and is **followed by
   an empty line** before the next statement (no blank line needed when the `if` is the
