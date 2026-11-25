@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import { IconCheck, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
-import { type FocusEvent, useRef, useState } from "react";
+import { type FocusEvent, type KeyboardEvent, useRef, useState } from "react";
 import { CardioEditor } from "./CardioEditor";
 import { PreviousPerformanceHint } from "./PreviousPerformanceHint";
 import { SetRowSkeleton } from "./SetRowSkeleton";
@@ -91,6 +91,15 @@ export function ExerciseEditor({
 
     onEditExercise(exerciseId);
     setActiveSetId(setId);
+  };
+
+  const finishSetOnEnter = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    event.currentTarget.blur();
+    setActiveSetId(null);
   };
 
   const onDeleteSet = (setId: number) => {
@@ -184,6 +193,7 @@ export function ExerciseEditor({
                   onChange={(weight) => updateSetWeight(Number(weight), set.id)}
                   placeholder={t.sets.weight}
                   inputMode="decimal"
+                  enterKeyHint="next"
                 />
                 <NumberInput
                   className="flex-1"
@@ -194,6 +204,8 @@ export function ExerciseEditor({
                   onChange={(reps) => updateSetReps(Number(reps), set.id)}
                   placeholder={t.sets.reps}
                   inputMode="numeric"
+                  enterKeyHint="done"
+                  onKeyDown={finishSetOnEnter}
                 />
                 <ActionIcon
                   variant="subtle"
