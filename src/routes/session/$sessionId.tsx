@@ -61,12 +61,11 @@ export const Route = createFileRoute("/session/$sessionId")({
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
-  const numericSessionId = Number(sessionId);
-  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
+  const [activeExerciseId, setActiveExerciseId] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const { undoOffers, offerUndo, undo, dismissUndo } = useUndo();
   const { deleteExercise, handleSelectExercise } = useExercise({
-    sessionId: numericSessionId,
+    sessionId: sessionId,
     onAdded: close,
     onDeleted: offerUndo,
   });
@@ -91,7 +90,7 @@ function SessionPage() {
     openFinishTime,
     closeFinishTime,
     saveFinishedAt,
-  } = useWorkoutSession(numericSessionId, { onFinished: stopRest });
+  } = useWorkoutSession(sessionId, { onFinished: stopRest });
   const findExercise = useExerciseLookup();
   const [sessionMode, toggleSessionMode] = useToggle([
     "default",
@@ -100,30 +99,22 @@ function SessionPage() {
 
   const sessionEditable = sessionMode === "edit";
 
-  const onEditExercise = (id: number) => {
+  const onEditExercise = (id: string) => {
     setActiveExerciseId(id);
   };
 
   // `null` once loaded if there is no such session (e.g. it was deleted), so
   // the page can say so instead of showing the skeleton forever.
-  const session = useLiveQuery(async () => {
-    if (!Number.isInteger(numericSessionId)) {
-      return null;
-    }
+  const session = useLiveQuery(
+    async () => (await db.sessions.get(sessionId)) ?? null,
+    [sessionId],
+  );
 
-    return (await db.workoutSessions.get(numericSessionId)) ?? null;
-  }, [numericSessionId]);
-
-  const exerciseLogs = useLiveQuery(async () => {
-    if (!numericSessionId) {
-      return [];
-    }
-
-    return await db.exerciseLogs
-      .where("sessionId")
-      .equals(numericSessionId)
-      .toArray();
-  }, [numericSessionId]);
+  const exerciseLogs = useLiveQuery(
+    () =>
+      db.sessionExercises.where("sessionId").equals(sessionId).sortBy("order"),
+    [sessionId],
+  );
 
   const previousPerformance = usePreviousPerformance(
     session ?? undefined,
@@ -158,7 +149,7 @@ function SessionPage() {
 
   // Quick workouts are started without a template and built up as you go, so
   // they always offer "Add exercise" and can be saved as a template.
-  const isQuickWorkout = session.workoutTemplateId == null;
+  const isQuickWorkout = session.templateId == null;
   const canSaveAsTemplate = isQuickWorkout && exerciseLogs.length > 0;
   const canAddExercise =
     sessionEditable || isQuickWorkout || exerciseLogs.length === 0;
@@ -267,7 +258,7 @@ function SessionPage() {
                   previousPerformanceKey(exercise),
                 )}
                 details={findExercise(exercise.name)}
-                sessionId={numericSessionId}
+                sessionId={sessionId}
                 editable={activeExerciseId === exercise.id}
                 sessionEditable={sessionEditable}
                 onEditExercise={onEditExercise}

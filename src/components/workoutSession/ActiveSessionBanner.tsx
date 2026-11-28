@@ -9,7 +9,7 @@ interface Props {
   session: WorkoutSession;
   exerciseCount: number;
   elapsedMinutes: number;
-  templateColorById: Map<number, string>;
+  templateColorById: Map<string, string>;
 }
 
 export function ActiveSessionBanner({
@@ -34,7 +34,7 @@ export function ActiveSessionBanner({
           </Text>
           <Link
             to="/session/$sessionId"
-            params={{ sessionId: session.id.toString() }}
+            params={{ sessionId: session.id }}
             className="block truncate font-semibold outline-none after:absolute after:inset-0 after:rounded-(--mantine-radius-lg) focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-(--mantine-primary-color-filled)"
           >
             {session.name}

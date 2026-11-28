@@ -26,6 +26,7 @@ import {
   type WorkoutTemplateFormValues,
 } from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
 import { db } from "../../store/db";
+import { newId } from "../../utils/ids";
 import { INDICATOR_COLORS, randomIndicatorColor } from "../../utils/colors";
 import { t } from "../../i18n/translations";
 
@@ -68,22 +69,19 @@ function NewWorkoutTemplate() {
   }: WorkoutTemplateFormValues) => {
     await db.transaction(
       "rw",
-      db.workoutTemplates,
-      db.exerciseTemplates,
+      db.templates,
+      db.templateExercises,
       async () => {
-        const templateId = await db.workoutTemplates.add({
+        const templateId = await db.templates.add({
+          id: newId(),
           name,
           createdAt: new Date().toISOString(),
           indicatorColor,
         });
-
-        if (!templateId) {
-          throw new Error("Failed to create template");
-        }
-
-        await db.exerciseTemplates.bulkAdd(
+        await db.templateExercises.bulkAdd(
           exercises.map((exercise, index) => ({
-            workoutTemplateId: templateId,
+            id: newId(),
+            templateId,
             name: exercise.name,
             kind: exercise.kind,
             order: index,

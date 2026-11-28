@@ -33,7 +33,7 @@ kit) for something the stack above already handles.
   those interfaces everywhere instead of re-declaring object shapes.
 - Type component props with a local `interface Props { ... }` and destructure them in
   the function signature.
-- Use **type-only imports** for types (`import { type ExerciseLog }` or
+- Use **type-only imports** for types (`import { type SessionExercise }` or
   `import type { WorkoutSession }`) — `verbatimModuleSyntax` requires it.
 - Prefer `as const` tuples for fixed option sets (e.g. the `useToggle(["default",
   "edit"] as const)` session-mode pattern) so the values stay literal-typed.
@@ -109,9 +109,14 @@ kit) for something the stack above already handles.
   (`src/i18n/translations.ts`), which must be read synchronously before the
   first render.
 - Read reactive data with **`useLiveQuery`** so the UI updates automatically. Pass a
-  correct dependency array (e.g. `[numericSessionId]`) just like React hooks.
+  correct dependency array (e.g. `[sessionId]`) just like React hooks.
 - Every DB operation is **`async`/`await`**. Mutation helpers return the new record id
-  (`add` result) when callers need it.
+  when callers need it.
+- **Ids are string UUIDs created on the device**: every new row gets
+  `id: newId()` (`src/utils/ids.ts`) — never an auto-increment key, so rows
+  made offline on different devices can't collide. Ids don't sort by creation
+  time: order lists explicitly (`sortBy("order")`, by date or `createdAt`),
+  never by relying on primary-key order.
 - Group **multi-table writes in a `db.transaction("rw", ...)`** (see
   `workout/new.tsx`) so related rows commit atomically.
 - Put mutation logic in **custom hooks** under `src/hooks/` (`useExercise`,
@@ -121,8 +126,8 @@ kit) for something the stack above already handles.
   plus `hooks/home/` for the home page's combined overview query.
 - When updating the schema, add a **new `db.version(n).stores({...})`** migration — do
   not edit an existing version block.
-- Exercises are either **strength** (sets of weight × reps in `setLogs`) or
-  **cardio** (`durationMinutes`/`distanceKm` on the `ExerciseLog`, no sets). The
+- Exercises are either **strength** (sets of weight × reps in `sessionSets`) or
+  **cardio** (`durationMinutes`/`distanceKm` on the `SessionExercise`, no sets). The
   `kind` field is optional on stored rows (older data has none), so always read
   it through **`exerciseKindOf(...)`** rather than `exercise.kind`, and copy it
   along when an exercise moves from library → template → session.
@@ -140,10 +145,10 @@ kit) for something the stack above already handles.
 - `index.html` holds only the theme (dark background, `color-scheme`, Mantine's
   color-scheme attribute) so nothing flashes white before the JS loads — no
   markup; all structure is rendered by React.
-- Read URL params via `Route.useParams()`, and **convert numeric id params with
-  `Number(...)`** into a `numericXId` before using them in queries.
-- Navigate with the typed `Link` component or `useNavigate()`; pass `params` as strings
-  (`id.toString()`). Do not hand-build URL strings.
+- Read URL params via `Route.useParams()`; id params are the row ids as they are
+  (string UUIDs), so use them in queries directly.
+- Navigate with the typed `Link` component or `useNavigate()`; pass ids as `params`
+  directly. Do not hand-build URL strings.
 
 ## Styling
 
@@ -223,7 +228,7 @@ kit) for something the stack above already handles.
     return;
   }
 
-  await db.workoutSessions.update(session.id, changes);
+  await db.sessions.update(session.id, changes);
   ```
 
 - **Build `Map`s (and `Set`s) declaratively** by passing an array of entries to the
@@ -246,6 +251,10 @@ kit) for something the stack above already handles.
 - Run **`npm run lint`** (ESLint: JS recommended + typescript-eslint + react-hooks +
   react-refresh) and fix all errors.
 - Run **`npm run build`** (`tsc -b && vite build`) — it must pass with no type errors.
+- Run **`npm test`** (Vitest; tests sit next to the code as `*.test.ts`). On
+  Windows, run it from a path with an uppercase drive letter (`C:\Code\…`):
+  from `c:\…` Vitest loads its runner twice and every file fails with
+  "Cannot read properties of undefined (reading 'config')".
 - Keep components compatible with the **React Compiler**: follow the Rules of React (no
   mutating props/state, no conditional hooks) so auto-memoization stays valid.
 - Do not commit generated or ignored files (`dist`, `node_modules`, `*.local`).

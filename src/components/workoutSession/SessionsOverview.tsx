@@ -9,7 +9,7 @@ import { t } from "../../i18n/translations";
 interface Props {
   /** All sessions, newest first. */
   sessions: WorkoutSession[];
-  templateColorById: Map<number, string>;
+  templateColorById: Map<string, string>;
 }
 
 const routeApi = getRouteApi("/");
@@ -21,10 +21,10 @@ export function SessionsOverview({ sessions, templateColorById }: Props) {
   const { month } = routeApi.useSearch();
   const displayedMonth = month ?? dayjs().format("YYYY-MM");
 
-  const openSession = (sessionId: number) =>
+  const openSession = (sessionId: string) =>
     navigate({
       to: "/session/$sessionId",
-      params: { sessionId: sessionId.toString() },
+      params: { sessionId: sessionId },
     });
 
   if (!sessions.length) {

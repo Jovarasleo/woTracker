@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { db } from "../../store/db";
-import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
+import { newId } from "../../utils/ids";
+import type { TemplateExercise, WorkoutTemplate } from "../../store/db";
 import type { WorkoutTemplateFormValues } from "./useWorkoutTemplateForm";
 
 /**
@@ -11,7 +12,7 @@ import type { WorkoutTemplateFormValues } from "./useWorkoutTemplateForm";
  */
 export function useTemplateEditor(
   template: WorkoutTemplate,
-  exercises: ExerciseTemplate[],
+  exercises: TemplateExercise[],
 ) {
   const [indicatorColor, setIndicatorColor] = useState(template.indicatorColor);
 
@@ -29,27 +30,28 @@ export function useTemplateEditor(
 
     await db.transaction(
       "rw",
-      db.workoutTemplates,
-      db.exerciseTemplates,
+      db.templates,
+      db.templateExercises,
       async () => {
-        await db.workoutTemplates.update(template.id, {
+        await db.templates.update(template.id, {
           name: values.name,
           indicatorColor,
         });
 
         if (removedIds.length) {
-          await db.exerciseTemplates.bulkDelete(removedIds);
+          await db.templateExercises.bulkDelete(removedIds);
         }
 
         await Promise.all(
           values.exercises.map((exercise, index) =>
             exercise.templateExerciseId != null
-              ? db.exerciseTemplates.update(exercise.templateExerciseId, {
+              ? db.templateExercises.update(exercise.templateExerciseId, {
                   name: exercise.name,
                   order: index,
                 })
-              : db.exerciseTemplates.add({
-                  workoutTemplateId: template.id,
+              : db.templateExercises.add({
+                  id: newId(),
+                  templateId: template.id,
                   name: exercise.name,
                   kind: exercise.kind,
                   order: index,

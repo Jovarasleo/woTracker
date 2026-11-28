@@ -4,7 +4,7 @@
 
 import {
   exerciseKindOf,
-  type CustomExercise,
+  type UserExercise,
   type ExerciseKind,
 } from "../store/db";
 
@@ -74,7 +74,7 @@ export function fromCatalogExercise(
   };
 }
 
-export function fromCustomExercise(exercise: CustomExercise): LibraryExercise {
+export function fromCustomExercise(exercise: UserExercise): LibraryExercise {
   return {
     key: `custom-${exercise.id}`,
     source: "custom",

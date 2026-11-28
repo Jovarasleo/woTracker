@@ -37,7 +37,7 @@ export function TemplateCard({ summary, onEdit, onDelete }: Props) {
         <div className="min-w-0 flex-1">
           <Link
             to="/workout/$templateId"
-            params={{ templateId: template.id.toString() }}
+            params={{ templateId: template.id }}
             tabIndex={0}
             className="block truncate text-lg font-semibold outline-none after:absolute after:inset-0 after:rounded-(--mantine-radius-lg) focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-(--mantine-primary-color-filled)"
           >

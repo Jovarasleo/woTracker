@@ -24,6 +24,7 @@ import { WorkoutSkeleton } from "../../components/workoutTemplate/WorkoutSkeleto
 import { useExerciseLookup } from "../../hooks/exercise/useExerciseLookup";
 import { useExercise } from "../../hooks/workoutSession/useExercise";
 import { db, exerciseKindOf } from "../../store/db";
+import { newId } from "../../utils/ids";
 import { formatDate } from "../../utils/dates";
 import { t } from "../../i18n/translations";
 
@@ -34,32 +35,31 @@ export const Route = createFileRoute("/workout/$templateId")({
 function WorkoutPage() {
   const navigate = useNavigate();
   const { templateId } = Route.useParams();
-  const numericTemplateId = Number(templateId);
   const { addExercise } = useExercise();
   const findExercise = useExerciseLookup();
   const [starting, setStarting] = useState(false);
 
   const template = useLiveQuery(
-    () => db.workoutTemplates.get(numericTemplateId),
-    [numericTemplateId],
+    () => db.templates.get(templateId),
+    [templateId],
   );
 
   const exerciseTemplates = useLiveQuery(
     () =>
-      db.exerciseTemplates
-        .where("workoutTemplateId")
-        .equals(numericTemplateId)
+      db.templateExercises
+        .where("templateId")
+        .equals(templateId)
         .sortBy("order"),
-    [numericTemplateId],
+    [templateId],
   );
 
   const sessions = useLiveQuery(
     () =>
-      db.workoutSessions
-        .where("workoutTemplateId")
-        .equals(numericTemplateId)
+      db.sessions
+        .where("templateId")
+        .equals(templateId)
         .toArray(),
-    [numericTemplateId],
+    [templateId],
   );
 
   const startSession = async () => {
@@ -74,14 +74,15 @@ function WorkoutPage() {
     const newSessionId = await db
       .transaction(
         "rw",
-        db.workoutSessions,
-        db.exerciseLogs,
-        db.setLogs,
+        db.sessions,
+        db.sessionExercises,
+        db.sessionSets,
         async () => {
-          const sessionId = await db.workoutSessions.add({
+          const sessionId = await db.sessions.add({
+            id: newId(),
             name: template.name,
             date: new Date().toISOString(),
-            workoutTemplateId: template.id,
+            templateId: template.id,
             indicatorColor: template.indicatorColor,
           });
 
@@ -91,7 +92,7 @@ function WorkoutPage() {
               {
                 name: exerciseTemplate.name,
                 kind: exerciseKindOf(exerciseTemplate),
-                exerciseTemplateId: exerciseTemplate.id,
+                templateExerciseId: exerciseTemplate.id,
               },
               sessionId,
             );
@@ -104,7 +105,7 @@ function WorkoutPage() {
 
     navigate({
       to: "/session/$sessionId",
-      params: { sessionId: newSessionId.toString() },
+      params: { sessionId: newSessionId },
       replace: true,
     });
   };

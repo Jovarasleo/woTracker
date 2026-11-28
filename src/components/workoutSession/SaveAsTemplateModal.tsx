@@ -1,12 +1,12 @@
 import { Modal } from "@mantine/core";
 import { SaveAsTemplateForm } from "./SaveAsTemplateForm";
-import { exerciseKindOf, type ExerciseLog } from "../../store/db";
+import { exerciseKindOf, type SessionExercise } from "../../store/db";
 import { t } from "../../i18n/translations";
 
 interface Props {
   opened: boolean;
   defaultName: string;
-  exerciseLogs: ExerciseLog[];
+  exerciseLogs: SessionExercise[];
   onClose: () => void;
   onSave: (name: string) => Promise<void>;
 }

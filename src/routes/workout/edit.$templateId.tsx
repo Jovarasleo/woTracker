@@ -27,7 +27,7 @@ import {
   WORKOUT_NAME_MAX_LENGTH,
   type WorkoutTemplateFormValues,
 } from "../../hooks/workoutTemplate/useWorkoutTemplateForm";
-import type { ExerciseTemplate, WorkoutTemplate } from "../../store/db";
+import type { TemplateExercise, WorkoutTemplate } from "../../store/db";
 import { db, exerciseKindOf } from "../../store/db";
 import { INDICATOR_COLORS } from "../../utils/colors";
 import { t } from "../../i18n/translations";
@@ -38,20 +38,19 @@ export const Route = createFileRoute("/workout/edit/$templateId")({
 
 function EditTemplatePage() {
   const { templateId } = Route.useParams();
-  const numericTemplateId = Number(templateId);
 
   const template = useLiveQuery(
-    () => db.workoutTemplates.get(numericTemplateId),
-    [numericTemplateId],
+    () => db.templates.get(templateId),
+    [templateId],
   );
 
   const exerciseTemplates = useLiveQuery(
     () =>
-      db.exerciseTemplates
-        .where("workoutTemplateId")
-        .equals(numericTemplateId)
+      db.templateExercises
+        .where("templateId")
+        .equals(templateId)
         .sortBy("order"),
-    [numericTemplateId],
+    [templateId],
   );
 
   if (!template || !exerciseTemplates) {
@@ -75,7 +74,7 @@ function EditTemplatePage() {
 
 interface TemplateEditFormProps {
   template: WorkoutTemplate;
-  exercises: ExerciseTemplate[];
+  exercises: TemplateExercise[];
 }
 
 function TemplateEditForm({ template, exercises }: TemplateEditFormProps) {

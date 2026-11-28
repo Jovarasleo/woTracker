@@ -28,7 +28,7 @@ import {
 } from "../../data/exerciseCatalog";
 import { type CustomExerciseDraft } from "../../hooks/exercise/useCustomExercises";
 import { useExerciseCatalog } from "../../hooks/exercise/useExerciseCatalog";
-import { type CustomExercise } from "../../store/db";
+import { type UserExercise } from "../../store/db";
 import { CardioBadge } from "./CardioBadge";
 import { CustomExerciseForm } from "./CustomExerciseForm";
 import { ExerciseDetails } from "./ExerciseDetails";
@@ -39,7 +39,7 @@ const MAX_VISIBLE_RESULTS = 50;
 const PLACEHOLDER_NAME_WIDTHS = ["55%", "40%", "65%", "45%", "50%", "35%"];
 
 interface Props {
-  customExercises: CustomExercise[] | undefined;
+  customExercises: UserExercise[] | undefined;
   onSelectExercise: (exercise: LibraryExercise) => void;
   onCreateCustomExercise: (draft: CustomExerciseDraft) => void;
 }

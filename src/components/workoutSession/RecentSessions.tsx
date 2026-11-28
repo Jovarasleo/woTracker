@@ -9,8 +9,8 @@ import { t } from "../../i18n/translations";
 interface Props {
   /** Sessions to show, newest first. */
   sessions: WorkoutSession[];
-  templateColorById: Map<number, string>;
-  onSelectSession: (sessionId: number) => void;
+  templateColorById: Map<string, string>;
+  onSelectSession: (sessionId: string) => void;
 }
 
 export function RecentSessions({

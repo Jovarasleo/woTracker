@@ -16,7 +16,7 @@ import { t } from "../../i18n/translations";
 
 interface Props {
   templates: TemplateSummary[];
-  onDeleteTemplate: (templateId: number) => Promise<void>;
+  onDeleteTemplate: (templateId: string) => Promise<void>;
   onStartQuickWorkout: () => void;
   startingQuickWorkout: boolean;
 }
@@ -116,7 +116,7 @@ export function TemplatesOverview({
                 onEdit={() =>
                   navigate({
                     to: "/workout/edit/$templateId",
-                    params: { templateId: summary.template.id.toString() },
+                    params: { templateId: summary.template.id },
                   })
                 }
                 onDelete={() => setPendingDelete(summary)}

@@ -17,7 +17,7 @@ import { useExerciseLogEditor } from "../../hooks/workoutSession/useExerciseLogE
 import { type PreviousPerformance } from "../../hooks/workoutSession/usePreviousPerformance";
 import { ExerciseName } from "../exercise/ExerciseName";
 import { type LibraryExercise } from "../../data/exerciseCatalog";
-import { exerciseKindOf, type ExerciseLog } from "../../store/db";
+import { exerciseKindOf, type SessionExercise } from "../../store/db";
 import { t } from "../../i18n/translations";
 
 const selectAll = (event: FocusEvent<HTMLInputElement>) =>
@@ -47,12 +47,12 @@ const showValue = (value: number, disabled: boolean) =>
   !disabled && value === 0 ? "" : value;
 
 interface Props {
-  exerciseLog: ExerciseLog;
-  sessionId: number;
+  exerciseLog: SessionExercise;
+  sessionId: string;
   editable: boolean;
   sessionEditable: boolean;
-  onEditExercise: (exerciseId: number) => void;
-  onDeleteExercise: (exerciseId: number) => void;
+  onEditExercise: (exerciseId: string) => void;
+  onDeleteExercise: (exerciseId: string) => void;
   onSetDeleted: (action: UndoAction) => void;
   previous?: PreviousPerformance;
   details?: LibraryExercise;
@@ -68,7 +68,7 @@ export function ExerciseEditor({
   onDeleteExercise,
   onSetDeleted,
 }: Props) {
-  const [activeSetId, setActiveSetId] = useState<number | null>(null);
+  const [activeSetId, setActiveSetId] = useState<string | null>(null);
   const [cardioEditing, setCardioEditing] = useState(false);
   const {
     sets,
@@ -106,7 +106,7 @@ export function ExerciseEditor({
     editingSet,
   );
 
-  const onSetEditable = (exerciseId: number, setId: number) => {
+  const onSetEditable = (exerciseId: string, setId: string) => {
     if (setId === activeSetId) {
       stopEditingSet();
       return;
@@ -133,7 +133,7 @@ export function ExerciseEditor({
     stopEditingSet();
   };
 
-  const onDeleteSet = (setId: number) => {
+  const onDeleteSet = (setId: string) => {
     if (setId === activeSetId) {
       stopEditingSet();
     }

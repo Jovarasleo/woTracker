@@ -6,10 +6,10 @@ import { sessionIndicatorColor } from "../../utils/colors";
 
 interface Props {
   sessions: WorkoutSession[];
-  templateColorById: Map<number, string>;
+  templateColorById: Map<string, string>;
   /** Currently displayed month in `YYYY-MM` format (controlled). */
   month: string;
-  onSelectSession: (sessionId: number) => void;
+  onSelectSession: (sessionId: string) => void;
   onMonthChange: (month: string) => void;
 }
 

@@ -4,8 +4,8 @@ import {
   exerciseKindOf,
   type CardioMetrics,
   type ExerciseKind,
-  type ExerciseLog,
-  type SetLog,
+  type SessionExercise,
+  type SessionSet,
   type WorkoutSession,
 } from "../../store/db";
 import { hasCardioMetrics, pickCardioMetrics } from "../../utils/cardio";
@@ -13,7 +13,7 @@ import { hasCardioMetrics, pickCardioMetrics } from "../../utils/cardio";
 export type PreviousPerformance = {
   date: string;
 } & (
-  | { kind: "strength"; sets: SetLog[] }
+  | { kind: "strength"; sets: SessionSet[] }
   | { kind: "cardio"; metrics: CardioMetrics }
 );
 
@@ -28,7 +28,7 @@ export function previousPerformanceKey(exercise: {
   return `${exerciseKindOf(exercise)}:${exercise.name.trim().toLowerCase()}`;
 }
 
-const isFilledSet = (set: SetLog) => set.weight > 0 || set.reps > 0;
+const isFilledSet = (set: SessionSet) => set.weight > 0 || set.reps > 0;
 
 const byDate = (a: { date: string }, b: { date: string }) =>
   new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -41,7 +41,7 @@ const byDate = (a: { date: string }, b: { date: string }) =>
  */
 export function usePreviousPerformance(
   session: WorkoutSession | undefined,
-  exerciseLogs: ExerciseLog[] | undefined,
+  exerciseLogs: SessionExercise[] | undefined,
 ) {
   const sessionId = session?.id;
   const sessionDate = session?.date;
@@ -64,13 +64,13 @@ export function usePreviousPerformance(
     }
 
     const sessionTime = new Date(sessionDate).getTime();
-    const namedLogs = await db.exerciseLogs
+    const namedLogs = await db.sessionExercises
       .where("name")
       .anyOfIgnoreCase(names)
       .filter((log) => log.sessionId !== sessionId)
       .toArray();
 
-    const sessions = await db.workoutSessions.bulkGet([
+    const sessions = await db.sessions.bulkGet([
       ...new Set(namedLogs.map((log) => log.sessionId)),
     ]);
     const earlierSessionDateById = new Map(
@@ -86,8 +86,8 @@ export function usePreviousPerformance(
       return date ? [{ log, date }] : [];
     });
 
-    const strengthSets = await db.setLogs
-      .where("exerciseLogId")
+    const strengthSets = await db.sessionSets
+      .where("sessionExerciseId")
       .anyOf(
         candidates
           .filter(({ log }) => exerciseKindOf(log) === "strength")
@@ -97,7 +97,7 @@ export function usePreviousPerformance(
       .sortBy("setNumber");
 
     const toPerformance = (
-      log: ExerciseLog,
+      log: SessionExercise,
       date: string,
     ): PreviousPerformance | null => {
       if (exerciseKindOf(log) === "cardio") {
@@ -106,7 +106,7 @@ export function usePreviousPerformance(
           : null;
       }
 
-      const sets = strengthSets.filter((set) => set.exerciseLogId === log.id);
+      const sets = strengthSets.filter((set) => set.sessionExerciseId === log.id);
       return sets.length ? { date, kind: "strength", sets } : null;
     };
 

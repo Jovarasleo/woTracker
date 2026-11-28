@@ -2,24 +2,25 @@ import { useDisclosure } from "@mantine/hooks";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { db } from "../../store/db";
+import { newId } from "../../utils/ids";
 import { minutesBetween } from "../../utils/sessionStatus";
 import { useGoBack } from "../shared/useGoBack";
 
-const deleteSession = (sessionId: number) =>
+const deleteSession = (sessionId: string) =>
   db.transaction(
     "rw",
-    db.workoutSessions,
-    db.exerciseLogs,
-    db.setLogs,
+    db.sessions,
+    db.sessionExercises,
+    db.sessionSets,
     async () => {
-      const exerciseLogIds = await db.exerciseLogs
+      const sessionExerciseIds = await db.sessionExercises
         .where("sessionId")
         .equals(sessionId)
         .primaryKeys();
 
-      await db.setLogs.where("exerciseLogId").anyOf(exerciseLogIds).delete();
-      await db.exerciseLogs.bulkDelete(exerciseLogIds);
-      await db.workoutSessions.delete(sessionId);
+      await db.sessionSets.where("sessionExerciseId").anyOf(sessionExerciseIds).delete();
+      await db.sessionExercises.bulkDelete(sessionExerciseIds);
+      await db.sessions.delete(sessionId);
     },
   );
 
@@ -28,36 +29,38 @@ const deleteSession = (sessionId: number) =>
  * links the session and its exercises to it, as if the session had been
  * started from that template. The session takes the template's name.
  */
-const saveSessionAsTemplate = (sessionId: number, name: string) =>
+const saveSessionAsTemplate = (sessionId: string, name: string) =>
   db.transaction(
     "rw",
     [
-      db.workoutSessions,
-      db.workoutTemplates,
-      db.exerciseTemplates,
-      db.exerciseLogs,
+      db.sessions,
+      db.templates,
+      db.templateExercises,
+      db.sessionExercises,
     ],
     async () => {
-      const session = await db.workoutSessions.get(sessionId);
+      const session = await db.sessions.get(sessionId);
 
       if (!session) {
         throw new Error("Session not found");
       }
 
-      const exerciseLogs = await db.exerciseLogs
+      const exerciseLogs = await db.sessionExercises
         .where("sessionId")
         .equals(sessionId)
         .sortBy("order");
 
-      const templateId = await db.workoutTemplates.add({
+      const templateId = await db.templates.add({
+        id: newId(),
         name,
         createdAt: new Date().toISOString(),
         indicatorColor: session.indicatorColor,
       });
 
-      const exerciseTemplateIds = await db.exerciseTemplates.bulkAdd(
+      const templateExerciseIds = await db.templateExercises.bulkAdd(
         exerciseLogs.map((log, index) => ({
-          workoutTemplateId: templateId,
+          id: newId(),
+          templateId,
           name: log.name,
           kind: log.kind,
           order: index * 1000,
@@ -65,15 +68,15 @@ const saveSessionAsTemplate = (sessionId: number, name: string) =>
         { allKeys: true },
       );
 
-      await db.exerciseLogs.bulkUpdate(
+      await db.sessionExercises.bulkUpdate(
         exerciseLogs.map((log, index) => ({
           key: log.id,
-          changes: { exerciseTemplateId: exerciseTemplateIds[index] },
+          changes: { templateExerciseId: templateExerciseIds[index] },
         })),
       );
-      await db.workoutSessions.update(sessionId, {
+      await db.sessions.update(sessionId, {
         name,
-        workoutTemplateId: templateId,
+        templateId,
       });
     },
   );
@@ -83,7 +86,7 @@ interface Options {
 }
 
 export function useWorkoutSession(
-  sessionId: number,
+  sessionId: string,
   { onFinished }: Options = {},
 ) {
   const goBack = useGoBack();
@@ -116,21 +119,21 @@ export function useWorkoutSession(
   };
 
   const finishSession = async () => {
-    await db.workoutSessions.update(sessionId, {
+    await db.sessions.update(sessionId, {
       finishedAt: new Date().toISOString(),
     });
     onFinished?.();
   };
 
   const resumeSession = () =>
-    db.transaction("rw", db.workoutSessions, async () => {
-      const session = await db.workoutSessions.get(sessionId);
+    db.transaction("rw", db.sessions, async () => {
+      const session = await db.sessions.get(sessionId);
 
       if (!session?.finishedAt) {
         return;
       }
 
-      await db.workoutSessions.update(sessionId, {
+      await db.sessions.update(sessionId, {
         finishedAt: undefined,
         pausedMinutes:
           (session.pausedMinutes ?? 0) +
@@ -139,7 +142,7 @@ export function useWorkoutSession(
     });
 
   const saveFinishedAt = async (finishedAt: string) => {
-    await db.workoutSessions.update(sessionId, { finishedAt });
+    await db.sessions.update(sessionId, { finishedAt });
     finishTimeDialog.close();
   };
 

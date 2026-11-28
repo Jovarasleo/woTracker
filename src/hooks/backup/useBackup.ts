@@ -1,4 +1,8 @@
 import { db, type BackupFile } from "../../store/db";
+import {
+  remapLegacyTables,
+  type LegacyTables,
+} from "../../store/legacyMigration";
 import { t } from "../../i18n/translations";
 
 const BACKUP_APP_ID = "woTracker";
@@ -41,6 +45,45 @@ function backupFileName(prefix: string) {
  */
 function toDexieVersion(version: number, madeByApp: boolean) {
   return madeByApp ? version : version / 10;
+}
+
+const FIRST_UUID_VERSION = 10;
+
+const LEGACY_TABLE_NAMES = [
+  "workoutTemplates",
+  "exerciseTemplates",
+  "workoutSessions",
+  "exerciseLogs",
+  "setLogs",
+  "customExercises",
+] as const satisfies (keyof LegacyTables)[];
+
+function pickTables(
+  rawTables: Record<string, unknown>,
+  names: readonly string[],
+) {
+  return Object.fromEntries(
+    names.flatMap((name) => {
+      const rows = rawTables[name];
+      if (rows === undefined) {
+        return [];
+      }
+
+      if (!Array.isArray(rows) || !rows.every(isRecord)) {
+        throw new Error(t.backup.errors.malformedTable(name));
+      }
+
+      return [[name, rows]];
+    }),
+  );
+}
+
+// Rows are only checked to be objects, the same trust a current backup gets
+// when its rows go straight into the tables.
+function toLegacyTables(tables: BackupFile["tables"]) {
+  return Object.fromEntries(
+    LEGACY_TABLE_NAMES.map((name) => [name, tables[name] ?? []]),
+  ) as unknown as LegacyTables;
 }
 
 /**
@@ -90,24 +133,16 @@ export function useBackup() {
     }
 
     const dbVersion = typeof data.dbVersion === "number" ? data.dbVersion : 0;
-    if (toDexieVersion(dbVersion, data.app === BACKUP_APP_ID) > db.verno) {
+    const dexieVersion = toDexieVersion(dbVersion, data.app === BACKUP_APP_ID);
+    if (dexieVersion > db.verno) {
       throw new Error(t.backup.errors.newerVersion);
     }
 
-    const knownTables = new Set(db.tables.map((table) => table.name));
-    const tables: BackupFile["tables"] = {};
-
-    for (const [name, rows] of Object.entries(data.tables)) {
-      if (!knownTables.has(name)) {
-        continue;
-      }
-
-      if (!Array.isArray(rows) || !rows.every(isRecord)) {
-        throw new Error(t.backup.errors.malformedTable(name));
-      }
-
-      tables[name] = rows;
-    }
+    const isLegacy = dexieVersion < FIRST_UUID_VERSION;
+    const tables = pickTables(
+      data.tables,
+      isLegacy ? LEGACY_TABLE_NAMES : db.tables.map((table) => table.name),
+    );
 
     if (Object.keys(tables).length === 0) {
       throw new Error(t.backup.errors.noData);
@@ -117,8 +152,10 @@ export function useBackup() {
       app: BACKUP_APP_ID,
       exportedAt:
         typeof data.exportedAt === "string" ? data.exportedAt : "unknown",
-      dbVersion,
-      tables,
+      dbVersion: isLegacy ? db.verno : dbVersion,
+      tables: isLegacy
+        ? { ...remapLegacyTables(toLegacyTables(tables)) }
+        : tables,
     };
   };
 

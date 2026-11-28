@@ -1,4 +1,5 @@
 import { db } from "../store/db";
+import { newId } from "../utils/ids";
 
 interface SeedExercise {
   name: string;
@@ -229,11 +230,11 @@ export async function seedDevData(): Promise<SeedSummary> {
   await db.transaction(
     "rw",
     [
-      db.workoutTemplates,
-      db.exerciseTemplates,
-      db.workoutSessions,
-      db.exerciseLogs,
-      db.setLogs,
+      db.templates,
+      db.templateExercises,
+      db.sessions,
+      db.sessionExercises,
+      db.sessionSets,
     ],
     async () => {
       const createdAt = new Date();
@@ -241,16 +242,18 @@ export async function seedDevData(): Promise<SeedSummary> {
 
       const templates = await Promise.all(
         WORKOUTS.map(async (workout) => {
-          const templateId = await db.workoutTemplates.add({
+          const templateId = await db.templates.add({
+            id: newId(),
             name: workout.name,
             createdAt: createdAt.toISOString(),
             indicatorColor: workout.color,
           });
 
-          const exerciseTemplateIds = await Promise.all(
+          const templateExerciseIds = await Promise.all(
             workout.exercises.map((exercise, index) =>
-              db.exerciseTemplates.add({
-                workoutTemplateId: templateId,
+              db.templateExercises.add({
+                id: newId(),
+                templateId: templateId,
                 name: exercise.name,
                 kind: isCardio(exercise) ? "cardio" : "strength",
                 order: index * 1000,
@@ -258,19 +261,20 @@ export async function seedDevData(): Promise<SeedSummary> {
             ),
           );
 
-          return { workout, templateId, exerciseTemplateIds };
+          return { workout, templateId, templateExerciseIds };
         }),
       );
 
       for (let s = 0; s < sessionPlan.length; s++) {
         const plan = sessionPlan[s];
-        const { workout, templateId, exerciseTemplateIds } =
+        const { workout, templateId, templateExerciseIds } =
           templates[s % templates.length];
 
-        const sessionId = await db.workoutSessions.add({
+        const sessionId = await db.sessions.add({
+          id: newId(),
           name: workout.name,
           date: plan.date.toISOString(),
-          workoutTemplateId: templateId,
+          templateId: templateId,
           indicatorColor: workout.color,
         });
 
@@ -283,12 +287,13 @@ export async function seedDevData(): Promise<SeedSummary> {
               exercise.minuteRange[0],
               exercise.minuteRange[1],
             );
-            await db.exerciseLogs.add({
+            await db.sessionExercises.add({
+              id: newId(),
               sessionId,
               name: exercise.name,
               kind: "cardio",
               order: e * 1000,
-              exerciseTemplateId: exerciseTemplateIds[e],
+              templateExerciseId: templateExerciseIds[e],
               durationMinutes: minutes,
               distanceKm:
                 Math.round(minutes * exercise.kmPerMinute * 100) / 100,
@@ -299,20 +304,22 @@ export async function seedDevData(): Promise<SeedSummary> {
             continue;
           }
 
-          const exerciseLogId = await db.exerciseLogs.add({
+          const sessionExerciseId = await db.sessionExercises.add({
+            id: newId(),
             sessionId,
             name: exercise.name,
             kind: "strength",
             order: e * 1000,
-            exerciseTemplateId: exerciseTemplateIds[e],
+            templateExerciseId: templateExerciseIds[e],
           });
 
           const sets = randInt(rng, 2, 3);
           const weight = computeWeight(exercise, plan.progress, rng);
 
           for (let setNumber = 1; setNumber <= sets; setNumber++) {
-            await db.setLogs.add({
-              exerciseLogId,
+            await db.sessionSets.add({
+              id: newId(),
+              sessionExerciseId,
               weight,
               reps: randInt(rng, exercise.repRange[0], exercise.repRange[1]),
               setNumber,
@@ -335,19 +342,19 @@ export async function clearAllData(): Promise<void> {
   await db.transaction(
     "rw",
     [
-      db.workoutTemplates,
-      db.exerciseTemplates,
-      db.workoutSessions,
-      db.exerciseLogs,
-      db.setLogs,
+      db.templates,
+      db.templateExercises,
+      db.sessions,
+      db.sessionExercises,
+      db.sessionSets,
     ],
     async () => {
       await Promise.all([
-        db.workoutTemplates.clear(),
-        db.exerciseTemplates.clear(),
-        db.workoutSessions.clear(),
-        db.exerciseLogs.clear(),
-        db.setLogs.clear(),
+        db.templates.clear(),
+        db.templateExercises.clear(),
+        db.sessions.clear(),
+        db.sessionExercises.clear(),
+        db.sessionSets.clear(),
       ]);
     },
   );

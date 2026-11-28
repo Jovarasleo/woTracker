@@ -2,7 +2,7 @@ import type { CardioMetrics } from "../store/db";
 import { t } from "../i18n/translations";
 
 /**
- * Copies only the cardio fields off a record (e.g. an `ExerciseLog`). The one
+ * Copies only the cardio fields off a record (e.g. an `SessionExercise`). The one
  * place that lists every metric: add new ones here and to `CardioMetrics`.
  */
 export function pickCardioMetrics({

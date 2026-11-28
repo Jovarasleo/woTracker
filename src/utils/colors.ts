@@ -30,11 +30,11 @@ export function randomIndicatorColor(): string {
  */
 export function sessionIndicatorColor(
   session: WorkoutSession,
-  templateColorById: Map<number, string>,
+  templateColorById: Map<string, string>,
 ): string {
   const templateColor =
-    session.workoutTemplateId != null
-      ? templateColorById.get(session.workoutTemplateId)
+    session.templateId != null
+      ? templateColorById.get(session.templateId)
       : undefined;
   return templateColor ?? session.indicatorColor;
 }

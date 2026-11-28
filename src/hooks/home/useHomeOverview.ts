@@ -17,11 +17,14 @@ export interface HomeOverview {
   unfinished?: UnfinishedSession;
   /** All sessions, newest first. */
   sessions: WorkoutSession[];
-  templateColorById: Map<number, string>;
+  templateColorById: Map<string, string>;
 }
 
 const byNewestDate = (a: WorkoutSession, b: WorkoutSession) =>
   new Date(b.date).getTime() - new Date(a.date).getTime();
+
+const byCreatedAt = (a: WorkoutTemplate, b: WorkoutTemplate) =>
+  new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 
 /**
  * Reads everything the home page shows: templates with their exercise counts
@@ -31,17 +34,18 @@ const byNewestDate = (a: WorkoutSession, b: WorkoutSession) =>
  */
 export async function loadHomeOverview(): Promise<HomeOverview> {
   const [templates, exerciseTemplates, sessions] = await Promise.all([
-    db.workoutTemplates.toArray(),
-    db.exerciseTemplates.toArray(),
-    db.workoutSessions.toArray(),
+    db.templates.toArray(),
+    db.templateExercises.toArray(),
+    db.sessions.toArray(),
   ]);
 
+  templates.sort(byCreatedAt);
   sessions.sort(byNewestDate);
 
   const unfinishedSession = sessions.find((session) => !session.finishedAt);
   const unfinished = unfinishedSession && {
     session: unfinishedSession,
-    exerciseCount: await db.exerciseLogs
+    exerciseCount: await db.sessionExercises
       .where("sessionId")
       .equals(unfinishedSession.id)
       .count(),
@@ -51,7 +55,7 @@ export async function loadHomeOverview(): Promise<HomeOverview> {
     templates.map((template) => [
       template.id,
       exerciseTemplates.filter(
-        (exercise) => exercise.workoutTemplateId === template.id,
+        (exercise) => exercise.templateId === template.id,
       ).length,
     ]),
   );
@@ -62,9 +66,9 @@ export async function loadHomeOverview(): Promise<HomeOverview> {
     [...sessions]
       .reverse()
       .flatMap((session) =>
-        session.workoutTemplateId == null
+        session.templateId == null
           ? []
-          : [[session.workoutTemplateId, session.date] as const],
+          : [[session.templateId, session.date] as const],
       ),
   );
 
@@ -86,17 +90,17 @@ export function useHomeOverview(initialOverview: HomeOverview) {
   const overview = useLiveQuery(loadHomeOverview, [], initialOverview);
 
   /** Deletes a template and its exercises. Past sessions are kept. */
-  const deleteTemplate = async (templateId: number) => {
+  const deleteTemplate = async (templateId: string) => {
     await db.transaction(
       "rw",
-      db.workoutTemplates,
-      db.exerciseTemplates,
+      db.templates,
+      db.templateExercises,
       async () => {
-        await db.exerciseTemplates
-          .where("workoutTemplateId")
+        await db.templateExercises
+          .where("templateId")
           .equals(templateId)
           .delete();
-        await db.workoutTemplates.delete(templateId);
+        await db.templates.delete(templateId);
       },
     );
   };

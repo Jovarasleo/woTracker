@@ -13,7 +13,7 @@ export const WORKOUT_NAME_MAX_LENGTH = 50;
 
 export interface TemplateExerciseValue {
   /** Id of the stored exercise template; absent for newly added ones. */
-  templateExerciseId?: number;
+  templateExerciseId?: string;
   name: string;
   kind: ExerciseKind;
 }
@@ -44,7 +44,7 @@ const exerciseNameRules = (): RegisterOptions<
  */
 export function useWorkoutTemplateForm(
   defaultValues: WorkoutTemplateFormValues,
-  excludeTemplateId?: number,
+  excludeTemplateId?: string,
 ) {
   const {
     control,
@@ -103,7 +103,7 @@ export function useWorkoutTemplateForm(
 
   const otherNames = useLiveQuery(
     async () =>
-      (await db.workoutTemplates.toArray())
+      (await db.templates.toArray())
         .filter((template) => template.id !== excludeTemplateId)
         .map((template) => template.name.trim().toLowerCase()),
     [excludeTemplateId],
